@@ -1,0 +1,23 @@
+{
+  "name": "website_dr_wallace_victor",
+  "version": "1.0.0",
+  "description": "API para agendamento de consultas do Dr. Wallace Victor",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "appointments",
+    "express",
+    "mysql"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.9.7"
+  }
+}
