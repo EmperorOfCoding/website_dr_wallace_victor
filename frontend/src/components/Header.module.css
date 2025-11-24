@@ -1,0 +1,51 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  background: rgba(247, 251, 255, 0.9);
+  border-bottom: 1px solid #d9e4ff;
+}
+
+.inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.brand {
+  font-weight: 800;
+  color: #1f2a5a;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+}
+
+.nav {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.link {
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #1f2a5a;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.link:hover {
+  background: #e8eeff;
+}
+
+.active {
+  background: #3b5bfd;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(59, 91, 253, 0.2);
+}
