@@ -66,7 +66,7 @@ async function getAvailableTimes(date) {
   return slots.filter((slot) => !occupied.has(slot));
 }
 
-async function createAppointment({ patientId, date, time, typeId }) {
+async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled' }) {
   const connection = await pool.getConnection();
 
   try {
@@ -81,9 +81,14 @@ async function createAppointment({ patientId, date, time, typeId }) {
       throw new Error('CONFLICT');
     }
 
+    const [typeRows] = await connection.execute('SELECT id FROM appointment_types WHERE id = ?', [typeId]);
+    if (typeRows.length === 0) {
+      throw new Error('INVALID_TYPE');
+    }
+
     const [result] = await connection.execute(
-      'INSERT INTO appointments (patient_id, date, time, type_id) VALUES (?, ?, ?, ?)',
-      [patientId, date, time, typeId]
+      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status) VALUES (?, ?, ?, ?, ?, ?)',
+      [patientId, doctorId, date, time, typeId, status]
     );
 
     await connection.commit();

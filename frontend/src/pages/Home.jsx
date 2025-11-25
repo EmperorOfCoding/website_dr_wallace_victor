@@ -1,7 +1,18 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 import styles from './Home.module.css';
 
 export default function Home({ onNavigate }) {
+  const { isAuthenticated } = useAuth();
+
+  const handleAgendar = () => {
+    if (isAuthenticated) {
+      onNavigate('agendar');
+    } else {
+      onNavigate('login');
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
@@ -15,6 +26,13 @@ export default function Home({ onNavigate }) {
             <div className={styles.ctaRow}>
               <button type="button" className={styles.cta} onClick={() => onNavigate('servicos')}>
                 Ver serviços
+              </button>
+              <button
+                type="button"
+                className={`${styles.cta} ${styles.secondary}`}
+                onClick={handleAgendar}
+              >
+                Agendar consulta
               </button>
               <button type="button" className={`${styles.cta} ${styles.secondary}`} onClick={() => onNavigate('contato')}>
                 Falar com a clínica
