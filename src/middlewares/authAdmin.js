@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+﻿const jwt = require('jsonwebtoken');
 const patientService = require('../services/patientService');
 
 async function authAdmin(req, res, next) {
@@ -18,9 +18,10 @@ async function authAdmin(req, res, next) {
 
     const userId = payload.patient_id;
     const tokenRole = payload.role;
+    const doctorId = payload.doctor_id;
 
-    if (tokenRole === 'admin') {
-      req.user = { ...payload };
+    if (tokenRole === 'admin' && doctorId) {
+      req.user = { ...payload, doctor_id: doctorId };
       return next();
     }
 
@@ -29,7 +30,7 @@ async function authAdmin(req, res, next) {
       return res.status(403).json({ status: 'error', message: 'Acesso não autorizado.' });
     }
 
-    req.user = { ...payload, role: 'admin' };
+    req.user = { ...payload, doctor_id: doctorId || null };
     return next();
   } catch (error) {
     return res.status(500).json({ status: 'error', message: 'Erro de autorização.' });

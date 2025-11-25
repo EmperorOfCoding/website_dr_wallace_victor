@@ -99,7 +99,10 @@ CREATE TABLE IF NOT EXISTS admins (
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(50) NOT NULL DEFAULT 'admin',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  doctor_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_admins_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT uc_admin_doctor UNIQUE (doctor_id)
 ) ENGINE=InnoDB;
 
 -- ===========================================

@@ -1,4 +1,4 @@
-const adminAppointmentService = require('../services/adminAppointmentService');
+﻿const adminAppointmentService = require('../services/adminAppointmentService');
 const appointmentService = require('../services/appointmentService');
 const blockedTimeService = require('../services/blockedTimeService');
 
@@ -18,12 +18,13 @@ function isWithinWorkingHours(time) {
 async function listAppointments(req, res) {
   try {
     const { date, page = 1, limit = 10, patient: search = '' } = req.query || {};
+    const doctorId = req.user?.doctor_id;
 
     if (date && !isValidDate(date)) {
       return res.status(400).json({ status: 'error', message: 'Data inválida.' });
     }
 
-    const result = await adminAppointmentService.getAppointments({ date, page, limit, search });
+    const result = await adminAppointmentService.getAppointments({ date, page, limit, search, doctorId });
 
     const appointments = result.appointments.map((item) => ({
       appointment_id: item.appointment_id,
@@ -31,7 +32,8 @@ async function listAppointments(req, res) {
       time: item.time,
       type_id: item.type_id,
       patient_name: item.patient_name,
-      patient_email: item.patient_email
+      patient_email: item.patient_email,
+      doctor_id: item.doctor_id
     }));
 
     return res.status(200).json({

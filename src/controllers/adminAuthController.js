@@ -15,6 +15,9 @@ async function login(req, res) {
     if (admin === false) {
       return res.status(401).json({ status: 'error', message: 'Senha inválida.' });
     }
+    if (!admin.doctor_id) {
+      return res.status(400).json({ status: 'error', message: 'Administrador sem médico vinculado.' });
+    }
 
     const token = adminService.generateToken(admin);
     return res.status(200).json({
@@ -25,6 +28,7 @@ async function login(req, res) {
         name: admin.name,
         email: admin.email,
         role: admin.role || 'admin',
+        doctor_id: admin.doctor_id,
       },
     });
   } catch (error) {

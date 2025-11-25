@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+﻿const pool = require('../config/db');
 
 function normalizePagination(page = 1, limit = 10) {
   const safePage = Number.isNaN(Number(page)) ? 1 : Math.max(1, Number(page));
@@ -7,11 +7,16 @@ function normalizePagination(page = 1, limit = 10) {
   return { safePage, safeLimit, offset };
 }
 
-async function getAppointments({ date, page = 1, limit = 10, search = '' }) {
+async function getAppointments({ date, page = 1, limit = 10, search = '', doctorId }) {
   const { safePage, safeLimit, offset } = normalizePagination(page, limit);
 
   const params = [];
   const where = [];
+
+  if (doctorId) {
+    where.push('a.doctor_id = ?');
+    params.push(doctorId);
+  }
 
   if (date) {
     where.push('a.date = ?');
@@ -32,6 +37,7 @@ async function getAppointments({ date, page = 1, limit = 10, search = '' }) {
       a.date,
       a.time,
       a.type_id,
+      a.doctor_id,
       p.name AS patient_name,
       p.email AS patient_email
     FROM appointments a
