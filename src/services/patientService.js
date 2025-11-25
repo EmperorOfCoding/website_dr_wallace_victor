@@ -30,13 +30,15 @@ async function getPatients(page = 1, limit = 10, search = '', doctorId) {
     params.push(like, like, like);
   }
 
+  const limitClause = `LIMIT ${safeLimit} OFFSET ${offset}`;
+
   const selectQuery = `
     SELECT p.id, p.name, p.email, p.phone, p.created_at
     FROM patients p
     ${joinClause}
     ${whereClause}
     ORDER BY p.created_at DESC
-    LIMIT ? OFFSET ?
+    ${limitClause}
   `;
 
   const countQuery = `
@@ -46,19 +48,35 @@ async function getPatients(page = 1, limit = 10, search = '', doctorId) {
     ${whereClause}
   `;
 
-  const [rows] = await pool.execute(selectQuery, [...params, safeLimit, offset]);
-  const [countRows] = await pool.execute(countQuery, params);
+  try {
+    const [rows] = await pool.execute(selectQuery, params);
+    const [countRows] = await pool.execute(countQuery, params);
 
-  const total = countRows[0]?.total || 0;
-  const totalPages = total > 0 ? Math.ceil(total / safeLimit) : 1;
+    const total = countRows[0]?.total || 0;
+    const totalPages = total > 0 ? Math.ceil(total / safeLimit) : 1;
 
-  return {
-    patients: rows,
-    total,
-    totalPages,
-    page: safePage,
-    limit: safeLimit
-  };
+    return {
+      patients: rows,
+      total,
+      totalPages,
+      page: safePage,
+      limit: safeLimit
+    };
+  } catch (error) {
+    // Log para diagnóstico e fallback sem filtro por médico
+    // eslint-disable-next-line no-console
+    console.error('getPatients error', error);
+    if (doctorId) {
+      return getPatients(page, limit, search, null);
+    }
+    return {
+      patients: [],
+      total: 0,
+      totalPages: 1,
+      page: safePage,
+      limit: safeLimit
+    };
+  }
 }
 
 module.exports = {

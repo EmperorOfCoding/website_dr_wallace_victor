@@ -22,6 +22,8 @@ async function listPatients(req, res) {
       patients
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('listPatients error', error);
     return res.status(500).json({ status: 'error', message: 'Erro ao listar pacientes.' });
   }
 }

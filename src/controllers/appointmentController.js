@@ -82,6 +82,7 @@ async function listAppointments(req, res) {
     const appointments = await appointmentService.listAppointmentsByPatient(patientId);
     return res.status(200).json({ status: 'success', appointments });
   } catch (error) {
+    console.error("Erro em listAppointments: ", error);
     return res.status(500).json({ status: 'error', message: 'Erro ao consultar agendamentos.' });
   }
 }

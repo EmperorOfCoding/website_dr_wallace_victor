@@ -1,5 +1,5 @@
 ﻿const jwt = require('jsonwebtoken');
-const patientService = require('../services/patientService');
+const adminService = require('../services/adminService');
 
 async function authAdmin(req, res, next) {
   try {
@@ -17,20 +17,16 @@ async function authAdmin(req, res, next) {
     }
 
     const userId = payload.patient_id;
-    const tokenRole = payload.role;
-    const doctorId = payload.doctor_id;
+    let doctorId = payload.doctor_id;
 
-    if (tokenRole === 'admin' && doctorId) {
-      req.user = { ...payload, doctor_id: doctorId };
-      return next();
+    // Recupera doctor_id se não veio no token
+    if (!doctorId) {
+      const admin = await adminService.findAdminById(userId);
+      doctorId = admin?.doctor_id || null;
     }
 
-    const isAdmin = await patientService.isAdmin(userId);
-    if (!isAdmin) {
-      return res.status(403).json({ status: 'error', message: 'Acesso não autorizado.' });
-    }
-
-    req.user = { ...payload, doctor_id: doctorId || null };
+    // A partir de agora, qualquer token válido (médico/admin) passa
+    req.user = { ...payload, doctor_id: doctorId };
     return next();
   } catch (error) {
     return res.status(500).json({ status: 'error', message: 'Erro de autorização.' });

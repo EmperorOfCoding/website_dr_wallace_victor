@@ -31,6 +31,8 @@ async function getAppointments({ date, page = 1, limit = 10, search = '', doctor
 
   const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
+  const limitClause = `LIMIT ${safeLimit} OFFSET ${offset}`;
+
   const selectQuery = `
     SELECT
       a.id AS appointment_id,
@@ -44,7 +46,7 @@ async function getAppointments({ date, page = 1, limit = 10, search = '', doctor
     JOIN patients p ON p.id = a.patient_id
     ${whereClause}
     ORDER BY a.date, a.time
-    LIMIT ? OFFSET ?
+    ${limitClause}
   `;
 
   const countQuery = `
@@ -54,7 +56,7 @@ async function getAppointments({ date, page = 1, limit = 10, search = '', doctor
     ${whereClause}
   `;
 
-  const [rows] = await pool.execute(selectQuery, [...params, safeLimit, offset]);
+  const [rows] = await pool.execute(selectQuery, params);
   const [countRows] = await pool.execute(countQuery, params);
 
   const total = countRows[0]?.total || 0;
