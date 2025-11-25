@@ -8,33 +8,54 @@ import Agendar from './pages/Agendar';
 import MinhaAgenda from './pages/MinhaAgenda';
 import Perfil from './pages/Perfil';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
 
 // Navegação simples sem roteador: alterna a página atual pelo estado interno.
-export default function App() {
+function AppShell() {
+  const { isAuthenticated, logout } = useAuth();
   const [page, setPage] = useState('home');
+  const protectedPages = ['agendar', 'minha-agenda', 'perfil', 'dashboard'];
+
+  const handleNavigate = (target) => {
+    if (protectedPages.includes(target) && !isAuthenticated) {
+      setPage('login');
+    } else {
+      setPage(target);
+    }
+  };
 
   const CurrentPage = useMemo(() => {
-    if (page === 'sobre') return () => <Sobre />;
+    if (page === 'sobre') return () => <Sobre onNavigate={handleNavigate} />;
     if (page === 'servicos') return () => <Servicos />;
     if (page === 'contato') return () => <Contato />;
-    if (page === 'login') return () => <Login onNavigate={setPage} />;
-    if (page === 'cadastro') return () => <Register onNavigate={setPage} />;
-    if (page === 'agendar') return () => <Agendar onNavigate={setPage} />;
-    if (page === 'minha-agenda') return () => <MinhaAgenda onNavigate={setPage} />;
-    if (page === 'perfil') return () => <Perfil onNavigate={setPage} />;
-    return () => <Home onNavigate={setPage} />;
-  }, [page]);
+    if (page === 'login') return () => <Login onNavigate={handleNavigate} />;
+    if (page === 'cadastro') return () => <Register onNavigate={handleNavigate} />;
+    if (page === 'agendar') return () => <Agendar onNavigate={handleNavigate} />;
+    if (page === 'minha-agenda') return () => <MinhaAgenda onNavigate={handleNavigate} />;
+    if (page === 'perfil') return () => <Perfil onNavigate={handleNavigate} />;
+    if (page === 'dashboard') return () => <Dashboard onNavigate={handleNavigate} />;
+    return () => <Home onNavigate={handleNavigate} />;
+  }, [page, isAuthenticated]);
 
   return (
-    <AuthProvider>
-      <Header currentPage={page} onNavigate={setPage} />
+    <>
+      <Header currentPage={page} onNavigate={handleNavigate} isAuthenticated={isAuthenticated} onLogout={logout} />
       <main style={{ marginTop: '8px' }}>
         <CurrentPage />
       </main>
       <Footer />
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppShell />
     </AuthProvider>
   );
 }

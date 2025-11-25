@@ -15,7 +15,8 @@ function isWithinWorkingHours(time) {
 
 async function createAppointment(req, res) {
   try {
-    const { patient_id: patientId, date, time, type_id: typeId } = req.body || {};
+    const { patient_id: patientId, date, time, type_id: typeId, doctor_id: doctorId = 1, status = 'scheduled' } =
+      req.body || {};
 
     if (!patientId || !date || !time || !typeId) {
       return res.status(400).json({ status: 'error', message: 'Campos obrigatórios ausentes.' });
@@ -40,14 +41,14 @@ async function createAppointment(req, res) {
       return res.status(409).json({ status: 'error', message: 'Horário indisponível.' });
     }
 
-    const appointmentId = await appointmentService.createAppointment({ patientId, date, time, typeId });
+    const appointmentId = await appointmentService.createAppointment({ patientId, date, time, typeId, doctorId, status });
     return res.status(201).json({
       status: 'success',
       appointment_id: appointmentId,
       message: 'Consulta agendada com sucesso.'
     });
   } catch (error) {
-    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+    if (error.code === 'ER_NO_REFERENCED_ROW_2' || error.message === 'INVALID_TYPE') {
       return res.status(400).json({ status: 'error', message: 'Paciente ou tipo de consulta inválido.' });
     }
 

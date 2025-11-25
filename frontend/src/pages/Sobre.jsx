@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './Sobre.module.css';
+import { useAuth } from '../context/AuthContext';
 
 const formacao = [
   'Residência em Medicina de Família e Comunidade (USP) – enfoque em cuidado integral',
@@ -23,7 +24,17 @@ const experiencias = [
   }
 ];
 
-export default function Sobre() {
+export default function Sobre({ onNavigate }) {
+  const { isAuthenticated } = useAuth();
+
+  const handleAgendar = () => {
+    if (isAuthenticated) {
+      onNavigate('agendar');
+    } else {
+      onNavigate('login');
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
@@ -67,13 +78,7 @@ export default function Sobre() {
         </section>
 
         <div className={styles.ctaWrapper}>
-          <button
-            type="button"
-            className={styles.ctaButton}
-            onClick={() => {
-              window.location.href = '/agendar';
-            }}
-          >
+          <button type="button" className={styles.ctaButton} onClick={handleAgendar}>
             Agendar consulta
           </button>
         </div>

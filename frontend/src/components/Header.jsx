@@ -1,14 +1,25 @@
 import React from 'react';
 import styles from './Header.module.css';
 
-export default function Header({ currentPage, onNavigate }) {
+export default function Header({ currentPage, onNavigate, isAuthenticated, onLogout }) {
   const links = [
     { key: 'home', label: 'Home' },
     { key: 'sobre', label: 'Sobre' },
     { key: 'servicos', label: 'Serviços' },
-    { key: 'contato', label: 'Contato' },
-    { key: 'cadastro', label: 'Cadastro' }
+    { key: 'contato', label: 'Contato' }
   ];
+
+  const authLinks = isAuthenticated
+    ? [
+        { key: 'dashboard', label: 'Dashboard' },
+        { key: 'agendar', label: 'Agendar' },
+        { key: 'minha-agenda', label: 'Minha Agenda' },
+        { key: 'perfil', label: 'Perfil' }
+      ]
+    : [
+        { key: 'cadastro', label: 'Cadastro' },
+        { key: 'login', label: 'Entrar' }
+      ];
 
   return (
     <header className={styles.header}>
@@ -25,6 +36,21 @@ export default function Header({ currentPage, onNavigate }) {
               {link.label}
             </button>
           ))}
+          {authLinks.map((link) => (
+            <button
+              key={link.key}
+              type="button"
+              className={`${styles.link} ${currentPage === link.key ? styles.active : ''}`}
+              onClick={() => onNavigate(link.key)}
+            >
+              {link.label}
+            </button>
+          ))}
+          {isAuthenticated && (
+            <button type="button" className={styles.link} onClick={onLogout}>
+              Sair
+            </button>
+          )}
         </nav>
       </div>
     </header>
