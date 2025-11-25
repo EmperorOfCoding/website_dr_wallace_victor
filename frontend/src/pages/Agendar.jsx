@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import ProtectedPage from "../components/ProtectedPage";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Agendar.module.css";
@@ -14,9 +15,29 @@ function formatDateDisplay(dateStr) {
   return `${day}/${month}/${year}`;
 }
 
+function getInitialDate(searchParams) {
+  const dateParam = searchParams.get("date");
+  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    // Parse date parts to avoid timezone issues (new Date("YYYY-MM-DD") is UTC)
+    const [year, month, day] = dateParam.split("-").map(Number);
+    const paramDate = new Date(year, month - 1, day);
+    paramDate.setHours(0, 0, 0, 0);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Only use param date if it's today or in the future
+    if (paramDate >= today) {
+      return dateParam;
+    }
+  }
+  return formatDateInput(new Date(Date.now() + 24 * 60 * 60 * 1000));
+}
+
 export default function Agendar({ onNavigate }) {
+  const [searchParams] = useSearchParams();
   const { patient, token, isAdmin } = useAuth();
-  const [date, setDate] = useState(() => formatDateInput(new Date(Date.now() + 24 * 60 * 60 * 1000)));
+  const [date, setDate] = useState(() => getInitialDate(searchParams));
   const [available, setAvailable] = useState([]);
   const [selectedTime, setSelectedTime] = useState("");
   const [types, setTypes] = useState([]);
@@ -31,6 +52,7 @@ export default function Agendar({ onNavigate }) {
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [rescheduleFromId, setRescheduleFromId] = useState(null);
 
   useEffect(() => {
     async function loadDoctors() {
@@ -39,7 +61,7 @@ export default function Agendar({ onNavigate }) {
         const data = await resp.json().catch(() => ({}));
         if (resp.ok && Array.isArray(data.doctors)) {
           setDoctors(data.doctors);
-          if (data.doctors.length > 0) {
+          if (data.doctors.length > 0 && !selectedDoctor) {
             setSelectedDoctor(data.doctors[0].id);
           }
         }
@@ -49,6 +71,52 @@ export default function Agendar({ onNavigate }) {
     }
     loadDoctors();
   }, []);
+
+  // Load reschedule data if available (after doctors are loaded)
+  useEffect(() => {
+    const rescheduleId = sessionStorage.getItem("reschedule_from");
+    if (rescheduleId && doctors.length > 0) {
+      setRescheduleFromId(rescheduleId);
+      
+      // Load original appointment data
+      async function loadOriginalAppointment() {
+        try {
+          const resp = await fetch(`/api/appointments/${rescheduleId}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (resp.ok && data.appointment) {
+            const appt = data.appointment;
+            // Pre-fill form with original appointment data
+            if (appt.doctor_id) {
+              // Verify doctor exists in the list
+              const doctorExists = doctors.some(d => d.id === appt.doctor_id);
+              if (doctorExists) {
+                setSelectedDoctor(appt.doctor_id);
+              }
+            }
+            if (appt.type_id) {
+              setSelectedType(appt.type_id);
+            }
+            if (appt.date) {
+              setDate(appt.date);
+            }
+            // Note: We don't pre-fill the time to allow user to choose a new time
+          }
+        } catch (err) {
+          console.error("Erro ao carregar agendamento original:", err);
+          // Clear invalid reschedule ID
+          sessionStorage.removeItem("reschedule_from");
+          setRescheduleFromId(null);
+        }
+      }
+      
+      loadOriginalAppointment();
+    } else if (rescheduleId) {
+      // Store the ID but wait for doctors to load
+      setRescheduleFromId(rescheduleId);
+    }
+  }, [token, doctors]);
 
   useEffect(() => {
     async function loadAvailable() {
@@ -158,13 +226,21 @@ export default function Agendar({ onNavigate }) {
           type_id: selectedType,
           date,
           time: selectedTime,
+          ...(rescheduleFromId ? { rescheduled_from: rescheduleFromId } : {}),
         }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
         throw new Error(data.message || "Não foi possível agendar.");
       }
-      setMessage("Consulta agendada com sucesso.");
+      
+      // Clear reschedule data after successful booking
+      if (rescheduleFromId) {
+        sessionStorage.removeItem("reschedule_from");
+        setRescheduleFromId(null);
+      }
+      
+      setMessage(rescheduleFromId ? "Consulta reagendada com sucesso." : "Consulta agendada com sucesso.");
       setSelectedTime("");
       onNavigate("minha-agenda");
     } catch (err) {
@@ -179,9 +255,13 @@ export default function Agendar({ onNavigate }) {
       <div className={styles.page}>
         <div className={styles.container}>
           <header className={styles.hero}>
-            <p className={styles.badge}>Agendamento online</p>
-            <h1 className={styles.title}>Agendar consulta</h1>
-            <p className={styles.lead}>Escolha a melhor data, médico e tipo de atendimento para você.</p>
+            <p className={styles.badge}>{rescheduleFromId ? "Reagendamento" : "Agendamento online"}</p>
+            <h1 className={styles.title}>{rescheduleFromId ? "Reagendar consulta" : "Agendar consulta"}</h1>
+            <p className={styles.lead}>
+              {rescheduleFromId 
+                ? "Escolha uma nova data, horário, médico ou tipo de atendimento para sua consulta."
+                : "Escolha a melhor data, médico e tipo de atendimento para você."}
+            </p>
           </header>
 
           <section className={styles.grid}>

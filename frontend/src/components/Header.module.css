@@ -1,62 +1,209 @@
 ﻿.header {
+  background: var(--bg-card, white);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
   position: sticky;
   top: 0;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #e5edff;
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  z-index: 100;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .inner {
-  max-width: 1180px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 0 1.5rem;
+  height: 64px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .brand {
   background: none;
   border: none;
+  cursor: pointer;
   padding: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
-  cursor: pointer;
 }
 
 .brand img {
-  height: 46px;
+  height: 40px;
   width: auto;
-  display: block;
+  object-fit: contain;
 }
 
+/* Desktop Navigation */
 .nav {
-  margin-left: auto;
   display: flex;
-  gap: 8px;
   align-items: center;
-  flex-wrap: wrap;
+  gap: 0.25rem;
 }
 
 .link {
   background: none;
   border: none;
-  color: #0b1b3f;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-weight: 700;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #64748b);
   cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .link:hover {
-  background: #e8eeff;
+  color: var(--text-primary, #0f172a);
+  background: var(--bg-hover, #f1f5f9);
 }
 
-.active {
-  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
-  color: #ffffff;
-  box-shadow: 0 12px 28px rgba(59, 91, 253, 0.25);
+.link.active {
+  color: #3b5bfd;
+  background: rgba(59, 91, 253, 0.1);
+}
+
+.link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: #3b5bfd;
+  border-radius: 3px;
+}
+
+.logoutBtn {
+  color: #ef4444;
+}
+
+.logoutBtn:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+/* Actions (Theme Toggle & Menu Button) */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Mobile Menu Button */
+.menuButton {
+  display: none;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 20px;
+}
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--text-primary, #0f172a);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile Navigation */
+.mobileNav {
+  display: none;
+  flex-direction: column;
+  background: var(--bg-card, white);
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.mobileLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.mobileLink:hover,
+.mobileLink.active {
+  color: var(--text-primary, #0f172a);
+  background: var(--bg-hover, #f1f5f9);
+}
+
+.mobileLink.active {
+  color: #3b5bfd;
+  background: rgba(59, 91, 253, 0.1);
+}
+
+.mobileLink.logoutBtn {
+  color: #ef4444;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  padding-top: 1rem;
+}
+
+.mobileIcon {
+  font-size: 1.25rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .nav {
+    display: none;
+  }
+
+  .menuButton {
+    display: flex;
+  }
+
+  .mobileNav {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .inner {
+    padding: 0 1rem;
+    height: 56px;
+  }
+
+  .brand img {
+    height: 32px;
+  }
 }

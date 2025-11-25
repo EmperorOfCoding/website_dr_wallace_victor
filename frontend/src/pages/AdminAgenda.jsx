@@ -1,4 +1,4 @@
-﻿import React from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
@@ -7,22 +7,42 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
+// Custom hook for debouncing
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 export default function AdminAgenda({ onNavigate }) {
   const { token } = useAuth();
-  const [appointments, setAppointments] = React.useState([]);
-  const [date, setDate] = React.useState("");
-  const [search, setSearch] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState("");
+  const [appointments, setAppointments] = useState([]);
+  const [date, setDate] = useState("");
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  React.useEffect(() => {
+  // Debounce search input to avoid excessive API calls
+  const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
     async function load() {
       setLoading(true);
       setError("");
       try {
         const params = new URLSearchParams();
         if (date) params.append("date", date);
-        if (search) params.append("patient", search);
+        if (debouncedSearch) params.append("patient", debouncedSearch);
         const resp = await fetch(`/api/admin/appointments?${params.toString()}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -38,7 +58,7 @@ export default function AdminAgenda({ onNavigate }) {
       }
     }
     load();
-  }, [token, date, search]);
+  }, [token, date, debouncedSearch]);
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>
