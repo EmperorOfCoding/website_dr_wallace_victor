@@ -49,6 +49,7 @@ function generateToken(patient) {
   };
 
   const secret = process.env.JWT_SECRET || 'default_jwt_secret';
+
   return jwt.sign(payload, secret, { expiresIn: '2h' });
 }
 

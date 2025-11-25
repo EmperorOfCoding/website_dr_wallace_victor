@@ -26,10 +26,10 @@ INSERT INTO appointment_types (name, description, duration_minutes) VALUES
   ('Teleconsulta', 'Atendimento remoto', 20),
   ('Urgência', 'Queixas agudas não críticas', 30);
 
--- Médicos
-INSERT INTO doctors (name, email, phone, specialty, bio) VALUES
-  ('Dr. Wallace Victor', 'wallace@clinica.com', '(11) 98888-0001', 'Clínica Geral', 'Atendimento integral e humanizado.'),
-  ('Dra. Marina Costa', 'marina@clinica.com', '(11) 98888-0002', 'Medicina da Família', 'Foco em atenção primária e crônicos.');
+-- Médicos (senha para ambos: 112818WallaceVictor)
+INSERT INTO doctors (name, email, phone, specialty, password_hash, bio) VALUES
+  ('Dr. Wallace Victor', 'wallace@clinica.com', '(11) 98888-0001', 'Clínica Geral', '$2a$10$QJcoIl0W1SoMXYOS2Or9b.wIZR.QF0Uv1g9kmg1HZZhBVDZPRI1hK', 'Atendimento integral e humanizado.'),
+  ('Dra. Marina Costa', 'marina@clinica.com', '(11) 98888-0002', 'Medicina da Família', '$2a$10$QJcoIl0W1SoMXYOS2Or9b.wIZR.QF0Uv1g9kmg1HZZhBVDZPRI1hK', 'Foco em atenção primária e crônicos.');
 
 -- Vínculo tipos por médico
 INSERT INTO doctor_consultation_types (doctor_id, type_id) VALUES
@@ -48,9 +48,9 @@ INSERT INTO appointments (patient_id, doctor_id, type_id, date, time, status) VA
   (2, 2, 3, '2025-12-02', '11:00', 'scheduled'),
   (3, 2, 1, '2025-12-03', '14:00', 'scheduled');
 
--- Admins (senha hash igual ao dos pacientes de teste: 'teste')
-INSERT INTO admins (name, email, password_hash, role, doctor_id) VALUES
-  ('Dr. Wallace Victor', 'admin@wallace.com', '$2a$10$QJcoIl0W1SoMXYOS2Or9b.wIZR.QF0Uv1g9kmg1HZZhBVDZPRI1hK', 'admin', 1);
+-- Admins (opcional, legado). Usamos os médicos como contas admin.
+-- INSERT INTO admins (name, email, password_hash, role, doctor_id) VALUES
+--   ('Dr. Wallace Victor', 'admin@wallace.com', '$2a$10$QJcoIl0W1SoMXYOS2Or9b.wIZR.QF0Uv1g9kmg1HZZhBVDZPRI1hK', 'admin', 1);
 
 -- Bloqueios de horário (opcional)
 INSERT INTO blocked_times (date, time, reason) VALUES

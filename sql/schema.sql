@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS doctors (
   email VARCHAR(255),
   phone VARCHAR(50),
   specialty VARCHAR(255),
+  password_hash VARCHAR(255) NOT NULL,
   bio TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;

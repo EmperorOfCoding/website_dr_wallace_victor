@@ -1,17 +1,21 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import React from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
 
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+}
+
 export default function AdminAgenda({ onNavigate }) {
   const { token } = useAuth();
-  const [appointments, setAppointments] = useState([]);
-  const [date, setDate] = useState("");
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [appointments, setAppointments] = React.useState([]);
+  const [date, setDate] = React.useState("");
+  const [search, setSearch] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState("");
 
-  useEffect(() => {
+  React.useEffect(() => {
     async function load() {
       setLoading(true);
       setError("");
@@ -79,13 +83,15 @@ export default function AdminAgenda({ onNavigate }) {
             </div>
             {loading && <p className={styles.info}>Carregando...</p>}
             {error && <p className={styles.error}>{error}</p>}
-            {!loading && !error && appointments.length === 0 && <div className={styles.empty}>Nenhum horário encontrado.</div>}
+            {!loading && !error && appointments.length === 0 && (
+              <div className={styles.empty}>Nenhum horário encontrado.</div>
+            )}
             {!loading && !error && appointments.length > 0 && (
               <div className={styles.list}>
                 {appointments.map((appt) => (
                   <article key={appt.appointment_id} className={styles.row}>
                     <div>
-                      <p className={styles.date}>{appt.date}</p>
+                      <p className={styles.date}>{formatDate(appt.date)}</p>
                       <p className={styles.time}>{appt.time?.slice(0, 5)}</p>
                     </div>
                     <div className={styles.detailBlock}>

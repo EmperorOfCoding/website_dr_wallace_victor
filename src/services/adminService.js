@@ -3,11 +3,22 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 
 async function findAdminByEmail(email) {
+  // agora doctors são as contas admin
   const [rows] = await pool.execute(
-    'SELECT id, name, email, password_hash, role, doctor_id FROM admins WHERE email = ?',
+    'SELECT id, name, email, password_hash, specialty, bio FROM doctors WHERE email = ?',
     [email]
   );
-  return rows[0] || null;
+  if (!rows[0]) return null;
+  return { ...rows[0], role: 'admin', doctor_id: rows[0].id };
+}
+
+async function findAdminById(id) {
+  const [rows] = await pool.execute(
+    'SELECT id, name, email, password_hash, specialty, bio FROM doctors WHERE id = ?',
+    [id]
+  );
+  if (!rows[0]) return null;
+  return { ...rows[0], role: 'admin', doctor_id: rows[0].id };
 }
 
 async function authenticate(email, password) {
@@ -23,7 +34,7 @@ function generateToken(admin) {
     patient_id: admin.id,
     name: admin.name,
     email: admin.email,
-    role: admin.role || 'admin',
+    role: 'admin',
     doctor_id: admin.doctor_id,
   };
   const secret = process.env.JWT_SECRET || 'default_jwt_secret';
@@ -32,6 +43,7 @@ function generateToken(admin) {
 
 module.exports = {
   findAdminByEmail,
+  findAdminById,
   authenticate,
   generateToken,
 };

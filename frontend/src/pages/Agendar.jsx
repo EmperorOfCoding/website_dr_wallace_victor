@@ -15,7 +15,7 @@ function formatDateDisplay(dateStr) {
 }
 
 export default function Agendar({ onNavigate }) {
-  const { patient, token } = useAuth();
+  const { patient, token, isAdmin } = useAuth();
   const [date, setDate] = useState(() => formatDateInput(new Date(Date.now() + 24 * 60 * 60 * 1000)));
   const [available, setAvailable] = useState([]);
   const [selectedTime, setSelectedTime] = useState("");
@@ -23,7 +23,11 @@ export default function Agendar({ onNavigate }) {
   const [selectedType, setSelectedType] = useState("");
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [patientOptions, setPatientOptions] = useState([]);
+  const [patientSearch, setPatientSearch] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingPatients, setLoadingPatients] = useState(false);
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -94,9 +98,40 @@ export default function Agendar({ onNavigate }) {
     loadTypes();
   }, [date, token, selectedDoctor]);
 
+  useEffect(() => {
+    async function loadPatients() {
+      if (!isAdmin) return;
+      setLoadingPatients(true);
+      try {
+        const params = new URLSearchParams();
+        params.append("limit", 50);
+        if (patientSearch) params.append("search", patientSearch);
+        const resp = await fetch(`/api/admin/patients?${params.toString()}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (resp.ok) {
+          setPatientOptions(data.patients || []);
+          if (!selectedPatientId && (data.patients || []).length > 0) {
+            setSelectedPatientId(data.patients[0].id);
+          }
+        }
+      } catch (_) {
+        setPatientOptions([]);
+      } finally {
+        setLoadingPatients(false);
+      }
+    }
+    loadPatients();
+  }, [isAdmin, patientSearch, token, selectedPatientId]);
+
   const handleBook = async () => {
     if (!selectedDoctor) {
       setError("Selecione um médico.");
+      return;
+    }
+    if (isAdmin && !selectedPatientId) {
+      setError("Selecione um paciente.");
       return;
     }
     if (!selectedTime) {
@@ -118,7 +153,7 @@ export default function Agendar({ onNavigate }) {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          patient_id: patient?.id,
+          patient_id: isAdmin ? selectedPatientId : patient?.id,
           doctor_id: selectedDoctor,
           type_id: selectedType,
           date,
@@ -196,9 +231,39 @@ export default function Agendar({ onNavigate }) {
                     ))}
                   </select>
                 </label>
+                {isAdmin && (
+                  <>
+                    <label className={styles.field} htmlFor="patientSearch">
+                      Buscar paciente
+                      <input
+                        id="patientSearch"
+                        type="text"
+                        placeholder="Nome, e-mail ou telefone"
+                        value={patientSearch}
+                        onChange={(e) => setPatientSearch(e.target.value)}
+                      />
+                    </label>
+                    <label className={styles.field} htmlFor="patient">
+                      Selecionar paciente
+                      <select
+                        id="patient"
+                        value={selectedPatientId || ""}
+                        onChange={(e) => setSelectedPatientId(Number(e.target.value))}
+                        disabled={loadingPatients}
+                      >
+                        {patientOptions.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} - {p.email}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </>
+                )}
               </div>
               <div className={styles.statusRow}>
                 {loading && <p className={styles.muted}>Carregando horários...</p>}
+                {loadingPatients && isAdmin && <p className={styles.muted}>Carregando pacientes...</p>}
                 {error && <p className={styles.error}>{error}</p>}
                 {message && <p className={styles.success}>{message}</p>}
               </div>
@@ -219,6 +284,14 @@ export default function Agendar({ onNavigate }) {
                     {doctors.find((d) => d.id === selectedDoctor)?.specialty || "--"}
                   </p>
                 </div>
+                {isAdmin && (
+                  <div className={styles.summaryRow}>
+                    <p className={styles.label}>Paciente</p>
+                    <p className={styles.value}>
+                      {patientOptions.find((p) => p.id === selectedPatientId)?.name || "Selecione o paciente"}
+                    </p>
+                  </div>
+                )}
                 <div className={styles.summaryRow}>
                   <p className={styles.label}>Tipo</p>
                   <p className={styles.value}>
@@ -231,7 +304,6 @@ export default function Agendar({ onNavigate }) {
                 </div>
               </div>
             </article>
-
             <article className={styles.card}>
               <div className={styles.cardHeader}>
                 <div>

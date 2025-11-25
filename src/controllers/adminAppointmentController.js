@@ -44,6 +44,8 @@ async function listAppointments(req, res) {
       total: result.total
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('listAppointments admin error', error);
     return res.status(500).json({ status: 'error', message: 'Erro ao listar agendamentos.' });
   }
 }
