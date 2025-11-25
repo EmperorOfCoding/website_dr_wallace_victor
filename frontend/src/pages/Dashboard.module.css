@@ -1,0 +1,263 @@
+﻿.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef3ff 55%, #ffffff 100%);
+  padding: 32px 24px 64px;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid #e5edff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+}
+
+.badge {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e8eeff;
+  color: #1f2a5a;
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0 0 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.lead {
+  margin: 6px 0 10px;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primary {
+  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(59, 91, 253, 0.25);
+}
+
+.secondary {
+  background: #ffffff;
+  color: #1f2a5a;
+  border: 1px solid #d9e4ff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.summaryCard {
+  background: #f9fbff;
+  border: 1px solid #e5edff;
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.summaryLabel {
+  margin: 0;
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 700;
+}
+
+.summaryValue {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.muted {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5edff;
+  padding: 18px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cardTitle {
+  margin: 4px 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.info {
+  color: #1f2937;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+.empty {
+  background: #f9fbff;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px dashed #d9e4ff;
+  color: #1f2937;
+}
+
+.nextCard {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  align-items: center;
+  background: #f9fbff;
+  border: 1px solid #e5edff;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.date {
+  margin: 0;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.time {
+  margin: 2px 0 0;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.nextDetails {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.type {
+  margin: 0;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.duration {
+  margin: 0;
+  color: #4b5563;
+  font-weight: 700;
+}
+
+.status {
+  background: #e8eeff;
+  color: #1f2a5a;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statBox {
+  background: #f9fbff;
+  border: 1px solid #e5edff;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.statNumber {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.statLabel {
+  margin: 4px 0 0;
+  color: #4b5563;
+  font-weight: 700;
+}
+
+.quickLinks {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.linkButton {
+  background: none;
+  border: 1px dashed #d9e4ff;
+  color: #1f2a5a;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: 1.1fr 0.9fr;
+    padding: 24px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nextCard {
+    grid-template-columns: 1fr 2fr;
+  }
+}

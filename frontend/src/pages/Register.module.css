@@ -79,3 +79,25 @@
   color: #1f7a47;
   font-weight: 700;
 }
+
+.helperRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #2b4ddc;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -1,5 +1,6 @@
 const express = require('express');
 const authAdmin = require('../middlewares/authAdmin');
+const adminAuthController = require('../controllers/adminAuthController');
 const patientController = require('../controllers/patientController');
 const adminAppointmentController = require('../controllers/adminAppointmentController');
 const adminBlockedTimeController = require('../controllers/adminBlockedTimeController');
@@ -7,6 +8,7 @@ const consultationTypeController = require('../controllers/consultationTypeContr
 
 const router = express.Router();
 
+router.post('/api/admin/login', adminAuthController.login);
 router.get('/api/admin/patients', authAdmin, patientController.listPatients);
 router.get('/api/admin/appointments', authAdmin, adminAppointmentController.listAppointments);
 router.put('/api/admin/appointments/:id', authAdmin, adminAppointmentController.updateAppointment);

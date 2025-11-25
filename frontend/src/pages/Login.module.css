@@ -79,3 +79,40 @@
   color: #1f7a47;
   font-weight: 700;
 }
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.switchLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #0f1f46;
+  font-size: 13px;
+}
+.helperRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #2b4ddc;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

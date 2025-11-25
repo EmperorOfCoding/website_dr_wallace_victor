@@ -1,0 +1,145 @@
+﻿.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef3ff 55%, #ffffff 100%);
+  padding: 32px 24px 64px;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e8eeff;
+  color: #1f2a5a;
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0 0 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primary {
+  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(59, 91, 253, 0.25);
+}
+
+.info {
+  color: #1f2937;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+.empty {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px dashed #d9e4ff;
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+  place-items: start;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5edff;
+  padding: 14px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.date {
+  margin: 0;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.time {
+  margin: 2px 0 0;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.type {
+  margin: 0;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.duration {
+  margin: 0;
+  color: #4b5563;
+  font-weight: 700;
+}
+
+.status {
+  background: #e8eeff;
+  color: #1f2a5a;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+}

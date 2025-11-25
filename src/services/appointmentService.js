@@ -101,6 +101,27 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
   }
 }
 
+async function listAppointmentsByPatient(patientId) {
+  const [rows] = await pool.execute(
+    `
+      SELECT 
+        a.id,
+        a.date,
+        a.time,
+        a.status,
+        a.type_id AS typeId,
+        t.name AS typeName,
+        t.duration_minutes AS durationMinutes
+      FROM appointments a
+      LEFT JOIN appointment_types t ON a.type_id = t.id
+      WHERE a.patient_id = ?
+      ORDER BY a.date ASC, a.time ASC
+    `,
+    [patientId]
+  );
+  return rows;
+}
+
 module.exports = {
   isSlotAvailable,
   checkAppointmentExists,
@@ -108,5 +129,6 @@ module.exports = {
   updateAppointment,
   deleteAppointment,
   getAvailableTimes,
-  createAppointment
+  createAppointment,
+  listAppointmentsByPatient
 };

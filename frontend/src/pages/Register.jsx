@@ -1,50 +1,83 @@
-import React, { useState } from 'react';
-import styles from './Register.module.css';
+﻿import React, { useState } from "react";
+import styles from "./Register.module.css";
 
 export default function Register({ onNavigate }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
-  const [error, setError] = useState('');
-  const [status, setStatus] = useState('');
+  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
+  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+  const [recoverMessage, setRecoverMessage] = useState("");
+  const [recovering, setRecovering] = useState(false);
 
   const handleChange = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
-    setError('');
-    setStatus('');
+    setError("");
+    setStatus("");
+    setRecoverMessage("");
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError('');
-    setStatus('');
+    setError("");
+    setStatus("");
+    setRecoverMessage("");
 
     if (!form.name || !form.email || !form.phone || !form.password) {
-      setError('Preencha todos os campos.');
+      setError("Preencha todos os campos.");
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
           phone: form.phone,
-          password: form.password
-        })
+          password: form.password,
+        }),
       });
 
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || 'Não foi possível cadastrar.');
+        throw new Error(data.message || "Não foi possível cadastrar.");
       }
 
-      setStatus('Cadastro realizado com sucesso! Faça login para acessar sua conta.');
-      setForm({ name: '', email: '', phone: '', password: '' });
-      setTimeout(() => onNavigate('login'), 1200);
+      setStatus("Cadastro realizado com sucesso! Faça login para acessar sua conta.");
+      setForm({ name: "", email: "", phone: "", password: "" });
+      setTimeout(() => onNavigate("login"), 1200);
     } catch (err) {
-      setError(err.message || 'Erro ao cadastrar.');
+      setError(err.message || "Erro ao cadastrar.");
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!form.email) {
+      setError("Informe o e-mail para recuperar a senha.");
+      return;
+    }
+    setError("");
+    setRecoverMessage("");
+    setRecovering(true);
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || "Não foi possível enviar o e-mail.");
+      }
+
+      setRecoverMessage("Enviamos um link de recuperação para o seu e-mail.");
+    } catch (err) {
+      setError(err.message || "Não foi possível enviar o e-mail.");
+    } finally {
+      setRecovering(false);
     }
   };
 
@@ -61,7 +94,7 @@ export default function Register({ onNavigate }) {
               className={styles.input}
               type="text"
               value={form.name}
-              onChange={handleChange('name')}
+              onChange={handleChange("name")}
               placeholder="Seu nome"
             />
           </label>
@@ -72,7 +105,7 @@ export default function Register({ onNavigate }) {
               className={styles.input}
               type="email"
               value={form.email}
-              onChange={handleChange('email')}
+              onChange={handleChange("email")}
               placeholder="email@exemplo.com"
             />
           </label>
@@ -83,7 +116,7 @@ export default function Register({ onNavigate }) {
               className={styles.input}
               type="tel"
               value={form.phone}
-              onChange={handleChange('phone')}
+              onChange={handleChange("phone")}
               placeholder="(00) 00000-0000"
             />
           </label>
@@ -94,15 +127,33 @@ export default function Register({ onNavigate }) {
               className={styles.input}
               type="password"
               value={form.password}
-              onChange={handleChange('password')}
+              onChange={handleChange("password")}
               placeholder="Crie uma senha"
             />
           </label>
           {error && <p className={styles.error}>{error}</p>}
           {status && <p className={styles.status}>{status}</p>}
+          {recoverMessage && <p className={styles.status}>{recoverMessage}</p>}
           <button className={styles.button} type="submit">
             Cadastrar
           </button>
+          <div className={styles.helperRow}>
+            <button
+              className={styles.link}
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={recovering}
+            >
+              {recovering ? "Enviando..." : "Esqueceu a senha?"}
+            </button>
+            <button
+              className={styles.link}
+              type="button"
+              onClick={() => onNavigate("login")}
+            >
+              Já tenho conta
+            </button>
+          </div>
         </form>
       </div>
     </div>
