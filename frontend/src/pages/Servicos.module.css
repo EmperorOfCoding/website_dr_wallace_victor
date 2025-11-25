@@ -1,0 +1,142 @@
+.page {
+  min-height: 100vh;
+  padding: 64px 24px 80px;
+  background: linear-gradient(180deg, #f7fbff 0%, #f2f6ff 50%, #ffffff 100%);
+  color: #0f172a;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.container {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #1f2937;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  border: 1px solid #e5edff;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #e8eeff;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f1f46;
+  margin: 0;
+}
+
+.duration {
+  font-size: 14px;
+  color: #304f9f;
+  font-weight: 600;
+}
+
+.description {
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cta {
+  margin-top: 6px;
+  align-self: flex-start;
+  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(59, 91, 253, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(59, 91, 253, 0.26);
+}
+
+.cta:active {
+  transform: translateY(0);
+  opacity: 0.96;
+}
+
+.status {
+  text-align: center;
+  color: #304f9f;
+  font-weight: 600;
+}
+
+.error {
+  text-align: center;
+  color: #c0392b;
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 38px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

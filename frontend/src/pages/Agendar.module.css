@@ -1,0 +1,243 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef3ff 55%, #ffffff 100%);
+  padding: 32px 24px 64px;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5edff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+  padding: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e8eeff;
+  color: #1f2a5a;
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.lead {
+  margin: 4px 0 0;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 0.95fr;
+  gap: 14px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5edff;
+  padding: 18px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b1b3f;
+}
+
+.muted {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+  color: #0f1f46;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #d9e4ff;
+  padding: 12px;
+  font-size: 15px;
+  background: #f9fbff;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: #3b5bfd;
+  box-shadow: 0 0 0 3px rgba(59, 91, 253, 0.15);
+}
+
+.statusRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: 700;
+  margin: 0;
+}
+
+.success {
+  color: #1f7a47;
+  font-weight: 700;
+  margin: 0;
+}
+
+.slotsCard {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5edff;
+  padding: 18px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 12px;
+}
+
+.slotsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.slot {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d9e4ff;
+  background: #f9fbff;
+  cursor: pointer;
+  font-weight: 700;
+  color: #0f172a;
+  transition: all 0.15s ease;
+}
+
+.slot:hover {
+  border-color: #3b5bfd;
+  box-shadow: 0 10px 22px rgba(59, 91, 253, 0.15);
+}
+
+.slotActive {
+  border: 2px solid #3b5bfd;
+  background: #e8eeff;
+  box-shadow: 0 12px 26px rgba(59, 91, 253, 0.22);
+}
+
+.summary {
+  display: grid;
+  gap: 6px;
+  background: #f9fbff;
+  border: 1px solid #e5edff;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.label {
+  color: #4b5563;
+  font-weight: 700;
+  margin: 0;
+}
+
+.value {
+  color: #0b1b3f;
+  font-weight: 800;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primary {
+  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(59, 91, 253, 0.25);
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghost {
+  background: none;
+  border: 1px dashed #d9e4ff;
+  color: #1f2a5a;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inputs {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,62 @@
+﻿.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e5edff;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.brand img {
+  height: 46px;
+  width: auto;
+  display: block;
+}
+
+.nav {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #0b1b3f;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.link:hover {
+  background: #e8eeff;
+}
+
+.active {
+  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(59, 91, 253, 0.25);
+}
