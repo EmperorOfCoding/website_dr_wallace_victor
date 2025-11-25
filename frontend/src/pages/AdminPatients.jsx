@@ -1,20 +1,35 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
+
+function decodeDoctorId(token) {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    return payload.doctor_id || null;
+  } catch (_) {
+    return null;
+  }
+}
 
 export default function AdminPatients({ onNavigate }) {
   const { token } = useAuth();
   const [patients, setPatients] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const doctorId = useMemo(() => decodeDoctorId(token), [token]);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
+      setError("");
       try {
         const params = new URLSearchParams();
         params.append("limit", 50);
+        if (doctorId) params.append("doctor_id", doctorId);
         if (search) params.append("search", search);
         const resp = await fetch(`/api/admin/patients?${params.toString()}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -22,17 +37,20 @@ export default function AdminPatients({ onNavigate }) {
         const data = await resp.json().catch(() => ({}));
         if (resp.ok) {
           setPatients(data.patients || []);
+        } else if (resp.status >= 500) {
+          throw new Error(data.message || "Não foi possível carregar pacientes.");
         } else {
           setPatients([]);
         }
-      } catch (_) {
+      } catch (err) {
+        setError(err.message || "Não foi possível carregar pacientes.");
         setPatients([]);
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, [token, search]);
+  }, [token, search, doctorId]);
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>
@@ -67,8 +85,9 @@ export default function AdminPatients({ onNavigate }) {
               </div>
             </div>
             {loading && <p className={styles.info}>Carregando pacientes...</p>}
-            {!loading && patients.length === 0 && <div className={styles.empty}>Nenhum paciente encontrado.</div>}
-            {!loading && patients.length > 0 && (
+            {error && <p className={styles.error}>{error}</p>}
+            {!loading && !error && patients.length === 0 && <div className={styles.empty}>Nenhum paciente encontrado.</div>}
+            {!loading && !error && patients.length > 0 && (
               <div className={styles.patientList}>
                 {patients.map((p) => (
                   <div key={p.id} className={styles.patientRow}>

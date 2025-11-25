@@ -35,7 +35,7 @@ async function getPatients(page = 1, limit = 10, search = '', doctorId) {
     FROM patients p
     ${joinClause}
     ${whereClause}
-    ORDER BY created_at DESC
+    ORDER BY p.created_at DESC
     LIMIT ? OFFSET ?
   `;
 

@@ -3,7 +3,10 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 
 async function findAdminByEmail(email) {
-  const [rows] = await pool.execute('SELECT id, name, email, password_hash, role FROM admins WHERE email = ?', [email]);
+  const [rows] = await pool.execute(
+    'SELECT id, name, email, password_hash, role, doctor_id FROM admins WHERE email = ?',
+    [email]
+  );
   return rows[0] || null;
 }
 
@@ -21,6 +24,7 @@ function generateToken(admin) {
     name: admin.name,
     email: admin.email,
     role: admin.role || 'admin',
+    doctor_id: admin.doctor_id,
   };
   const secret = process.env.JWT_SECRET || 'default_jwt_secret';
   return jwt.sign(payload, secret, { expiresIn: '4h' });

@@ -49,8 +49,8 @@ INSERT INTO appointments (patient_id, doctor_id, type_id, date, time, status) VA
   (3, 2, 1, '2025-12-03', '14:00', 'scheduled');
 
 -- Admins (senha hash igual ao dos pacientes de teste: 'teste')
-INSERT INTO admins (name, email, password_hash, role) VALUES
-  ('Dr. Wallace Victor', 'admin@wallace.com', '$2a$10$7Wf1tl9ZJydZzMjhkfzkkuLGjfx8Vv4tx0eRy84rXLBnpNzarmMT6', 'admin');
+INSERT INTO admins (name, email, password_hash, role, doctor_id) VALUES
+  ('Dr. Wallace Victor', 'admin@wallace.com', '$2a$10$QJcoIl0W1SoMXYOS2Or9b.wIZR.QF0Uv1g9kmg1HZZhBVDZPRI1hK', 'admin', 1);
 
 -- Bloqueios de horário (opcional)
 INSERT INTO blocked_times (date, time, reason) VALUES
