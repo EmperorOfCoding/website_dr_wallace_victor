@@ -1,95 +1,105 @@
-import React, { useEffect, useState } from 'react';
-import ProtectedPage from '../components/ProtectedPage';
-import { useAuth } from '../context/AuthContext';
+﻿import React, { useEffect, useState } from "react";
+import ProtectedPage from "../components/ProtectedPage";
+import { useAuth } from "../context/AuthContext";
+import styles from "./Agendar.module.css";
 
 function formatDateInput(dateObj) {
   return dateObj.toISOString().slice(0, 10);
 }
 
 export default function Agendar({ onNavigate }) {
-  const { patient } = useAuth();
+  const { patient, token } = useAuth();
   const [date, setDate] = useState(() => formatDateInput(new Date(Date.now() + 24 * 60 * 60 * 1000)));
   const [available, setAvailable] = useState([]);
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedTime, setSelectedTime] = useState("");
   const [types, setTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState("");
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     async function loadAvailable() {
       setLoading(true);
-      setError('');
-      setMessage('');
-      setSelectedTime('');
+      setError("");
+      setMessage("");
+      setSelectedTime("");
       try {
-        const resp = await fetch(`/api/appointments/available?date=${date}`);
-        const data = await resp.json();
+        const resp = await fetch(`/api/appointments/available?date=${date}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
-          throw new Error(data.message || 'Falha ao carregar horários.');
+          throw new Error(data.message || "Falha ao carregar horários.");
         }
         setAvailable(data.available_times || []);
       } catch (err) {
-        setError(err.message || 'Falha ao carregar horários.');
+        setError(err.message || "Falha ao carregar horários.");
         setAvailable([]);
       } finally {
         setLoading(false);
       }
     }
-    loadAvailable();
+
     async function loadTypes() {
       try {
-        const resp = await fetch('/api/consultation-types');
-        const data = await resp.json();
+        const resp = await fetch("/api/consultation-types", {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
-          throw new Error(data.message || 'Falha ao carregar tipos.');
+          throw new Error(data.message || "Falha ao carregar tipos.");
         }
         setTypes(data.types || []);
         if ((data.types || []).length > 0) {
           setSelectedType((data.types || [])[0].id);
         }
       } catch (err) {
-        setError(err.message || 'Falha ao carregar tipos.');
+        setError(err.message || "Falha ao carregar tipos.");
       }
     }
+
+    loadAvailable();
     loadTypes();
-  }, [date]);
+  }, [date, token]);
 
   const handleBook = async () => {
     if (!selectedTime) {
-      setError('Selecione um horário.');
+      setError("Selecione um horário.");
       return;
     }
     if (!selectedType) {
-      setError('Selecione um tipo de consulta.');
+      setError("Selecione um tipo de consulta.");
       return;
     }
     setBooking(true);
-    setError('');
-    setMessage('');
+    setError("");
+    setMessage("");
     try {
-      const resp = await fetch('/api/appointments/book', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const resp = await fetch("/api/appointments/book", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           patient_id: patient?.id,
           doctor_id: 1,
           type_id: selectedType,
           date,
-          time: selectedTime
-        })
+          time: selectedTime,
+        }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
-        throw new Error(data.message || 'Não foi possível agendar.');
+        throw new Error(data.message || "Não foi possível agendar.");
       }
-      setMessage('Consulta agendada com sucesso.');
-      setSelectedTime('');
-      onNavigate('minha-agenda');
+      setMessage("Consulta agendada com sucesso.");
+      setSelectedTime("");
+      onNavigate("minha-agenda");
     } catch (err) {
-      setError(err.message || 'Não foi possível agendar.');
+      setError(err.message || "Não foi possível agendar.");
     } finally {
       setBooking(false);
     }
@@ -97,76 +107,121 @@ export default function Agendar({ onNavigate }) {
 
   return (
     <ProtectedPage onNavigate={onNavigate}>
-      <div style={{ padding: '32px 24px', maxWidth: 960, margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>
-        <h1>Agendar consulta</h1>
-        <p>Escolha uma data e selecione um horário disponível.</p>
+      <div className={styles.page}>
+        <div className={styles.container}>
+          <header className={styles.hero}>
+            <p className={styles.badge}>Agendamento online</p>
+            <h1 className={styles.title}>Agendar consulta</h1>
+            <p className={styles.lead}>Escolha a melhor data, horário e tipo de atendimento para você.</p>
+          </header>
 
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center', margin: '16px 0' }}>
-          <label htmlFor="date">
-            Data:{' '}
-            <input
-              id="date"
-              type="date"
-              value={date}
-              min={formatDateInput(new Date())}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </label>
-          <label htmlFor="type">
-            Tipo:
-            <select
-              id="type"
-              value={selectedType}
-              onChange={(e) => setSelectedType(Number(e.target.value))}
-              style={{ marginLeft: 8 }}
-            >
-              {types.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.duration} min)
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+          <section className={styles.grid}>
+            <article className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div>
+                  <h2 className={styles.cardTitle}>Dados do agendamento</h2>
+                  <p className={styles.muted}>Selecione a data e o tipo de consulta.</p>
+                </div>
+              </div>
+              <div className={styles.inputs}>
+                <label className={styles.field} htmlFor="date">
+                  Data
+                  <input
+                    id="date"
+                    type="date"
+                    value={date}
+                    min={formatDateInput(new Date())}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                </label>
+                <label className={styles.field} htmlFor="type">
+                  Tipo de consulta
+                  <select
+                    id="type"
+                    value={selectedType}
+                    onChange={(e) => setSelectedType(Number(e.target.value))}
+                  >
+                    {types.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name} ({t.duration} min)
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className={styles.statusRow}>
+                {loading && <p className={styles.muted}>Carregando horários...</p>}
+                {error && <p className={styles.error}>{error}</p>}
+                {message && <p className={styles.success}>{message}</p>}
+              </div>
+              <div className={styles.summary}>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Data</p>
+                  <p className={styles.value}>{new Date(date).toLocaleDateString("pt-BR")}</p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Tipo</p>
+                  <p className={styles.value}>
+                    {types.find((t) => t.id === selectedType)?.name || "Selecione o tipo"}
+                  </p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Horário</p>
+                  <p className={styles.value}>{selectedTime || "Selecione um horário"}</p>
+                </div>
+              </div>
+            </article>
 
-        {loading && <div>Carregando horários...</div>}
-        {error && <div style={{ color: '#c0392b', marginBottom: 8 }}>{error}</div>}
-        {message && <div style={{ color: '#1f7a47', marginBottom: 8 }}>{message}</div>}
+            <article className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div>
+                  <h2 className={styles.cardTitle}>Confirmar</h2>
+                  <p className={styles.muted}>Confira os dados e finalize.</p>
+                </div>
+              </div>
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={styles.primary}
+                  onClick={handleBook}
+                  disabled={booking || !selectedTime || !selectedType}
+                >
+                  {booking ? "Agendando..." : "Confirmar agendamento"}
+                </button>
+                <button type="button" className={styles.ghost} onClick={() => onNavigate("minha-agenda")}>
+                  Ir para minha agenda
+                </button>
+              </div>
+            </article>
+          </section>
 
-        {!loading && !error && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-              gap: 10,
-              marginTop: 12
-            }}
-          >
-            {available.length === 0 && <div>Nenhum horário disponível.</div>}
-            {available.map((time) => (
-              <button
-                key={time}
-                type="button"
-                onClick={() => setSelectedTime(time)}
-                style={{
-                  padding: '10px 12px',
-                  borderRadius: 10,
-                  border: selectedTime === time ? '2px solid #3b5bfd' : '1px solid #d9e4ff',
-                  background: selectedTime === time ? '#e8eeff' : '#fff',
-                  cursor: 'pointer',
-                  fontWeight: 700
-                }}
-              >
-                {time}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div style={{ marginTop: 16 }}>
-          <button type="button" onClick={handleBook} disabled={booking || !selectedTime}>
-            {booking ? 'Agendando...' : 'Confirmar agendamento'}
-          </button>
+          <section className={styles.slotsCard}>
+            <div className={styles.cardHeader}>
+              <div>
+                <h2 className={styles.cardTitle}>Horários disponíveis</h2>
+                <p className={styles.muted}>Escolha um horário para a data selecionada.</p>
+              </div>
+            </div>
+            {!loading && !error && available.length === 0 && (
+              <div className={styles.empty}>Nenhum horário disponível para esta data.</div>
+            )}
+            {loading && <p className={styles.muted}>Carregando horários...</p>}
+            {error && <p className={styles.error}>{error}</p>}
+            {!loading && !error && available.length > 0 && (
+              <div className={styles.slotsGrid}>
+                {available.map((time) => (
+                  <button
+                    key={time}
+                    type="button"
+                    onClick={() => setSelectedTime(time)}
+                    className={`${styles.slot} ${selectedTime === time ? styles.slotActive : ""}`}
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </div>
     </ProtectedPage>

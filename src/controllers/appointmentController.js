@@ -60,6 +60,21 @@ async function createAppointment(req, res) {
   }
 }
 
+async function listAppointments(req, res) {
+  try {
+    const { patient_id: patientId } = req.query || {};
+
+    if (!patientId) {
+      return res.status(400).json({ status: 'error', message: 'Paciente é obrigatório.' });
+    }
+
+    const appointments = await appointmentService.listAppointmentsByPatient(patientId);
+    return res.status(200).json({ status: 'success', appointments });
+  } catch (error) {
+    return res.status(500).json({ status: 'error', message: 'Erro ao consultar agendamentos.' });
+  }
+}
+
 async function getAvailableAppointments(req, res) {
   try {
     const { date } = req.query || {};
@@ -151,6 +166,7 @@ async function cancelAppointment(req, res) {
 
 module.exports = {
   createAppointment,
+  listAppointments,
   getAvailableAppointments,
   updateAppointment,
   cancelAppointment

@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import styles from './Servicos.module.css';
+﻿import React, { useEffect, useState } from "react";
+import styles from "./Servicos.module.css";
 
-export default function Servicos() {
+export default function Servicos({ onNavigate }) {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadServices() {
       try {
-        const response = await fetch('/api/consultation-types');
+        const response = await fetch("/api/consultation-types");
+        const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error('Falha ao carregar serviços.');
+          throw new Error(data.message || "Falha ao carregar serviços.");
         }
-        const data = await response.json();
         if (isMounted) {
           setServices(data.types || []);
         }
       } catch (err) {
         if (isMounted) {
-          setError('Não foi possível carregar os serviços. Tente novamente em instantes.');
+          setError("Não foi possível carregar os serviços. Tente novamente em instantes.");
         }
       } finally {
         if (isMounted) {
@@ -37,7 +37,7 @@ export default function Servicos() {
   }, []);
 
   const handleAgendar = () => {
-    window.location.href = '/agendar';
+    onNavigate?.("agendar");
   };
 
   return (
@@ -63,14 +63,14 @@ export default function Servicos() {
               <article key={service.id} className={styles.card}>
                 <div className={styles.cardHeader}>
                   <div className={styles.icon} aria-hidden="true">
-                    🩺
+                    💡
                   </div>
                   <div>
                     <h3 className={styles.cardTitle}>{service.name}</h3>
                     <span className={styles.duration}>{service.duration} minutos</span>
                   </div>
                 </div>
-                <p className={styles.description}>{service.description || 'Descrição breve do serviço.'}</p>
+                <p className={styles.description}>{service.description || "Descrição breve do serviço."}</p>
                 <button type="button" className={styles.cta} onClick={handleAgendar}>
                   Agendar Consulta
                 </button>
