@@ -2,8 +2,8 @@ const patientService = require('../services/patientService');
 
 async function listPatients(req, res) {
   try {
-    const { page = 1, limit = 10, search = '' } = req.query || {};
-    const result = await patientService.getPatients(page, limit, search);
+    const { page = 1, limit = 10, search = '', doctor_id: doctorId } = req.query || {};
+    const result = await patientService.getPatients(page, limit, search, doctorId);
 
     const patients = result.patients.map((p) => ({
       id: p.id,

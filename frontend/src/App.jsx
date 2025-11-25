@@ -10,6 +10,8 @@ import Perfil from "./pages/Perfil";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminPatients from "./pages/AdminPatients";
+import AdminAgenda from "./pages/AdminAgenda";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { AuthProvider } from "./context/AuthContext";
@@ -20,7 +22,7 @@ function AppShell() {
   const { isAuthenticated, isAdmin, logout } = useAuth();
   const [page, setPage] = useState("home");
   const protectedPages = ["agendar", "minha-agenda", "perfil", "dashboard"];
-  const adminPages = ["admin"];
+  const adminPages = ["admin", "admin-pacientes", "admin-agenda"];
 
   const handleNavigate = (target) => {
     if (protectedPages.includes(target) && !isAuthenticated) {
@@ -45,6 +47,8 @@ function AppShell() {
     if (page === "perfil") return () => <Perfil onNavigate={handleNavigate} />;
     if (page === "dashboard") return () => <Dashboard onNavigate={handleNavigate} />;
     if (page === "admin") return () => <AdminDashboard onNavigate={handleNavigate} />;
+    if (page === "admin-pacientes") return () => <AdminPatients onNavigate={handleNavigate} />;
+    if (page === "admin-agenda") return () => <AdminAgenda onNavigate={handleNavigate} />;
     return () => <Home onNavigate={handleNavigate} />;
   }, [page, isAuthenticated, isAdmin]);
 

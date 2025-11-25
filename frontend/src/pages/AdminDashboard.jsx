@@ -29,10 +29,16 @@ export default function AdminDashboard({ onNavigate }) {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) {
+        if (resp.ok) {
+          setAppointments(data.appointments || []);
+          setError("");
+        } else if (resp.status >= 500) {
           throw new Error(data.message || "Não foi possível carregar agendamentos.");
+        } else {
+          // Erros 4xx tratam como lista vazia
+          setAppointments([]);
+          setError("");
         }
-        setAppointments(data.appointments || []);
       } catch (err) {
         setError(err.message || "Não foi possível carregar agendamentos.");
       } finally {
@@ -146,7 +152,9 @@ export default function AdminDashboard({ onNavigate }) {
                   <h2 className={styles.cardTitle}>Pacientes recentes</h2>
                   <p className={styles.muted}>Lista rápida para contato.</p>
                 </div>
-                <button type="button" className={styles.secondary} onClick={() => onNavigate("perfil")}>Ver perfil</button>
+                <button type="button" className={styles.secondary} onClick={() => onNavigate("perfil")}>
+                  Ver perfil
+                </button>
               </div>
               {loadingPatients && <p className={styles.info}>Carregando pacientes...</p>}
               {!loadingPatients && patients.length === 0 && <div className={styles.empty}>Nenhum paciente encontrado.</div>}

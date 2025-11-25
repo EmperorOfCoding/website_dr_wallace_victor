@@ -17,15 +17,48 @@ CREATE TABLE IF NOT EXISTS patients (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- ===========================================
--- Tabela: appointment_types
--- ===========================================
 CREATE TABLE IF NOT EXISTS appointment_types (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
   duration_minutes INT NOT NULL DEFAULT 60,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ===========================================
+-- Tabela: doctors
+-- ===========================================
+CREATE TABLE IF NOT EXISTS doctors (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255),
+  phone VARCHAR(50),
+  specialty VARCHAR(255),
+  bio TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ===========================================
+-- Tabela: doctor_consultation_types (tipos por médico)
+-- ===========================================
+CREATE TABLE IF NOT EXISTS doctor_consultation_types (
+  doctor_id INT NOT NULL,
+  type_id INT NOT NULL,
+  PRIMARY KEY (doctor_id, type_id),
+  CONSTRAINT fk_dct_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_dct_type FOREIGN KEY (type_id) REFERENCES appointment_types(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ===========================================
+-- Tabela: doctor_patients (vínculo médico-paciente)
+-- ===========================================
+CREATE TABLE IF NOT EXISTS doctor_patients (
+  doctor_id INT NOT NULL,
+  patient_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (doctor_id, patient_id),
+  CONSTRAINT fk_dp_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_dp_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ===========================================
@@ -49,8 +82,12 @@ CREATE TABLE IF NOT EXISTS appointments (
     FOREIGN KEY (type_id) REFERENCES appointment_types(id)
     ON DELETE RESTRICT ON UPDATE CASCADE,
 
+  CONSTRAINT fk_appointments_doctor
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+
   CONSTRAINT uc_appointments_unique_slot 
-    UNIQUE (date, time)
+    UNIQUE (doctor_id, date, time)
 ) ENGINE=InnoDB;
 
 -- ===========================================

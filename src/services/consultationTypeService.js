@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const doctorService = require('./doctorService');
 
 function parseDuration(duration) {
   const num = Number(duration);
@@ -49,6 +50,24 @@ async function listConsultationTypes() {
   return rows;
 }
 
+async function listConsultationTypesForDoctor(doctorId) {
+  if (!doctorId) return listConsultationTypes();
+  const doctor = await doctorService.findDoctorById(doctorId);
+  if (!doctor) {
+    const error = new Error('DOCTOR_NOT_FOUND');
+    throw error;
+  }
+  const [rows] = await pool.execute(
+    `SELECT t.id, t.name, t.duration_minutes AS duration, t.description
+     FROM doctor_consultation_types dct
+     JOIN appointment_types t ON dct.type_id = t.id
+     WHERE dct.doctor_id = ?
+     ORDER BY t.name`,
+    [doctorId]
+  );
+  return rows;
+}
+
 async function updateConsultationType(id, { name, duration, description }) {
   const existing = await findById(id);
   if (!existing) {
@@ -95,6 +114,7 @@ async function deleteConsultationType(id) {
 module.exports = {
   createConsultationType,
   listConsultationTypes,
+  listConsultationTypesForDoctor,
   updateConsultationType,
   deleteConsultationType,
   existsAppointmentsUsingType,

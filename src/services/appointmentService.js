@@ -1,5 +1,8 @@
 const pool = require('../config/db');
 const blockedTimeService = require('./blockedTimeService');
+const doctorService = require('./doctorService');
+const consultationTypeService = require('./consultationTypeService');
+const doctorPatientService = require('./doctorPatientService');
 
 const START_HOUR = 8;
 const END_HOUR = 18;
@@ -13,11 +16,15 @@ function buildDailySlots() {
   return slots;
 }
 
-async function isSlotAvailable(date, time) {
+async function isSlotAvailable(date, time, doctorId = 1) {
   const blocked = await blockedTimeService.isBlocked(date, time);
   if (blocked) return false;
 
-  const [rows] = await pool.execute('SELECT id FROM appointments WHERE date = ? AND time = ?', [date, time]);
+  const [rows] = await pool.execute('SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ?', [
+    date,
+    time,
+    doctorId
+  ]);
   return rows.length === 0;
 }
 
@@ -29,12 +36,16 @@ async function checkAppointmentExists(id) {
   return rows[0] || null;
 }
 
-async function isTimeAvailable(date, time, appointmentIdToIgnore) {
+async function isTimeAvailable(date, time, appointmentIdToIgnore, doctorId) {
   const blocked = await blockedTimeService.isBlocked(date, time);
   if (blocked) return false;
 
   const params = [date, time];
   let query = 'SELECT id FROM appointments WHERE date = ? AND time = ?';
+  if (doctorId) {
+    query += ' AND doctor_id = ?';
+    params.push(doctorId);
+  }
 
   if (appointmentIdToIgnore) {
     query += ' AND id <> ?';
@@ -56,8 +67,8 @@ async function deleteAppointment(id) {
   await pool.execute('DELETE FROM appointments WHERE id = ?', [id]);
 }
 
-async function getAvailableTimes(date) {
-  const [rows] = await pool.execute('SELECT time FROM appointments WHERE date = ?', [date]);
+async function getAvailableTimes(date, doctorId = 1) {
+  const [rows] = await pool.execute('SELECT time FROM appointments WHERE date = ? AND doctor_id = ?', [date, doctorId]);
   const [blockedRows] = await pool.execute('SELECT time FROM blocked_times WHERE date = ?', [date]);
   const occupied = new Set(rows.map((row) => row.time.slice(0, 5)));
   blockedRows.forEach((row) => occupied.add(row.time.slice(0, 5)));
@@ -72,9 +83,14 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
   try {
     await connection.beginTransaction();
 
+    const doctor = await doctorService.findDoctorById(doctorId);
+    if (!doctor) {
+      throw new Error('INVALID_DOCTOR');
+    }
+
     const [existing] = await connection.execute(
-      'SELECT id FROM appointments WHERE date = ? AND time = ? FOR UPDATE',
-      [date, time]
+      'SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ? FOR UPDATE',
+      [date, time, doctorId]
     );
 
     if (existing.length > 0) {
@@ -86,10 +102,21 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
       throw new Error('INVALID_TYPE');
     }
 
+    const doctorTypes = await consultationTypeService.listConsultationTypesForDoctor(doctorId).catch(() => []);
+    if (doctorTypes.length > 0) {
+      const allowed = doctorTypes.some((t) => t.id === Number(typeId));
+      if (!allowed) {
+        throw new Error('TYPE_NOT_ALLOWED');
+      }
+    }
+
     const [result] = await connection.execute(
       'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status) VALUES (?, ?, ?, ?, ?, ?)',
       [patientId, doctorId, date, time, typeId, status]
     );
+
+    // vincula paciente ao médico
+    await doctorPatientService.linkDoctorPatient(doctorId, patientId, connection);
 
     await connection.commit();
     return result.insertId;
