@@ -31,9 +31,15 @@ async function createType(req, res) {
 
 async function listTypes(req, res) {
   try {
-    const types = await consultationTypeService.listConsultationTypes();
+    const { doctor_id: doctorId } = req.query || {};
+    const types = doctorId
+      ? await consultationTypeService.listConsultationTypesForDoctor(doctorId)
+      : await consultationTypeService.listConsultationTypes();
     return res.status(200).json({ status: 'success', types });
   } catch (error) {
+    if (error.message === 'DOCTOR_NOT_FOUND') {
+      return res.status(404).json({ status: 'error', message: 'Médico não encontrado.' });
+    }
     return res.status(500).json({ status: 'error', message: 'Erro ao listar tipos de consulta.' });
   }
 }

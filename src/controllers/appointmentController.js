@@ -1,4 +1,4 @@
-const appointmentService = require('../services/appointmentService');
+﻿const appointmentService = require('../services/appointmentService');
 
 function isValidDate(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -15,8 +15,14 @@ function isWithinWorkingHours(time) {
 
 async function createAppointment(req, res) {
   try {
-    const { patient_id: patientId, date, time, type_id: typeId, doctor_id: doctorId = 1, status = 'scheduled' } =
-      req.body || {};
+    const {
+      patient_id: patientId,
+      date,
+      time,
+      type_id: typeId,
+      doctor_id: doctorId = 1,
+      status = 'scheduled',
+    } = req.body || {};
 
     if (!patientId || !date || !time || !typeId) {
       return res.status(400).json({ status: 'error', message: 'Campos obrigatórios ausentes.' });
@@ -36,7 +42,7 @@ async function createAppointment(req, res) {
       return res.status(400).json({ status: 'error', message: 'Não é possível agendar no passado.' });
     }
 
-    const isAvailable = await appointmentService.isSlotAvailable(date, time);
+    const isAvailable = await appointmentService.isSlotAvailable(date, time, doctorId);
     if (!isAvailable) {
       return res.status(409).json({ status: 'error', message: 'Horário indisponível.' });
     }
@@ -45,13 +51,18 @@ async function createAppointment(req, res) {
     return res.status(201).json({
       status: 'success',
       appointment_id: appointmentId,
-      message: 'Consulta agendada com sucesso.'
+      message: 'Consulta agendada com sucesso.',
     });
   } catch (error) {
     if (error.code === 'ER_NO_REFERENCED_ROW_2' || error.message === 'INVALID_TYPE') {
       return res.status(400).json({ status: 'error', message: 'Paciente ou tipo de consulta inválido.' });
     }
-
+    if (error.message === 'INVALID_DOCTOR') {
+      return res.status(400).json({ status: 'error', message: 'Médico inválido.' });
+    }
+    if (error.message === 'TYPE_NOT_ALLOWED') {
+      return res.status(400).json({ status: 'error', message: 'Tipo de consulta não disponível para o médico escolhido.' });
+    }
     if (error.message === 'CONFLICT') {
       return res.status(409).json({ status: 'error', message: 'Horário indisponível.' });
     }
@@ -77,7 +88,7 @@ async function listAppointments(req, res) {
 
 async function getAvailableAppointments(req, res) {
   try {
-    const { date } = req.query || {};
+    const { date, doctor_id: doctorId = 1 } = req.query || {};
 
     if (!date || !isValidDate(date)) {
       return res.status(400).json({ status: 'error', message: 'Data inválida ou anterior a hoje.' });
@@ -94,7 +105,7 @@ async function getAvailableAppointments(req, res) {
       return res.status(400).json({ status: 'error', message: 'Data inválida ou anterior a hoje.' });
     }
 
-    const availableTimes = await appointmentService.getAvailableTimes(date);
+    const availableTimes = await appointmentService.getAvailableTimes(date, Number(doctorId));
     return res.status(200).json({ date, available_times: availableTimes });
   } catch (error) {
     return res.status(500).json({ status: 'error', message: 'Erro ao consultar horários disponíveis.' });
@@ -129,7 +140,7 @@ async function updateAppointment(req, res) {
       return res.status(400).json({ status: 'error', message: 'Não é possível editar um agendamento já encerrado.' });
     }
 
-    const available = await appointmentService.isTimeAvailable(date, time, id);
+    const available = await appointmentService.isTimeAvailable(date, time, id, appointment.doctor_id);
     if (!available) {
       return res.status(409).json({ status: 'error', message: 'Horário indisponível.' });
     }
@@ -169,5 +180,5 @@ module.exports = {
   listAppointments,
   getAvailableAppointments,
   updateAppointment,
-  cancelAppointment
+  cancelAppointment,
 };

@@ -7,6 +7,13 @@ function formatDateInput(dateObj) {
   return dateObj.toISOString().slice(0, 10);
 }
 
+function formatDateDisplay(dateStr) {
+  if (!dateStr) return "";
+  const [year, month, day] = dateStr.split("-");
+  if (!year || !month || !day) return dateStr;
+  return `${day}/${month}/${year}`;
+}
+
 export default function Agendar({ onNavigate }) {
   const { patient, token } = useAuth();
   const [date, setDate] = useState(() => formatDateInput(new Date(Date.now() + 24 * 60 * 60 * 1000)));
@@ -14,19 +21,40 @@ export default function Agendar({ onNavigate }) {
   const [selectedTime, setSelectedTime] = useState("");
   const [types, setTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState("");
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+    async function loadDoctors() {
+      try {
+        const resp = await fetch("/api/doctors");
+        const data = await resp.json().catch(() => ({}));
+        if (resp.ok && Array.isArray(data.doctors)) {
+          setDoctors(data.doctors);
+          if (data.doctors.length > 0) {
+            setSelectedDoctor(data.doctors[0].id);
+          }
+        }
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    loadDoctors();
+  }, []);
+
+  useEffect(() => {
     async function loadAvailable() {
+      if (!selectedDoctor) return;
       setLoading(true);
       setError("");
       setMessage("");
       setSelectedTime("");
       try {
-        const resp = await fetch(`/api/appointments/available?date=${date}`, {
+        const resp = await fetch(`/api/appointments/available?date=${date}&doctor_id=${selectedDoctor}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));
@@ -43,8 +71,9 @@ export default function Agendar({ onNavigate }) {
     }
 
     async function loadTypes() {
+      if (!selectedDoctor) return;
       try {
-        const resp = await fetch("/api/consultation-types", {
+        const resp = await fetch(`/api/consultation-types?doctor_id=${selectedDoctor}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));
@@ -57,14 +86,19 @@ export default function Agendar({ onNavigate }) {
         }
       } catch (err) {
         setError(err.message || "Falha ao carregar tipos.");
+        setTypes([]);
       }
     }
 
     loadAvailable();
     loadTypes();
-  }, [date, token]);
+  }, [date, token, selectedDoctor]);
 
   const handleBook = async () => {
+    if (!selectedDoctor) {
+      setError("Selecione um médico.");
+      return;
+    }
     if (!selectedTime) {
       setError("Selecione um horário.");
       return;
@@ -85,7 +119,7 @@ export default function Agendar({ onNavigate }) {
         },
         body: JSON.stringify({
           patient_id: patient?.id,
-          doctor_id: 1,
+          doctor_id: selectedDoctor,
           type_id: selectedType,
           date,
           time: selectedTime,
@@ -112,7 +146,7 @@ export default function Agendar({ onNavigate }) {
           <header className={styles.hero}>
             <p className={styles.badge}>Agendamento online</p>
             <h1 className={styles.title}>Agendar consulta</h1>
-            <p className={styles.lead}>Escolha a melhor data, horário e tipo de atendimento para você.</p>
+            <p className={styles.lead}>Escolha a melhor data, médico e tipo de atendimento para você.</p>
           </header>
 
           <section className={styles.grid}>
@@ -120,7 +154,7 @@ export default function Agendar({ onNavigate }) {
               <div className={styles.cardHeader}>
                 <div>
                   <h2 className={styles.cardTitle}>Dados do agendamento</h2>
-                  <p className={styles.muted}>Selecione a data e o tipo de consulta.</p>
+                  <p className={styles.muted}>Selecione a data, médico e tipo de consulta.</p>
                 </div>
               </div>
               <div className={styles.inputs}>
@@ -133,6 +167,20 @@ export default function Agendar({ onNavigate }) {
                     min={formatDateInput(new Date())}
                     onChange={(e) => setDate(e.target.value)}
                   />
+                </label>
+                <label className={styles.field} htmlFor="doctor">
+                  Médico
+                  <select
+                    id="doctor"
+                    value={selectedDoctor}
+                    onChange={(e) => setSelectedDoctor(Number(e.target.value))}
+                  >
+                    {doctors.map((doc) => (
+                      <option key={doc.id} value={doc.id}>
+                        {doc.name} {doc.specialty ? `- ${doc.specialty}` : ""}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label className={styles.field} htmlFor="type">
                   Tipo de consulta
@@ -157,7 +205,19 @@ export default function Agendar({ onNavigate }) {
               <div className={styles.summary}>
                 <div className={styles.summaryRow}>
                   <p className={styles.label}>Data</p>
-                  <p className={styles.value}>{new Date(date).toLocaleDateString("pt-BR")}</p>
+                  <p className={styles.value}>{formatDateDisplay(date)}</p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Médico</p>
+                  <p className={styles.value}>
+                    {doctors.find((d) => d.id === selectedDoctor)?.name || "Selecione o médico"}
+                  </p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Especialidade</p>
+                  <p className={styles.value}>
+                    {doctors.find((d) => d.id === selectedDoctor)?.specialty || "--"}
+                  </p>
                 </div>
                 <div className={styles.summaryRow}>
                   <p className={styles.label}>Tipo</p>
@@ -184,7 +244,7 @@ export default function Agendar({ onNavigate }) {
                   type="button"
                   className={styles.primary}
                   onClick={handleBook}
-                  disabled={booking || !selectedTime || !selectedType}
+                  disabled={booking || !selectedTime || !selectedType || !selectedDoctor}
                 >
                   {booking ? "Agendando..." : "Confirmar agendamento"}
                 </button>
@@ -199,7 +259,7 @@ export default function Agendar({ onNavigate }) {
             <div className={styles.cardHeader}>
               <div>
                 <h2 className={styles.cardTitle}>Horários disponíveis</h2>
-                <p className={styles.muted}>Escolha um horário para a data selecionada.</p>
+                <p className={styles.muted}>Escolha um horário para a data e médico selecionados.</p>
               </div>
             </div>
             {!loading && !error && available.length === 0 && (

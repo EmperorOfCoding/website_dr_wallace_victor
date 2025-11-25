@@ -2,25 +2,33 @@
 import styles from "./Header.module.css";
 
 export default function Header({ currentPage, onNavigate, isAuthenticated, isAdmin, onLogout }) {
-  const links = [
-    { key: "home", label: "Home" },
-    { key: "sobre", label: "Sobre" },
-    { key: "servicos", label: "Serviços" },
-    { key: "contato", label: "Contato" },
-  ];
-
-  const authLinks = isAuthenticated
+  const links = isAdmin
     ? [
-        { key: "dashboard", label: "Dashboard" },
-        { key: "agendar", label: "Agendar" },
-        { key: "minha-agenda", label: "Minha Agenda" },
-        { key: "perfil", label: "Perfil" },
-        ...(isAdmin ? [{ key: "admin", label: "Admin" }] : []),
+        { key: "admin", label: "Painel" },
+        { key: "admin-agenda", label: "Agenda" },
+        { key: "admin-pacientes", label: "Pacientes" },
       ]
     : [
-        { key: "cadastro", label: "Cadastro" },
-        { key: "login", label: "Entrar" },
+        { key: "home", label: "Home" },
+        { key: "sobre", label: "Sobre" },
+        { key: "servicos", label: "Serviços" },
+        { key: "contato", label: "Contato" },
       ];
+
+  const authLinks =
+    !isAdmin && isAuthenticated
+      ? [
+          { key: "dashboard", label: "Dashboard" },
+          { key: "agendar", label: "Agendar" },
+          { key: "minha-agenda", label: "Minha Agenda" },
+          { key: "perfil", label: "Perfil" },
+        ]
+      : !isAuthenticated
+      ? [
+          { key: "cadastro", label: "Cadastro" },
+          { key: "login", label: "Entrar" },
+        ]
+      : [];
 
   return (
     <header className={styles.header}>
