@@ -16,15 +16,20 @@ function buildDailySlots() {
   return slots;
 }
 
-async function isSlotAvailable(date, time, doctorId = 1) {
+async function isSlotAvailable(date, time, doctorId = 1, excludeAppointmentId = null) {
   const blocked = await blockedTimeService.isBlocked(date, time);
   if (blocked) return false;
 
-  const [rows] = await pool.execute('SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ?', [
-    date,
-    time,
-    doctorId
-  ]);
+  const params = [date, time, doctorId];
+  let query = 'SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ?';
+  
+  // Exclude the original appointment when rescheduling
+  if (excludeAppointmentId) {
+    query += ' AND id != ?';
+    params.push(excludeAppointmentId);
+  }
+  
+  const [rows] = await pool.execute(query, params);
   return rows.length === 0;
 }
 
@@ -77,7 +82,7 @@ async function getAvailableTimes(date, doctorId = 1) {
   return slots.filter((slot) => !occupied.has(slot));
 }
 
-async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled' }) {
+async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled', rescheduledFrom = null }) {
   const connection = await pool.getConnection();
 
   try {
@@ -88,10 +93,15 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
       throw new Error('INVALID_DOCTOR');
     }
 
-    const [existing] = await connection.execute(
-      'SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ? FOR UPDATE',
-      [date, time, doctorId]
-    );
+    // When rescheduling, exclude the original appointment from the conflict check
+    const conflictCheckQuery = rescheduledFrom
+      ? 'SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ? AND id != ? FOR UPDATE'
+      : 'SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ? FOR UPDATE';
+    const conflictCheckParams = rescheduledFrom
+      ? [date, time, doctorId, rescheduledFrom]
+      : [date, time, doctorId];
+
+    const [existing] = await connection.execute(conflictCheckQuery, conflictCheckParams);
 
     if (existing.length > 0) {
       throw new Error('CONFLICT');
@@ -110,9 +120,17 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
       }
     }
 
+    // If rescheduling, cancel the original appointment
+    if (rescheduledFrom) {
+      await connection.execute(
+        'UPDATE appointments SET status = ?, cancelled_at = NOW() WHERE id = ?',
+        ['cancelled', rescheduledFrom]
+      );
+    }
+
     const [result] = await connection.execute(
-      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [patientId, doctorId, date, time, typeId, status]
+      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status, rescheduled_from) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [patientId, doctorId, date, time, typeId, status, rescheduledFrom]
     );
 
     // vincula paciente ao médico

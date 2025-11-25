@@ -1,4 +1,7 @@
 ﻿const appointmentService = require('../services/appointmentService');
+const reviewService = require('../services/reviewService');
+const { scheduleNotifications, cancelNotifications, sendBookingConfirmation, sendCancellationNotification } = require('../services/notificationService');
+const pool = require('../config/db');
 
 function isValidDate(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -22,6 +25,7 @@ async function createAppointment(req, res) {
       type_id: typeId,
       doctor_id: doctorId = 1,
       status = 'scheduled',
+      rescheduled_from: rescheduledFrom,
     } = req.body || {};
 
     if (!patientId || !date || !time || !typeId) {
@@ -42,12 +46,30 @@ async function createAppointment(req, res) {
       return res.status(400).json({ status: 'error', message: 'Não é possível agendar no passado.' });
     }
 
-    const isAvailable = await appointmentService.isSlotAvailable(date, time, doctorId);
+    const isAvailable = await appointmentService.isSlotAvailable(date, time, doctorId, rescheduledFrom);
     if (!isAvailable) {
       return res.status(409).json({ status: 'error', message: 'Horário indisponível.' });
     }
 
-    const appointmentId = await appointmentService.createAppointment({ patientId, date, time, typeId, doctorId, status });
+    const appointmentId = await appointmentService.createAppointment({
+      patientId,
+      date,
+      time,
+      typeId,
+      doctorId,
+      status,
+      rescheduledFrom: rescheduledFrom ? parseInt(rescheduledFrom) : null,
+    });
+
+    // Schedule notifications and send confirmation
+    try {
+      await scheduleNotifications(appointmentId, patientId, date, time);
+      await sendBookingConfirmation(appointmentId);
+    } catch (notifError) {
+      console.error('Error scheduling notifications:', notifError);
+      // Don't fail the request if notifications fail
+    }
+
     return res.status(201).json({
       status: 'success',
       appointment_id: appointmentId,
@@ -80,10 +102,66 @@ async function listAppointments(req, res) {
     }
 
     const appointments = await appointmentService.listAppointmentsByPatient(patientId);
-    return res.status(200).json({ status: 'success', appointments });
+
+    // Add review status to each appointment
+    const appointmentsWithReview = await Promise.all(
+      appointments.map(async (appt) => {
+        const review = await reviewService.getReviewByAppointmentId(appt.id);
+        return {
+          ...appt,
+          hasReview: !!review,
+        };
+      })
+    );
+
+    return res.status(200).json({ status: 'success', appointments: appointmentsWithReview });
   } catch (error) {
     console.error("Erro em listAppointments: ", error);
     return res.status(500).json({ status: 'error', message: 'Erro ao consultar agendamentos.' });
+  }
+}
+
+async function getAppointmentById(req, res) {
+  try {
+    const { id } = req.params;
+    const patientId = req.user?.patient_id;
+
+    const [rows] = await pool.execute(
+      `SELECT a.*, 
+              at.name as typeName, at.duration_minutes as durationMinutes,
+              d.name as doctorName,
+              p.name as patientName, p.email as patientEmail, p.phone as patientPhone
+       FROM appointments a
+       LEFT JOIN appointment_types at ON a.type_id = at.id
+       LEFT JOIN doctors d ON a.doctor_id = d.id
+       LEFT JOIN patients p ON a.patient_id = p.id
+       WHERE a.id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ status: 'error', message: 'Consulta não encontrada.' });
+    }
+
+    const appointment = rows[0];
+
+    // Check ownership (patient can only see their own, admin can see all)
+    const isAdmin = req.user?.doctor_id;
+    if (!isAdmin && appointment.patient_id !== patientId) {
+      return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+    }
+
+    // Get review if exists
+    const review = await reviewService.getReviewByAppointmentId(id);
+
+    return res.status(200).json({
+      status: 'success',
+      appointment,
+      review,
+    });
+  } catch (error) {
+    console.error("Erro em getAppointmentById: ", error);
+    return res.status(500).json({ status: 'error', message: 'Erro ao buscar consulta.' });
   }
 }
 
@@ -149,6 +227,14 @@ async function updateAppointment(req, res) {
     const nextTypeId = typeId ?? appointment.type_id;
     await appointmentService.updateAppointment(id, { date, time, typeId: nextTypeId });
 
+    // Reschedule notifications
+    try {
+      await cancelNotifications(id);
+      await scheduleNotifications(id, appointment.patient_id, date, time);
+    } catch (notifError) {
+      console.error('Error rescheduling notifications:', notifError);
+    }
+
     return res.status(200).json({ status: 'success', message: 'Agendamento atualizado com sucesso.' });
   } catch (error) {
     return res.status(500).json({ status: 'error', message: 'Erro ao atualizar agendamento.' });
@@ -170,8 +256,56 @@ async function cancelAppointment(req, res) {
     }
 
     await appointmentService.deleteAppointment(id);
+
+    // Cancel notifications
+    try {
+      await cancelNotifications(id);
+    } catch (notifError) {
+      console.error('Error canceling notifications:', notifError);
+    }
+
     return res.status(200).json({ status: 'success', message: 'Agendamento cancelado com sucesso.' });
   } catch (error) {
+    return res.status(500).json({ status: 'error', message: 'Erro ao cancelar agendamento.' });
+  }
+}
+
+async function cancelAppointmentWithReason(req, res) {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body || {};
+
+    const appointment = await appointmentService.checkAppointmentExists(id);
+    if (!appointment) {
+      return res.status(404).json({ status: 'error', message: 'Agendamento não encontrado.' });
+    }
+
+    const appointmentDateTime = new Date(`${appointment.date}T${appointment.time}`);
+    if (appointmentDateTime <= new Date()) {
+      return res.status(400).json({ status: 'error', message: 'Não é possível cancelar um agendamento passado.' });
+    }
+
+    // Update status to cancelled with reason
+    await pool.execute(
+      `UPDATE appointments 
+       SET status = 'cancelled', 
+           cancellation_reason = ?, 
+           cancelled_at = NOW()
+       WHERE id = ?`,
+      [reason || null, id]
+    );
+
+    // Cancel notifications and send cancellation email
+    try {
+      await cancelNotifications(id);
+      await sendCancellationNotification(id, reason);
+    } catch (notifError) {
+      console.error('Error handling cancellation notifications:', notifError);
+    }
+
+    return res.status(200).json({ status: 'success', message: 'Agendamento cancelado com sucesso.' });
+  } catch (error) {
+    console.error('Error canceling appointment:', error);
     return res.status(500).json({ status: 'error', message: 'Erro ao cancelar agendamento.' });
   }
 }
@@ -179,7 +313,9 @@ async function cancelAppointment(req, res) {
 module.exports = {
   createAppointment,
   listAppointments,
+  getAppointmentById,
   getAvailableAppointments,
   updateAppointment,
   cancelAppointment,
+  cancelAppointmentWithReason,
 };

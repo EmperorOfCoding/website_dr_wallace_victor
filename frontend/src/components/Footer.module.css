@@ -1,8 +1,9 @@
 .footer {
-  background: #0f1f46;
-  color: #e9efff;
+  background: var(--bg-card);
+  color: var(--text-primary);
   padding: 28px 20px;
   margin-top: 40px;
+  border-top: 1px solid var(--border-color);
 }
 
 .inner {
@@ -21,12 +22,12 @@
 }
 
 .info span {
-  opacity: 0.9;
+  color: var(--text-secondary);
 }
 
 .copy {
   font-size: 13px;
-  opacity: 0.75;
+  color: var(--text-muted);
 }
 
 @media (min-width: 768px) {

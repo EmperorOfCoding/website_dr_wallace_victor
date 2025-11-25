@@ -7,6 +7,23 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
+// Custom hook for debouncing
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 export default function AdminDashboard({ onNavigate }) {
   const { token } = useAuth();
   const [appointments, setAppointments] = useState([]);
@@ -17,6 +34,9 @@ export default function AdminDashboard({ onNavigate }) {
   const [loadingPatients, setLoadingPatients] = useState(false);
   const [error, setError] = useState("");
 
+  // Debounce search input to avoid excessive API calls
+  const debouncedSearch = useDebounce(search, 500);
+
   useEffect(() => {
     async function loadAppointments() {
       setLoadingAppt(true);
@@ -24,7 +44,7 @@ export default function AdminDashboard({ onNavigate }) {
       try {
         const params = new URLSearchParams();
         if (date) params.append("date", date);
-        if (search) params.append("patient", search);
+        if (debouncedSearch) params.append("patient", debouncedSearch);
         const resp = await fetch(`/api/admin/appointments?${params.toString()}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -50,7 +70,7 @@ export default function AdminDashboard({ onNavigate }) {
       try {
         const params = new URLSearchParams();
         params.append("limit", 5);
-        if (search) params.append("search", search);
+        if (debouncedSearch) params.append("search", debouncedSearch);
         const resp = await fetch(`/api/admin/patients?${params.toString()}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -66,7 +86,7 @@ export default function AdminDashboard({ onNavigate }) {
     }
     loadAppointments();
     loadPatients();
-  }, [token, date, search]);
+  }, [token, date, debouncedSearch]);
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>

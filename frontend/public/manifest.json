@@ -1,0 +1,29 @@
+{
+  "name": "Dr. Wallace Victor - Agendamento",
+  "short_name": "Dr. Wallace",
+  "description": "Sistema de agendamento de consultas do Dr. Wallace Victor",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#3b5bfd",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo_wallace_victor.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo_wallace_victor.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical", "productivity"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}
+
+
