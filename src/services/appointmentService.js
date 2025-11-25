@@ -1,29 +1,122 @@
 const pool = require('../config/db');
+const blockedTimeService = require('./blockedTimeService');
+const doctorService = require('./doctorService');
+const consultationTypeService = require('./consultationTypeService');
+const doctorPatientService = require('./doctorPatientService');
 
-async function isSlotAvailable(date, time) {
-  const [rows] = await pool.execute('SELECT id FROM appointments WHERE date = ? AND time = ?', [date, time]);
+const START_HOUR = 8;
+const END_HOUR = 18;
+
+function buildDailySlots() {
+  const slots = [];
+  for (let hour = START_HOUR; hour < END_HOUR; hour += 1) {
+    const hourStr = hour.toString().padStart(2, '0');
+    slots.push(`${hourStr}:00`);
+  }
+  return slots;
+}
+
+async function isSlotAvailable(date, time, doctorId = 1) {
+  const blocked = await blockedTimeService.isBlocked(date, time);
+  if (blocked) return false;
+
+  const [rows] = await pool.execute('SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ?', [
+    date,
+    time,
+    doctorId
+  ]);
   return rows.length === 0;
 }
 
-async function createAppointment({ patientId, date, time, typeId }) {
+async function checkAppointmentExists(id) {
+  const [rows] = await pool.execute(
+    'SELECT id, patient_id, type_id, date, time FROM appointments WHERE id = ?',
+    [id]
+  );
+  return rows[0] || null;
+}
+
+async function isTimeAvailable(date, time, appointmentIdToIgnore, doctorId) {
+  const blocked = await blockedTimeService.isBlocked(date, time);
+  if (blocked) return false;
+
+  const params = [date, time];
+  let query = 'SELECT id FROM appointments WHERE date = ? AND time = ?';
+  if (doctorId) {
+    query += ' AND doctor_id = ?';
+    params.push(doctorId);
+  }
+
+  if (appointmentIdToIgnore) {
+    query += ' AND id <> ?';
+    params.push(appointmentIdToIgnore);
+  }
+
+  const [rows] = await pool.execute(query, params);
+  return rows.length === 0;
+}
+
+async function updateAppointment(id, { date, time, typeId }) {
+  await pool.execute(
+    'UPDATE appointments SET date = ?, time = ?, type_id = ? WHERE id = ?',
+    [date, time, typeId, id]
+  );
+}
+
+async function deleteAppointment(id) {
+  await pool.execute('DELETE FROM appointments WHERE id = ?', [id]);
+}
+
+async function getAvailableTimes(date, doctorId = 1) {
+  const [rows] = await pool.execute('SELECT time FROM appointments WHERE date = ? AND doctor_id = ?', [date, doctorId]);
+  const [blockedRows] = await pool.execute('SELECT time FROM blocked_times WHERE date = ?', [date]);
+  const occupied = new Set(rows.map((row) => row.time.slice(0, 5)));
+  blockedRows.forEach((row) => occupied.add(row.time.slice(0, 5)));
+
+  const slots = buildDailySlots();
+  return slots.filter((slot) => !occupied.has(slot));
+}
+
+async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled' }) {
   const connection = await pool.getConnection();
 
   try {
     await connection.beginTransaction();
 
+    const doctor = await doctorService.findDoctorById(doctorId);
+    if (!doctor) {
+      throw new Error('INVALID_DOCTOR');
+    }
+
     const [existing] = await connection.execute(
-      'SELECT id FROM appointments WHERE date = ? AND time = ? FOR UPDATE',
-      [date, time]
+      'SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ? FOR UPDATE',
+      [date, time, doctorId]
     );
 
     if (existing.length > 0) {
       throw new Error('CONFLICT');
     }
 
+    const [typeRows] = await connection.execute('SELECT id FROM appointment_types WHERE id = ?', [typeId]);
+    if (typeRows.length === 0) {
+      throw new Error('INVALID_TYPE');
+    }
+
+    const doctorTypes = await consultationTypeService.listConsultationTypesForDoctor(doctorId).catch(() => []);
+    if (doctorTypes.length > 0) {
+      const allowed = doctorTypes.some((t) => t.id === Number(typeId));
+      if (!allowed) {
+        throw new Error('TYPE_NOT_ALLOWED');
+      }
+    }
+
     const [result] = await connection.execute(
-      'INSERT INTO appointments (patient_id, date, time, type_id) VALUES (?, ?, ?, ?)',
-      [patientId, date, time, typeId]
+      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status) VALUES (?, ?, ?, ?, ?, ?)',
+      [patientId, doctorId, date, time, typeId, status]
     );
+
+    // vincula paciente ao médico
+    await doctorPatientService.linkDoctorPatient(doctorId, patientId, connection);
 
     await connection.commit();
     return result.insertId;
@@ -35,7 +128,34 @@ async function createAppointment({ patientId, date, time, typeId }) {
   }
 }
 
+async function listAppointmentsByPatient(patientId) {
+  const [rows] = await pool.execute(
+    `
+      SELECT 
+        a.id,
+        a.date,
+        a.time,
+        a.status,
+        a.type_id AS typeId,
+        t.name AS typeName,
+        t.duration_minutes AS durationMinutes
+      FROM appointments a
+      LEFT JOIN appointment_types t ON a.type_id = t.id
+      WHERE a.patient_id = ?
+      ORDER BY a.date ASC, a.time ASC
+    `,
+    [patientId]
+  );
+  return rows;
+}
+
 module.exports = {
   isSlotAvailable,
-  createAppointment
+  checkAppointmentExists,
+  isTimeAvailable,
+  updateAppointment,
+  deleteAppointment,
+  getAvailableTimes,
+  createAppointment,
+  listAppointmentsByPatient
 };

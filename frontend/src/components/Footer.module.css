@@ -1,0 +1,40 @@
+.footer {
+  background: #0f1f46;
+  color: #e9efff;
+  padding: 28px 20px;
+  margin-top: 40px;
+}
+
+.inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.info span {
+  opacity: 0.9;
+}
+
+.copy {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: center;
+  }
+  .info {
+    justify-content: flex-end;
+  }
+}
