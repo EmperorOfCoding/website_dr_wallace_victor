@@ -1,5 +1,5 @@
 ﻿import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ProtectedPage from "../components/ProtectedPage";
 import { useAuth } from "../context/AuthContext";
 import styles from "./MinhaAgenda.module.css";
@@ -162,6 +162,10 @@ export default function MinhaAgenda({ onNavigate }) {
             <div className={styles.detailRow}>
               <span className={styles.detailIcon}>⏱️</span>
               <span>{appt.durationMinutes || "30"} min</span>
+            </div>
+            <div className={styles.detailRow}>
+              <span className={styles.detailIcon}>{appt.modality === 'online' ? '💻' : '🏥'}</span>
+              <span>{appt.modality === 'online' ? 'Online' : 'Presencial'}</span>
             </div>
             {appt.doctorName && (
               <div className={styles.detailRow}>

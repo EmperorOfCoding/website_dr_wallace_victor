@@ -203,7 +203,13 @@ function AppRoutes() {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             {/* Public Routes */}
-            <Route path="/" element={<PageTransition><Home onNavigate={handleNavigate} /></PageTransition>} />
+            <Route path="/" element={
+              isAuthenticated ? (
+                <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />
+              ) : (
+                <PageTransition><Home onNavigate={handleNavigate} /></PageTransition>
+              )
+            } />
             <Route path="/sobre" element={<PageTransition><Sobre onNavigate={handleNavigate} /></PageTransition>} />
             <Route path="/servicos" element={<PageTransition><Servicos onNavigate={handleNavigate} /></PageTransition>} />
             <Route path="/contato" element={<PageTransition><Contato /></PageTransition>} />

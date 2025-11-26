@@ -82,7 +82,7 @@ async function getAvailableTimes(date, doctorId = 1) {
   return slots.filter((slot) => !occupied.has(slot));
 }
 
-async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled', rescheduledFrom = null, notes = null }) {
+async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled', rescheduledFrom = null, notes = null, modality = 'presencial' }) {
   const connection = await pool.getConnection();
 
   try {
@@ -129,8 +129,8 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
     }
 
     const [result] = await connection.execute(
-      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status, rescheduled_from, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [patientId, doctorId, date, time, typeId, status, rescheduledFrom, notes]
+      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status, rescheduled_from, notes, modality) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [patientId, doctorId, date, time, typeId, status, rescheduledFrom, notes, modality]
     );
 
     // vincula paciente ao médico
@@ -164,6 +164,8 @@ async function listAppointmentsByPatient(patientId, page = 1, limit = 10) {
         a.date,
         a.time,
         a.status,
+        a.status,
+        a.modality,
         a.type_id AS typeId,
         t.name AS typeName,
         t.duration_minutes AS durationMinutes,

@@ -26,9 +26,10 @@ export default function Header({ currentPage, onNavigate, isAuthenticated, isAdm
   const authLinks =
     !isAdmin && isAuthenticated
       ? [
-          { key: "dashboard", label: "Dashboard", icon: "📊" },
+          { key: "dashboard", label: "Início", icon: "🏠" },
           { key: "agendar", label: "Agendar", icon: "➕" },
           { key: "minha-agenda", label: "Minha Agenda", icon: "📋" },
+          { key: "exames", label: "Exames", icon: "🧪" },
           { key: "perfil", label: "Perfil", icon: "👤" },
         ]
       : !isAuthenticated

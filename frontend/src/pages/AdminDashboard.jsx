@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from "react";
+import ExamPanel from "../components/ExamPanel";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
@@ -36,6 +37,7 @@ export default function AdminDashboard({ onNavigate }) {
   const [selectedAppt, setSelectedAppt] = useState(null);
   const [apptDocs, setApptDocs] = useState([]);
   const [loadingDocs, setLoadingDocs] = useState(false);
+  const [selectedPatientForExams, setSelectedPatientForExams] = useState(null);
 
   // Debounce search input to avoid excessive API calls
   const debouncedSearch = useDebounce(search, 500);
@@ -214,6 +216,7 @@ export default function AdminDashboard({ onNavigate }) {
                       <div className={styles.detailBlock}>
                         <p className={styles.sub}>Tipo</p>
                         <p className={styles.value}>{appt.type_name || appt.type_id}</p>
+                        <p className={styles.sub}>{appt.modality === 'online' ? 'Online' : 'Presencial'}</p>
                       </div>
                       <button
                         type="button"
@@ -250,7 +253,15 @@ export default function AdminDashboard({ onNavigate }) {
                         <p className={styles.patient}>{p.name}</p>
                         <p className={styles.sub}>{p.email}</p>
                       </div>
-                      <p className={styles.value}>{p.phone || "--"}</p>
+                      <div className={styles.patientActions}>
+                        <p className={styles.value}>{p.phone || "--"}</p>
+                        <button 
+                          className={styles.btnSmall}
+                          onClick={() => setSelectedPatientForExams(p.id)}
+                        >
+                          Exames
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -272,6 +283,7 @@ export default function AdminDashboard({ onNavigate }) {
               <p><strong>Paciente:</strong> {selectedAppt.patient_name}</p>
               <p><strong>Data:</strong> {formatDate(selectedAppt.date)} - {selectedAppt.time?.slice(0, 5)}</p>
               <p><strong>Tipo:</strong> {selectedAppt.type_name || selectedAppt.type_id}</p>
+              <p><strong>Modalidade:</strong> {selectedAppt.modality === 'online' ? 'Online' : 'Presencial'}</p>
               
               <div className={styles.section}>
                 <h4>Resumo do problema</h4>
@@ -306,6 +318,12 @@ export default function AdminDashboard({ onNavigate }) {
             </div>
           </div>
         </div>
+      )}
+      {selectedPatientForExams && (
+        <ExamPanel 
+          patientId={selectedPatientForExams} 
+          onClose={() => setSelectedPatientForExams(null)} 
+        />
       )}
     </ProtectedAdmin>
   );
