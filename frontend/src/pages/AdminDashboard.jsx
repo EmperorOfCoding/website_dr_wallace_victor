@@ -115,6 +115,35 @@ export default function AdminDashboard({ onNavigate }) {
     setApptDocs([]);
   }
 
+  async function handleDownload(docId, filename) {
+    try {
+      const resp = await fetch(`/api/documents/${docId}/download`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        alert(data.message || "Erro ao baixar documento.");
+        return;
+      }
+
+      const blob = await resp.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Erro ao baixar documento:", err);
+      alert("Erro ao baixar documento.");
+    }
+  }
+
   return (
     <ProtectedAdmin onNavigate={onNavigate}>
       <div className={styles.page}>
@@ -257,13 +286,13 @@ export default function AdminDashboard({ onNavigate }) {
                   <ul className={styles.docList}>
                     {apptDocs.map((doc) => (
                       <li key={doc.id}>
-                        <a
-                          href={`/api/documents/${doc.id}/download`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          type="button"
+                          className={styles.linkBtn}
+                          onClick={() => handleDownload(doc.id, doc.original_name)}
                         >
                           {doc.original_name}
-                        </a>
+                        </button>
                       </li>
                     ))}
                   </ul>

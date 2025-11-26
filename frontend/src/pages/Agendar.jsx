@@ -244,7 +244,7 @@ export default function Agendar({ onNavigate }) {
         formData.append("appointment_id", data.appointment_id);
         // If admin is booking, we need to associate with the selected patient
         if (isAdmin && selectedPatientId) {
-          formData.append("patient_id", selectedPatientId);
+          formData.append("patient_id", String(selectedPatientId));
         }
         formData.append("file", file);
 

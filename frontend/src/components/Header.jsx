@@ -1,7 +1,7 @@
-﻿import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import ThemeToggle from "./ThemeToggle";
+﻿import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 import styles from "./Header.module.css";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header({ currentPage, onNavigate, isAuthenticated, isAdmin, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,6 +14,8 @@ export default function Header({ currentPage, onNavigate, isAuthenticated, isAdm
         { key: "admin-metricas", label: "Métricas", icon: "📈" },
         { key: "admin-pacientes", label: "Pacientes", icon: "👥" },
       ]
+    : isAuthenticated
+    ? [] // No public links for authenticated patients
     : [
         { key: "home", label: "Home", icon: "🏠" },
         { key: "sobre", label: "Sobre", icon: "👨‍⚕️" },
