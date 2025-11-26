@@ -1,7 +1,337 @@
 .page {
   min-height: 100vh;
   padding: 2rem;
-  background: var(--bg-gradient, linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%));
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #3b5bfd 0%, #5b7cfd 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.primary,
+.secondary,
+.danger {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.primary {
+  background: linear-gradient(135deg, #3b5bfd 0%, #5b7cfd 100%);
+  color: white;
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 91, 253, 0.4);
+}
+
+.secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.secondary:hover {
+  background: var(--bg-hover);
+}
+
+.danger {
+  background: #ef4444;
+  color: white;
+}
+
+.danger:hover {
+  background: #dc2626;
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.calendarWrapper {
+  background: var(--bg-card);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* FullCalendar customization */
+.calendarWrapper :global(.fc) {
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.calendarWrapper :global(.fc-toolbar-title) {
+  font-size: 1.25rem !important;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.calendarWrapper :global(.fc-button) {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.calendarWrapper :global(.fc-button:hover) {
+  background: var(--bg-hover) !important;
+}
+
+.calendarWrapper :global(.fc-button-active) {
+  background: linear-gradient(135deg, #3b5bfd 0%, #5b7cfd 100%) !important;
+  color: white !important;
+  border-color: #3b5bfd !important;
+}
+
+.calendarWrapper :global(.fc-event) {
+  border-radius: 4px;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.calendarWrapper :global(.fc-timegrid-slot) {
+  height: 3rem;
+}
+
+.calendarWrapper :global(.fc-col-header-cell-cushion) {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.calendarWrapper :global(.fc-daygrid-day-number) {
+  color: var(--text-primary);
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--bg-card);
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  animation: slideIn 0.3s ease;
+  border: 1px solid var(--border-color);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalClose {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.modalClose:hover {
+  color: var(--text-primary);
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalLabel {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status.scheduled {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status.confirmed {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.status.completed {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.status.cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* Dark Mode Overrides */
+:global([data-theme="dark"]) .calendarWrapper,
+:global([data-theme="dark"]) .modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+:global([data-theme="dark"]) .calendarWrapper :global(.fc-button) {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+:global([data-theme="dark"]) .calendarWrapper :global(.fc-button:hover) {
+  background: var(--bg-hover) !important;
+}
+
+:global([data-theme="dark"]) .calendarWrapper :global(.fc-col-header-cell-cushion),
+:global([data-theme="dark"]) .calendarWrapper :global(.fc-daygrid-day-number),
+:global([data-theme="dark"]) .calendarWrapper :global(.fc-toolbar-title) {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+
+  .legend {
+    gap: 1rem;
+  }
+
+  .calendarWrapper {
+    padding: 0.75rem;
+  }
 }
 
 .container {

@@ -261,3 +261,58 @@
     grid-template-columns: 1fr 2fr;
   }
 }
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px 12px 48px;
+  }
+
+  .hero,
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .cardTitle {
+    font-size: 18px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .nextCard {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .actions,
+  .quickLinks {
+    flex-direction: column;
+  }
+
+  .primary,
+  .secondary,
+  .linkButton {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 12px 8px 32px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .badge {
+    font-size: 11px;
+  }
+}
