@@ -1,7 +1,8 @@
 .page {
   min-height: 100vh;
   padding: 2rem;
-  background: var(--bg-gradient, linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%));
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .container {
@@ -34,12 +35,12 @@
 .title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   font-size: 1rem;
   margin: 0;
 }
@@ -264,4 +265,37 @@
   }
 }
 
+/* Dark Mode Overrides */
+:global([data-theme="dark"]) .uploadArea,
+:global([data-theme="dark"]) .documentsSection {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
 
+:global([data-theme="dark"]) .uploadTitle,
+:global([data-theme="dark"]) .sectionTitle,
+:global([data-theme="dark"]) .docName {
+  color: var(--text-primary);
+}
+
+:global([data-theme="dark"]) .uploadText,
+:global([data-theme="dark"]) .uploadHint,
+:global([data-theme="dark"]) .docMeta,
+:global([data-theme="dark"]) .docDescription {
+  color: var(--text-secondary);
+}
+
+:global([data-theme="dark"]) .documentCard {
+  background: var(--bg-secondary);
+}
+
+:global([data-theme="dark"]) .documentCard:hover {
+  background: var(--bg-hover);
+}
+
+:global([data-theme="dark"]) .docIcon,
+:global([data-theme="dark"]) .downloadBtn,
+:global([data-theme="dark"]) .deleteBtn {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
