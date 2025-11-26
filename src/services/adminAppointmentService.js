@@ -38,6 +38,8 @@ async function getAppointments({ date, page = 1, limit = 10, search = '', doctor
       a.id AS appointment_id,
       a.date,
       a.time,
+      a.time,
+      a.modality,
       a.type_id,
       a.doctor_id,
       p.name AS patient_name,

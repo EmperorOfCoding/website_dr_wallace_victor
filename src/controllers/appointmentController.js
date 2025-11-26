@@ -27,6 +27,7 @@ async function createAppointment(req, res) {
       status = 'scheduled',
       rescheduled_from: rescheduledFrom,
       notes,
+      modality = 'presencial',
     } = req.body || {};
 
     if (!patientId || !date || !time || !typeId) {
@@ -61,6 +62,7 @@ async function createAppointment(req, res) {
       status,
       rescheduledFrom: rescheduledFrom ? parseInt(rescheduledFrom) : null,
       notes,
+      modality,
     });
 
     // Schedule notifications and send confirmation

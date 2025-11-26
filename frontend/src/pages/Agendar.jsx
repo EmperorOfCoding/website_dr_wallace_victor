@@ -42,6 +42,7 @@ export default function Agendar({ onNavigate }) {
   const [selectedTime, setSelectedTime] = useState("");
   const [types, setTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
+  const [modality, setModality] = useState("presencial");
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [patientOptions, setPatientOptions] = useState([]);
@@ -230,6 +231,7 @@ export default function Agendar({ onNavigate }) {
           time: selectedTime,
           ...(rescheduleFromId ? { rescheduled_from: rescheduleFromId } : {}),
           notes,
+          modality,
         }),
       });
       const data = await resp.json().catch(() => ({}));
@@ -340,6 +342,56 @@ export default function Agendar({ onNavigate }) {
                     ))}
                   </select>
                 </label>
+                <div className={styles.field}>
+                  <span className={styles.label}>Modalidade</span>
+                  <div className={styles.radioGroup}>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="modality"
+                        value="presencial"
+                        checked={modality === "presencial"}
+                        onChange={(e) => setModality(e.target.value)}
+                      />
+                      Presencial
+                    </label>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="modality"
+                        value="online"
+                        checked={modality === "online"}
+                        onChange={(e) => setModality(e.target.value)}
+                      />
+                      Online
+                    </label>
+                  </div>
+                </div>
+                <div className={styles.field}>
+                  <span className={styles.label}>Modalidade</span>
+                  <div className={styles.radioGroup}>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="modality"
+                        value="presencial"
+                        checked={modality === "presencial"}
+                        onChange={(e) => setModality(e.target.value)}
+                      />
+                      Presencial
+                    </label>
+                    <label className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="modality"
+                        value="online"
+                        checked={modality === "online"}
+                        onChange={(e) => setModality(e.target.value)}
+                      />
+                      Online
+                    </label>
+                  </div>
+                </div>
                 {isAdmin && (
                   <>
                     <label className={styles.field} htmlFor="patientSearch">
@@ -424,6 +476,12 @@ export default function Agendar({ onNavigate }) {
                   <p className={styles.label}>Tipo</p>
                   <p className={styles.value}>
                     {types.find((t) => t.id === selectedType)?.name || "Selecione o tipo"}
+                  </p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Modalidade</p>
+                  <p className={styles.value}>
+                    {modality === "presencial" ? "Presencial" : "Online"}
                   </p>
                 </div>
                 <div className={styles.summaryRow}>

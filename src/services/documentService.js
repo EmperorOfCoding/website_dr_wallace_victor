@@ -43,7 +43,7 @@ async function getDocumentsByAppointmentId(appointmentId) {
   return rows;
 }
 
-async function saveDocument(patientId, file, appointmentId = null, description = null) {
+async function saveDocument(patientId, file, appointmentId = null, description = null, examRequestId = null, type = 'document') {
   await ensureUploadDir();
 
   // Generate unique filename
@@ -57,8 +57,8 @@ async function saveDocument(patientId, file, appointmentId = null, description =
   // Save record to database
   const [result] = await pool.execute(
     `INSERT INTO patient_documents 
-     (patient_id, appointment_id, filename, original_name, mimetype, size_bytes, description)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+     (patient_id, appointment_id, filename, original_name, mimetype, size_bytes, description, exam_request_id, type)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       patientId,
       appointmentId,
@@ -66,7 +66,10 @@ async function saveDocument(patientId, file, appointmentId = null, description =
       file.originalname,
       file.mimetype,
       file.size,
+      file.size,
       description,
+      examRequestId,
+      type
     ]
   );
 
@@ -81,7 +84,10 @@ async function saveDocument(patientId, file, appointmentId = null, description =
     original_name: file.originalname,
     mimetype: file.mimetype,
     size_bytes: file.size,
+    size_bytes: file.size,
     description,
+    exam_request_id: examRequestId,
+    type,
     uploaded_at: new Date().toISOString(),
   };
 }

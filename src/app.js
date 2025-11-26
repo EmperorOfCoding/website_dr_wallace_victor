@@ -12,6 +12,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const metricsRoutes = require('./routes/metricsRoutes');
 const calendarRoutes = require('./routes/calendarRoutes');
+const examRoutes = require('./routes/examRoutes');
 
 // Middlewares
 const { apiLimiter } = require('./middlewares/rateLimiter');
@@ -52,11 +53,12 @@ app.use(reviewRoutes);
 app.use(documentRoutes);
 app.use(metricsRoutes);
 app.use(calendarRoutes);
+app.use(examRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
+  res.status(200).json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
   });

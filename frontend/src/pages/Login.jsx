@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
 
@@ -39,7 +39,11 @@ export default function Login({ onNavigate }) {
       const userPayload = data.patient || data.admin || data.user;
       login({ token: data.token, patient: userPayload });
       setStatus("Login realizado com sucesso.");
-      onNavigate("home");
+      if (isAdminMode) {
+        onNavigate("admin");
+      } else {
+        onNavigate("dashboard");
+      }
     } catch (err) {
       setError(err.message || "Erro ao autenticar.");
     }

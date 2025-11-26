@@ -130,6 +130,31 @@
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
+.radioGroup {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+:global([data-theme="dark"]) .radioLabel {
+  color: #f1f5f9;
+}
+
+.radioLabel input {
+  accent-color: var(--primary);
+  width: 18px;
+  height: 18px;
+}
+
 /* Fix autofill styling - Light mode */
 .field input:-webkit-autofill,
 .field input:-webkit-autofill:hover,
@@ -149,7 +174,11 @@
   color: #f1f5f9 !important;
   -webkit-text-fill-color: #f1f5f9 !important;
   caret-color: #f1f5f9;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #f1f5f9;
   background-color: #1e293b !important;
+  border-color: #334155;
 }
 
 :global([data-theme="dark"]) .field input::placeholder {

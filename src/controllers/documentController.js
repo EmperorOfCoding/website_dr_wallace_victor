@@ -53,13 +53,15 @@ async function uploadDocument(req, res) {
             return res.status(400).json({ status: 'error', message: 'Nenhum arquivo enviado.' });
         }
 
-        const { appointment_id, description } = req.body;
+        const { appointment_id, description, exam_request_id, type } = req.body;
 
         const document = await documentService.saveDocument(
             patientId,
             req.file,
             appointment_id ? parseInt(appointment_id) : null,
-            description
+            description,
+            exam_request_id ? parseInt(exam_request_id) : null,
+            type || 'document'
         );
 
         return res.status(201).json({ status: 'success', document, message: 'Documento enviado com sucesso.' });
