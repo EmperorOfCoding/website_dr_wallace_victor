@@ -40,11 +40,14 @@ async function uploadDocument(req, res) {
         const isDoctor = !!req.user?.doctor_id;
 
         // If doctor, patient_id must be in body. If patient, use from token.
-        const patientId = isDoctor ? req.body.patient_id : req.user?.patient_id;
+        let patientId = isDoctor ? req.body.patient_id : req.user?.patient_id;
 
         if (!patientId) {
             return res.status(400).json({ status: 'error', message: 'ID do paciente é obrigatório.' });
         }
+
+        // Ensure patientId is an integer
+        patientId = parseInt(patientId);
 
         if (!req.file) {
             return res.status(400).json({ status: 'error', message: 'Nenhum arquivo enviado.' });

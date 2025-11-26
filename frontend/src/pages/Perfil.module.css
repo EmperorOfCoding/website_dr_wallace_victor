@@ -1,7 +1,8 @@
 .page {
   min-height: 100vh;
   padding: 2rem;
-  background: var(--bg-gradient, linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%));
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .container {
@@ -34,12 +35,12 @@
 .title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .lead {
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   font-size: 1rem;
   max-width: 500px;
   margin: 0 0 1.5rem 0;
@@ -319,6 +320,65 @@
   gap: 0.75rem;
   flex-wrap: wrap;
   margin-bottom: 1rem;
+}
+
+/* Dark Mode Overrides */
+:global([data-theme="dark"]) .title {
+  color: #f8fafc;
+}
+
+:global([data-theme="dark"]) .lead {
+  color: #cbd5e1;
+}
+
+:global([data-theme="dark"]) .summaryCard,
+:global([data-theme="dark"]) .card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+:global([data-theme="dark"]) .summaryLabel {
+  color: #94a3b8;
+}
+
+:global([data-theme="dark"]) .summaryValue {
+  color: #f8fafc;
+}
+
+:global([data-theme="dark"]) .cardTitle {
+  color: #f8fafc;
+}
+
+:global([data-theme="dark"]) .field {
+  color: #f8fafc;
+}
+
+:global([data-theme="dark"]) .field input,
+:global([data-theme="dark"]) .field select,
+:global([data-theme="dark"]) .field textarea {
+  background: var(--bg-input);
+  color: #f8fafc;
+  border-color: var(--border-color);
+}
+
+:global([data-theme="dark"]) .checkbox {
+  color: #f8fafc;
+}
+
+:global([data-theme="dark"]) .themeOption {
+  background: var(--bg-secondary);
+}
+
+:global([data-theme="dark"]) .themeTitle {
+  color: #f8fafc;
+}
+
+:global([data-theme="dark"]) .themeDesc {
+  color: #94a3b8;
+}
+
+:global([data-theme="dark"]) .toggleTrack {
+  background: #475569;
 }
 
 @media (max-width: 768px) {

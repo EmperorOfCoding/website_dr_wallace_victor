@@ -58,6 +58,11 @@
   background: var(--bg-hover, #f1f5f9);
 }
 
+:global([data-theme="dark"]) .link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
 .link.active {
   color: #3b5bfd;
   background: rgba(59, 91, 253, 0.1);

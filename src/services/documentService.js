@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
 
-const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'documents');
+const UPLOAD_DIR = path.join(__dirname, '../../uploads/documents');
 
 // Ensure upload directory exists
 async function ensureUploadDir() {
