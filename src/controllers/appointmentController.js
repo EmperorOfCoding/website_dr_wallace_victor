@@ -26,6 +26,7 @@ async function createAppointment(req, res) {
       doctor_id: doctorId = 1,
       status = 'scheduled',
       rescheduled_from: rescheduledFrom,
+      notes,
     } = req.body || {};
 
     if (!patientId || !date || !time || !typeId) {
@@ -59,6 +60,7 @@ async function createAppointment(req, res) {
       doctorId,
       status,
       rescheduledFrom: rescheduledFrom ? parseInt(rescheduledFrom) : null,
+      notes,
     });
 
     // Schedule notifications and send confirmation
@@ -95,26 +97,31 @@ async function createAppointment(req, res) {
 
 async function listAppointments(req, res) {
   try {
-    const { patient_id: patientId } = req.query || {};
+    const { patient_id: patientId, page = 1, limit = 10 } = req.query || {};
 
     if (!patientId) {
       return res.status(400).json({ status: 'error', message: 'Paciente é obrigatório.' });
     }
 
-    const appointments = await appointmentService.listAppointmentsByPatient(patientId);
-
-    // Add review status to each appointment
-    const appointmentsWithReview = await Promise.all(
-      appointments.map(async (appt) => {
-        const review = await reviewService.getReviewByAppointmentId(appt.id);
-        return {
-          ...appt,
-          hasReview: !!review,
-        };
-      })
+    const { appointments, pagination } = await appointmentService.listAppointmentsByPatient(
+      patientId,
+      Number(page),
+      Number(limit)
     );
 
-    return res.status(200).json({ status: 'success', appointments: appointmentsWithReview });
+    // Format response to match expected frontend structure (adding hasReview)
+    const formattedAppointments = appointments.map(appt => ({
+      ...appt,
+      hasReview: !!appt.reviewId,
+      reviewId: undefined, // Optional: clean up if not needed
+      reviewRating: undefined // Optional: clean up if not needed
+    }));
+
+    return res.status(200).json({
+      status: 'success',
+      appointments: formattedAppointments,
+      pagination
+    });
   } catch (error) {
     console.error("Erro em listAppointments: ", error);
     return res.status(500).json({ status: 'error', message: 'Erro ao consultar agendamentos.' });

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProtectedPage from "../components/ProtectedPage";
 import { useAuth } from "../context/AuthContext";
@@ -53,6 +53,8 @@ export default function Agendar({ onNavigate }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [rescheduleFromId, setRescheduleFromId] = useState(null);
+  const [notes, setNotes] = useState("");
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     async function loadDoctors() {
@@ -227,11 +229,38 @@ export default function Agendar({ onNavigate }) {
           date,
           time: selectedTime,
           ...(rescheduleFromId ? { rescheduled_from: rescheduleFromId } : {}),
+          notes,
         }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
         throw new Error(data.message || "Não foi possível agendar.");
+      }
+
+      // Upload file if selected
+      if (file && data.appointment_id) {
+        const formData = new FormData();
+        // Append text fields BEFORE file to ensure they are available in req.body
+        formData.append("appointment_id", data.appointment_id);
+        // If admin is booking, we need to associate with the selected patient
+        if (isAdmin && selectedPatientId) {
+          formData.append("patient_id", selectedPatientId);
+        }
+        formData.append("file", file);
+
+        try {
+          await fetch("/api/documents/upload", {
+            method: "POST",
+            headers: {
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: formData,
+          });
+        } catch (uploadErr) {
+          console.error("Erro ao enviar arquivo:", uploadErr);
+          // Don't fail the booking if upload fails, just log it
+          setMessage("Agendamento realizado, mas houve erro ao enviar o arquivo.");
+        }
       }
       
       // Clear reschedule data after successful booking
@@ -340,6 +369,25 @@ export default function Agendar({ onNavigate }) {
                     </label>
                   </>
                 )}
+                <label className={styles.field} htmlFor="notes">
+                  Resumo do problema (opcional)
+                  <textarea
+                    id="notes"
+                    rows="3"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Descreva brevemente o motivo da consulta..."
+                  />
+                </label>
+                <label className={styles.field} htmlFor="file">
+                  Anexar documento (opcional)
+                  <input
+                    id="file"
+                    type="file"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    accept="image/*,.pdf,.doc,.docx"
+                  />
+                </label>
               </div>
               <div className={styles.statusRow}>
                 {loading && <p className={styles.muted}>Carregando horários...</p>}

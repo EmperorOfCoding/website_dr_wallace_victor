@@ -44,12 +44,8 @@ async function login(req, res) {
 
     const patient = await authService.authenticate(email, password);
 
-    if (patient === null) {
-      return res.status(404).json({ status: 'error', message: 'E-mail não encontrado.' });
-    }
-
-    if (patient === false) {
-      return res.status(401).json({ status: 'error', message: 'Senha inválida.' });
+    if (!patient) {
+      return res.status(401).json({ status: 'error', message: 'E-mail ou senha inválidos.' });
     }
 
     const token = authService.generateToken(patient);

@@ -41,9 +41,12 @@ async function getAppointments({ date, page = 1, limit = 10, search = '', doctor
       a.type_id,
       a.doctor_id,
       p.name AS patient_name,
-      p.email AS patient_email
+      p.email AS patient_email,
+      t.name AS type_name,
+      a.notes
     FROM appointments a
     JOIN patients p ON p.id = a.patient_id
+    LEFT JOIN appointment_types t ON t.id = a.type_id
     ${whereClause}
     ORDER BY a.date, a.time
     ${limitClause}

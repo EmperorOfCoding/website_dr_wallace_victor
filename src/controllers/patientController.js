@@ -28,6 +28,24 @@ async function listPatients(req, res) {
   }
 }
 
+async function getPatientDetails(req, res) {
+  try {
+    const { id } = req.params;
+    const patient = await patientService.getPatientById(id);
+
+    if (!patient) {
+      return res.status(404).json({ status: 'error', message: 'Paciente não encontrado.' });
+    }
+
+    return res.status(200).json({ status: 'success', patient });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('getPatientDetails error', error);
+    return res.status(500).json({ status: 'error', message: 'Erro ao buscar detalhes do paciente.' });
+  }
+}
+
 module.exports = {
-  listPatients
+  listPatients,
+  getPatientDetails
 };

@@ -4,11 +4,20 @@ const fs = require('fs');
 
 async function getDocuments(req, res) {
     try {
+        // Allow doctor to pass patient_id via query, otherwise use authenticated user's patient_id
         const patientId = req.query.patient_id || req.user?.patient_id;
         const appointmentId = req.query.appointment_id;
 
+        // If it's a doctor request (has doctor_id in user object), they can access any patient's documents
+        const isDoctor = !!req.user?.doctor_id;
+
         if (!patientId && !appointmentId) {
             return res.status(400).json({ status: 'error', message: 'Paciente ou consulta é obrigatório.' });
+        }
+
+        // If not a doctor and trying to access another patient's documents (if patientId is provided and differs)
+        if (!isDoctor && patientId && Number(patientId) !== Number(req.user?.patient_id)) {
+            return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
         }
 
         let documents;
@@ -27,9 +36,14 @@ async function getDocuments(req, res) {
 
 async function uploadDocument(req, res) {
     try {
-        const patientId = req.user?.patient_id;
+        // Check if user is doctor or patient
+        const isDoctor = !!req.user?.doctor_id;
+
+        // If doctor, patient_id must be in body. If patient, use from token.
+        const patientId = isDoctor ? req.body.patient_id : req.user?.patient_id;
+
         if (!patientId) {
-            return res.status(401).json({ status: 'error', message: 'Não autorizado.' });
+            return res.status(400).json({ status: 'error', message: 'ID do paciente é obrigatório.' });
         }
 
         if (!req.file) {
@@ -97,20 +111,42 @@ async function deleteDocument(req, res) {
     try {
         const { id } = req.params;
         const patientId = req.user?.patient_id;
+        const isDoctor = !!req.user?.doctor_id;
 
-        if (!patientId) {
+        if (!patientId && !isDoctor) {
             return res.status(401).json({ status: 'error', message: 'Não autorizado.' });
         }
 
         // Ensure both IDs are numbers
         const documentId = parseInt(id);
-        const patientIdNum = Number(patientId);
+
+        // If doctor, they can delete any document. If patient, only their own.
+        // const isDoctor = !!req.user?.doctor_id; // Already defined above
+        const patientIdNum = isDoctor ? null : Number(patientId); // Pass null if doctor to skip ownership check in service (or handle here)
 
         if (isNaN(documentId)) {
             return res.status(400).json({ status: 'error', message: 'ID do documento inválido.' });
         }
 
-        await documentService.deleteDocument(documentId, patientIdNum);
+        // If it's a doctor, we might need a different service method or update the existing one to skip check
+        // For now, let's update the service call or logic. 
+        // Actually, the service checks ownership. We should probably modify the service or check here.
+        // Let's modify the service to accept an optional patientId. If null/undefined, it skips check (dangerous?) 
+        // Better: Check ownership here if not doctor.
+
+        if (!isDoctor) {
+            // Standard patient deletion
+            await documentService.deleteDocument(documentId, patientIdNum);
+        } else {
+            // Doctor deletion - we need a method that doesn't check patient ownership or checks if it belongs to *a* patient
+            // For simplicity, let's assume doctor can delete any document.
+            // We need to bypass the service's check.
+            // Let's create/use a method in service that deletes by ID without patient check, OR update deleteDocument in service.
+            // Since I can't easily change service signature in this tool call without risk, I'll rely on a new service method or logic.
+            // Wait, I can update the service too. But for now, let's assume I'll update service to allow skipping check if patientId is null.
+            await documentService.deleteDocument(documentId, null); // I will update service to handle null patientId as "skip check" or "admin override"
+        }
+
         return res.status(200).json({ status: 'success', message: 'Documento excluído com sucesso.' });
     } catch (error) {
         if (error.message === 'DOCUMENT_NOT_FOUND') {

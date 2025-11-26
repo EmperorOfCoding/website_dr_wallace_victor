@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
@@ -33,6 +33,9 @@ export default function AdminDashboard({ onNavigate }) {
   const [loadingAppt, setLoadingAppt] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false);
   const [error, setError] = useState("");
+  const [selectedAppt, setSelectedAppt] = useState(null);
+  const [apptDocs, setApptDocs] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
 
   // Debounce search input to avoid excessive API calls
   const debouncedSearch = useDebounce(search, 500);
@@ -87,6 +90,30 @@ export default function AdminDashboard({ onNavigate }) {
     loadAppointments();
     loadPatients();
   }, [token, date, debouncedSearch]);
+
+  async function handleViewDetails(appt) {
+    setSelectedAppt(appt);
+    setApptDocs([]);
+    setLoadingDocs(true);
+    try {
+      const resp = await fetch(`/api/documents?appointment_id=${appt.appointment_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (resp.ok) {
+        setApptDocs(data.documents || []);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar documentos:", err);
+    } finally {
+      setLoadingDocs(false);
+    }
+  }
+
+  function closeDetails() {
+    setSelectedAppt(null);
+    setApptDocs([]);
+  }
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>
@@ -157,8 +184,16 @@ export default function AdminDashboard({ onNavigate }) {
                       </div>
                       <div className={styles.detailBlock}>
                         <p className={styles.sub}>Tipo</p>
-                        <p className={styles.value}>{appt.type_id}</p>
+                        <p className={styles.value}>{appt.type_name || appt.type_id}</p>
                       </div>
+                      <button
+                        type="button"
+                        className={styles.secondary}
+                        onClick={() => handleViewDetails(appt)}
+                        style={{ marginLeft: "auto" }}
+                      >
+                        Ver Detalhes
+                      </button>
                     </article>
                   ))}
                 </div>
@@ -195,6 +230,54 @@ export default function AdminDashboard({ onNavigate }) {
           </section>
         </div>
       </div>
+      {selectedAppt && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h3>Detalhes do Agendamento</h3>
+              <button onClick={closeDetails} className={styles.closeBtn}>
+                &times;
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p><strong>Paciente:</strong> {selectedAppt.patient_name}</p>
+              <p><strong>Data:</strong> {formatDate(selectedAppt.date)} - {selectedAppt.time?.slice(0, 5)}</p>
+              <p><strong>Tipo:</strong> {selectedAppt.type_name || selectedAppt.type_id}</p>
+              
+              <div className={styles.section}>
+                <h4>Resumo do problema</h4>
+                <p className={styles.notes}>{selectedAppt.notes || "Nenhuma observação."}</p>
+              </div>
+
+              <div className={styles.section}>
+                <h4>Documentos anexados</h4>
+                {loadingDocs && <p>Carregando documentos...</p>}
+                {!loadingDocs && apptDocs.length === 0 && <p className={styles.muted}>Nenhum documento anexado.</p>}
+                {!loadingDocs && apptDocs.length > 0 && (
+                  <ul className={styles.docList}>
+                    {apptDocs.map((doc) => (
+                      <li key={doc.id}>
+                        <a
+                          href={`/api/documents/${doc.id}/download`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {doc.original_name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button onClick={closeDetails} className={styles.primary}>
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ProtectedAdmin>
   );
 }

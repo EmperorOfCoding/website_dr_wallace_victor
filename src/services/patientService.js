@@ -79,7 +79,21 @@ async function getPatients(page = 1, limit = 10, search = '', doctorId) {
   }
 }
 
+async function getPatientById(id) {
+  const [rows] = await pool.execute(
+    `SELECT p.id, p.name, p.email, p.phone, p.created_at,
+            pp.birthdate, pp.emergency_name, pp.emergency_phone, 
+            pp.allergies, pp.notes, pp.contact_preference, pp.reminders_enabled
+     FROM patients p
+     LEFT JOIN patient_profiles pp ON pp.patient_id = p.id
+     WHERE p.id = ?`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
 module.exports = {
   isAdmin,
-  getPatients
+  getPatients,
+  getPatientById
 };

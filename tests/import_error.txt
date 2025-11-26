@@ -1,0 +1,69 @@
+[1m[31mJest encountered an unexpected token[39m[22m
+
+Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+By default "node_modules" folder is ignored by transformers.
+
+Here's what you can do:
+ • If you are trying to use ECMAScript Modules, see [4mhttps://jestjs.io/docs/ecmascript-modules[24m for how to enable it.
+ • If you are trying to use TypeScript, see [4mhttps://jestjs.io/docs/getting-started#using-typescript[24m
+ • To have some of your "node_modules" files transformed, you can specify a custom [1m"transformIgnorePatterns"[22m in your config.
+ • If you need a custom transformation, specify a [1m"transform"[22m option in your config.
+ • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the [1m"moduleNameMapper"[22m config option.
+
+You'll find more details and examples of these config options in the docs:
+[36mhttps://jestjs.io/docs/configuration[39m
+For information about custom transformations, see:
+[36mhttps://jestjs.io/docs/code-transformation[39m
+
+[1m[31mDetails:[39m[22m
+
+C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\uuid\dist-node\index.js:1
+export { default as MAX } from './max.js';
+^^^^^^
+
+SyntaxError: Unexpected token 'export'
+    at internalCompileFunction (node:internal/vm:128:18)
+    at compileFunction (node:vm:365:10)
+    at Runtime.createScriptFromCode (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:1318:40)
+    at Runtime._execModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:1244:35)
+    at Runtime._loadModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:944:12)
+    at Runtime.requireModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:832:12)
+    at Runtime.requireModuleOrMock (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:964:21)
+    at Object.require (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\src\services\documentService.js:4:24)
+    at Runtime._execModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:1268:24)
+    at Runtime._loadModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:944:12)
+    at Runtime.requireModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:832:12)
+    at Runtime.requireModuleOrMock (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:964:21)
+    at Object.require (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\src\controllers\documentController.js:1:25)
+    at Runtime._execModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:1268:24)
+    at Runtime._loadModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:944:12)
+    at Runtime.requireModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:832:12)
+    at Runtime.requireModuleOrMock (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:964:21)
+    at Object.require (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\src\routes\documentRoutes.js:3:28)
+    at Runtime._execModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:1268:24)
+    at Runtime._loadModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:944:12)
+    at Runtime.requireModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:832:12)
+    at Runtime.requireModuleOrMock (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:964:21)
+    at Object.require (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\src\app.js:12:24)
+    at Runtime._execModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:1268:24)
+    at Runtime._loadModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:944:12)
+    at Runtime.requireModule (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:832:12)
+    at Runtime.requireModuleOrMock (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runtime\build\index.js:964:21)
+    at Object.require (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\tests\simple.test.js:7:25)
+    at Promise.finally.completed (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:1557:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:1497:10)
+    at _callCircusTest (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:1007:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:947:3)
+    at C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:849:7
+    at _runTestsForDescribeBlock (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:862:11)
+    at _runTestsForDescribeBlock (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+    at run (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:761:3)
+    at runAndTransformResultsToJestFormat (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\jestAdapterInit.js:1918:21)
+    at jestAdapter (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-circus\build\runner.js:101:19)
+    at runTestInternal (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runner\build\index.js:275:16)
+    at runTest (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-1\node_modules\jest-runner\build\index.js:343:7)
