@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
@@ -96,6 +96,13 @@ export default function AdminPatients({ onNavigate }) {
                       <p className={styles.sub}>{p.email}</p>
                     </div>
                     <p className={styles.value}>{p.phone || "--"}</p>
+                    <button 
+                        className={styles.actionButton}
+                        onClick={() => onNavigate(`admin/pacientes/${p.id}`)}
+                        style={{marginLeft: 'auto', padding: '4px 12px', fontSize: '0.9rem', cursor: 'pointer'}}
+                    >
+                        Ver Detalhes
+                    </button>
                   </div>
                 ))}
               </div>

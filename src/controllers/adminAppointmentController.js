@@ -33,7 +33,9 @@ async function listAppointments(req, res) {
       type_id: item.type_id,
       patient_name: item.patient_name,
       patient_email: item.patient_email,
-      doctor_id: item.doctor_id
+      doctor_id: item.doctor_id,
+      type_name: item.type_name,
+      notes: item.notes
     }));
 
     return res.status(200).json({

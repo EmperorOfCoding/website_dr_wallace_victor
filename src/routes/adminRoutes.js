@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.post('/api/admin/login', adminAuthController.login);
 router.get('/api/admin/patients', authAdmin, patientController.listPatients);
+router.get('/api/admin/patients/:id', authAdmin, patientController.getPatientDetails);
 router.get('/api/admin/appointments', authAdmin, adminAppointmentController.listAppointments);
 router.put('/api/admin/appointments/:id', authAdmin, adminAppointmentController.updateAppointment);
 router.delete('/api/admin/appointments/:id', authAdmin, adminAppointmentController.deleteAppointment);

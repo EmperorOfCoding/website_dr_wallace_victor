@@ -27,8 +27,8 @@ async function getDocumentsByPatientId(patientId, limit = 100) {
     `SELECT * FROM patient_documents 
      WHERE patient_id = ?
      ORDER BY uploaded_at DESC
-     LIMIT ?`,
-    [patientId, limit]
+     LIMIT ${parseInt(limit)}`,
+    [parseInt(patientId)]
   );
   return rows;
 }
@@ -72,7 +72,7 @@ async function saveDocument(patientId, file, appointmentId = null, description =
 
   // Fetch the complete document record including uploaded_at
   const document = await getDocumentById(result.insertId);
-  
+
   return document || {
     id: result.insertId,
     patient_id: patientId,
@@ -94,7 +94,8 @@ async function deleteDocument(documentId, patientId) {
   }
 
   // Verify ownership - compare as numbers to avoid type mismatch issues
-  if (Number(document.patient_id) !== Number(patientId)) {
+  // If patientId is null (admin/doctor), skip check
+  if (patientId !== null && Number(document.patient_id) !== Number(patientId)) {
     throw new Error('UNAUTHORIZED');
   }
 

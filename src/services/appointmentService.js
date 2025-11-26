@@ -22,13 +22,13 @@ async function isSlotAvailable(date, time, doctorId = 1, excludeAppointmentId = 
 
   const params = [date, time, doctorId];
   let query = 'SELECT id FROM appointments WHERE date = ? AND time = ? AND doctor_id = ?';
-  
+
   // Exclude the original appointment when rescheduling
   if (excludeAppointmentId) {
     query += ' AND id != ?';
     params.push(excludeAppointmentId);
   }
-  
+
   const [rows] = await pool.execute(query, params);
   return rows.length === 0;
 }
@@ -82,7 +82,7 @@ async function getAvailableTimes(date, doctorId = 1) {
   return slots.filter((slot) => !occupied.has(slot));
 }
 
-async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled', rescheduledFrom = null }) {
+async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled', rescheduledFrom = null, notes = null }) {
   const connection = await pool.getConnection();
 
   try {
@@ -129,8 +129,8 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
     }
 
     const [result] = await connection.execute(
-      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status, rescheduled_from) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [patientId, doctorId, date, time, typeId, status, rescheduledFrom]
+      'INSERT INTO appointments (patient_id, doctor_id, date, time, type_id, status, rescheduled_from, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [patientId, doctorId, date, time, typeId, status, rescheduledFrom, notes]
     );
 
     // vincula paciente ao médico
@@ -146,7 +146,17 @@ async function createAppointment({ patientId, date, time, typeId, doctorId = 1, 
   }
 }
 
-async function listAppointmentsByPatient(patientId) {
+async function listAppointmentsByPatient(patientId, page = 1, limit = 10) {
+  const offset = (page - 1) * limit;
+
+  // Get total count for pagination
+  const [countRows] = await pool.execute(
+    'SELECT COUNT(*) as total FROM appointments WHERE patient_id = ?',
+    [patientId]
+  );
+  const total = countRows[0].total;
+
+  // Get appointments with review status
   const [rows] = await pool.execute(
     `
       SELECT 
@@ -156,15 +166,28 @@ async function listAppointmentsByPatient(patientId) {
         a.status,
         a.type_id AS typeId,
         t.name AS typeName,
-        t.duration_minutes AS durationMinutes
+        t.duration_minutes AS durationMinutes,
+        r.id AS reviewId,
+        r.rating AS reviewRating
       FROM appointments a
       LEFT JOIN appointment_types t ON a.type_id = t.id
+      LEFT JOIN appointment_reviews r ON a.id = r.appointment_id
       WHERE a.patient_id = ?
-      ORDER BY a.date ASC, a.time ASC
+      ORDER BY a.date DESC, a.time DESC
+      LIMIT ? OFFSET ?
     `,
-    [patientId]
+    [patientId, limit.toString(), offset.toString()]
   );
-  return rows;
+
+  return {
+    appointments: rows,
+    pagination: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      pages: Math.ceil(total / limit)
+    }
+  };
 }
 
 module.exports = {

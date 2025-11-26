@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from "react";
+﻿import { useEffect, useState } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
@@ -120,7 +120,7 @@ export default function AdminAgenda({ onNavigate }) {
                     </div>
                     <div className={styles.detailBlock}>
                       <p className={styles.sub}>Tipo</p>
-                      <p className={styles.value}>{appt.type_id}</p>
+                      <p className={styles.value}>{appt.type_name || appt.type_id}</p>
                     </div>
                   </article>
                 ))}

@@ -1,5 +1,5 @@
 ﻿import { AnimatePresence } from "framer-motion";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 // Pages
@@ -7,6 +7,7 @@ import AdminAgenda from "./pages/AdminAgenda";
 import AdminCalendar from "./pages/AdminCalendar";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminMetrics from "./pages/AdminMetrics";
+import AdminPatientDetails from "./pages/AdminPatientDetails";
 import AdminPatients from "./pages/AdminPatients";
 import Agendar from "./pages/Agendar";
 import Contato from "./pages/Contato";
@@ -281,6 +282,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute adminOnly>
                   <PageTransition><AdminPatients onNavigate={handleNavigate} /></PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/pacientes/:id"
+              element={
+                <ProtectedRoute adminOnly>
+                  <PageTransition><AdminPatientDetails onNavigate={handleNavigate} /></PageTransition>
                 </ProtectedRoute>
               }
             />
