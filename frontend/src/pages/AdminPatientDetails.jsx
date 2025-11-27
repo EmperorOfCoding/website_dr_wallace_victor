@@ -156,7 +156,7 @@ export default function AdminPatientDetails({ onNavigate }) {
         <div className={styles.container}>
           <header className={styles.hero}>
             <div>
-                <button onClick={() => onNavigate("admin-pacientes")} className={styles.backLink}>← Voltar</button>
+                <button onClick={() => onNavigate("painel-medico-pacientes")} className={styles.backLink}>← Voltar</button>
                 <p className={styles.badge}>Paciente</p>
                 <h1 className={styles.title}>{patient.name}</h1>
                 <p className={styles.lead}>{patient.email} • {patient.phone || "Sem telefone"}</p>

@@ -116,7 +116,7 @@ export default function AdminCalendar({ onNavigate }) {
             <button
               type="button"
               className={styles.secondary}
-              onClick={() => onNavigate("admin-agenda")}
+              onClick={() => onNavigate("painel-medico-agenda")}
             >
               Ver lista
             </button>

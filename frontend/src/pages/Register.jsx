@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import { useState } from "react";
 import styles from "./Register.module.css";
 
 export default function Register({ onNavigate }) {
@@ -84,7 +84,7 @@ export default function Register({ onNavigate }) {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Cadastro de Paciente</h1>
+        <h1 className={styles.title}>Cadastro do Paciente</h1>
         <p className={styles.subtitle}>Crie sua conta para agendar consultas e acompanhar sua agenda.</p>
         <form onSubmit={handleSubmit}>
           <label className={styles.label} htmlFor="name">

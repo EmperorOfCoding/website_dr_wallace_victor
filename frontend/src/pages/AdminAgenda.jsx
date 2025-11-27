@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
-import styles from "./AdminDashboard.module.css";
+import styles from "./AdminAgenda.module.css";
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });

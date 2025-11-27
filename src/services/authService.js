@@ -5,11 +5,16 @@ const crypto = require('crypto');
 const { sendPasswordResetEmail } = require('./emailService');
 
 async function findPatientByEmail(email) {
-  const [rows] = await pool.execute(
-    'SELECT id, name, email, phone, password_hash FROM patients WHERE email = ?',
-    [email]
-  );
-  return rows[0] || null;
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, name, email, phone, password_hash FROM patients WHERE email = ?',
+      [email]
+    );
+    return rows[0] || null;
+  } catch (error) {
+    console.error('Error in findPatientByEmail:', error);
+    return null;
+  }
 }
 
 async function hashPassword(password) {
@@ -27,17 +32,22 @@ async function createPatient({ name, email, phone, passwordHash }) {
 }
 
 async function authenticate(email, password) {
-  const patient = await findPatientByEmail(email);
-  if (!patient) {
+  try {
+    const patient = await findPatientByEmail(email);
+    if (!patient) {
+      return null;
+    }
+
+    const isValidPassword = await bcrypt.compare(password, patient.password_hash);
+    if (!isValidPassword) {
+      return null;
+    }
+
+    return patient;
+  } catch (error) {
+    console.error('Error in authenticate:', error);
     return null;
   }
-
-  const isValidPassword = await bcrypt.compare(password, patient.password_hash);
-  if (!isValidPassword) {
-    return false;
-  }
-
-  return patient;
 }
 
 function generateToken(patient) {

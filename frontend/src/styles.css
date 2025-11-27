@@ -7,6 +7,7 @@
   --primary-hover: #1d4ed8;
   --primary-light: rgba(37, 99, 235, 0.1);
   --primary-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   
   --secondary: #0ea5e9; /* Sky Blue */
   --secondary-hover: #0284c7;
@@ -70,6 +71,7 @@
   --bg-card-hover: #334155;
   --bg-glass: rgba(30, 41, 59, 0.8);
   --glass-border: rgba(255, 255, 255, 0.1);
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
@@ -162,10 +164,8 @@ button {
 input,
 select,
 textarea {
-  background: var(--bg-input);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  color: #0f172a !important;
-  -webkit-text-fill-color: #0f172a !important;
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
@@ -241,8 +241,6 @@ input[type="time"],
 input[type="datetime-local"],
 select,
 textarea {
-  color: #0f172a !important;
-  -webkit-text-fill-color: #0f172a !important;
   opacity: 1 !important;
 }
 

@@ -13,6 +13,7 @@ const documentRoutes = require('./routes/documentRoutes');
 const metricsRoutes = require('./routes/metricsRoutes');
 const calendarRoutes = require('./routes/calendarRoutes');
 const examRoutes = require('./routes/examRoutes');
+const doctorProfileRoutes = require('./routes/doctorProfileRoutes');
 
 // Middlewares
 const { apiLimiter } = require('./middlewares/rateLimiter');
@@ -54,6 +55,7 @@ app.use(documentRoutes);
 app.use(metricsRoutes);
 app.use(calendarRoutes);
 app.use(examRoutes);
+app.use(doctorProfileRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

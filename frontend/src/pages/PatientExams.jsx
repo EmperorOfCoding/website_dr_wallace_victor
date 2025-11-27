@@ -8,24 +8,25 @@ export default function PatientExams({ onNavigate }) {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    async function loadExams() {
-      if (!patient?.id) return;
-      setLoading(true);
-      try {
-        const resp = await fetch(`/api/exams?patient_id=${patient.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await resp.json();
-        if (resp.ok) {
-          setExams(data.exams || []);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar exames:", error);
-      } finally {
-        setLoading(false);
+  const loadExams = async () => {
+    if (!patient?.id) return;
+    setLoading(true);
+    try {
+      const resp = await fetch(`/api/exams?patient_id=${patient.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        setExams(data.exams || []);
       }
+    } catch (error) {
+      console.error("Erro ao carregar exames:", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadExams();
   }, [patient, token]);
 
@@ -40,10 +41,37 @@ export default function PatientExams({ onNavigate }) {
           </header>
 
           <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>Meus Exames</h2>
+              <button 
+                type="button" 
+                className={styles.refreshBtn} 
+                onClick={loadExams}
+                disabled={loading}
+                title="Atualizar lista de exames"
+              >
+                {loading ? "🔄 Atualizando..." : "🔄 Atualizar"}
+              </button>
+            </div>
+
             {loading ? (
               <p className={styles.info}>Carregando exames...</p>
             ) : exams.length === 0 ? (
-              <div className={styles.empty}>Nenhum exame solicitado.</div>
+              <div className={styles.empty}>
+                <div className={styles.emptyIcon}>🔬</div>
+                <h3 className={styles.emptyTitle}>Nenhum exame disponível</h3>
+                <p className={styles.emptyText}>
+                  Você ainda não possui exames solicitados. Quando seu médico solicitar um exame, 
+                  ele aparecerá aqui e você poderá baixar o resultado assim que estiver disponível.
+                </p>
+                <button 
+                  type="button" 
+                  className={styles.refreshBtnLarge} 
+                  onClick={loadExams}
+                >
+                  🔄 Verificar novamente
+                </button>
+              </div>
             ) : (
               <div className={styles.list}>
                 {exams.map((exam) => (

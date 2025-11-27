@@ -37,6 +37,7 @@ async function listTypes(req, res) {
       : await consultationTypeService.listConsultationTypes();
     return res.status(200).json({ status: 'success', types });
   } catch (error) {
+    console.error('Error in listTypes:', error);
     if (error.message === 'DOCTOR_NOT_FOUND') {
       return res.status(404).json({ status: 'error', message: 'Médico não encontrado.' });
     }

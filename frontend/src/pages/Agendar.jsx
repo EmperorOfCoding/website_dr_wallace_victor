@@ -299,6 +299,69 @@ export default function Agendar({ onNavigate }) {
             <article className={styles.card}>
               <div className={styles.cardHeader}>
                 <div>
+                  <h2 className={styles.cardTitle}>Confirmar agendamento</h2>
+                  <p className={styles.muted}>Confira os dados e finalize.</p>
+                </div>
+              </div>
+              <div className={styles.summary}>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Data</p>
+                  <p className={styles.value}>{formatDateDisplay(date)}</p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Médico</p>
+                  <p className={styles.value}>
+                    {doctors.find((d) => d.id === selectedDoctor)?.name || "Selecione o médico"}
+                  </p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Especialidade</p>
+                  <p className={styles.value}>
+                    {doctors.find((d) => d.id === selectedDoctor)?.specialty || "--"}
+                  </p>
+                </div>
+                {isAdmin && (
+                  <div className={styles.summaryRow}>
+                    <p className={styles.label}>Paciente</p>
+                    <p className={styles.value}>
+                      {patientOptions.find((p) => p.id === selectedPatientId)?.name || "Selecione o paciente"}
+                    </p>
+                  </div>
+                )}
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Tipo</p>
+                  <p className={styles.value}>
+                    {types.find((t) => t.id === selectedType)?.name || "Selecione o tipo"}
+                  </p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Modalidade</p>
+                  <p className={styles.value}>
+                    {modality === "presencial" ? "Presencial" : "Online"}
+                  </p>
+                </div>
+                <div className={styles.summaryRow}>
+                  <p className={styles.label}>Horário</p>
+                  <p className={styles.value}>{selectedTime || "Selecione um horário"}</p>
+                </div>
+              </div>
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={styles.primary}
+                  onClick={handleBook}
+                  disabled={booking || !selectedTime || !selectedType || !selectedDoctor}
+                >
+                  {booking ? "Agendando..." : "Confirmar agendamento"}
+                </button>
+                <button type="button" className={styles.ghost} onClick={() => onNavigate("minha-agenda")}>
+                  Ir para minha agenda
+                </button>
+              </div>
+            </article>
+            <article className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div>
                   <h2 className={styles.cardTitle}>Dados do agendamento</h2>
                   <p className={styles.muted}>Selecione a data, médico e tipo de consulta.</p>
                 </div>
@@ -342,31 +405,6 @@ export default function Agendar({ onNavigate }) {
                     ))}
                   </select>
                 </label>
-                <div className={styles.field}>
-                  <span className={styles.label}>Modalidade</span>
-                  <div className={styles.radioGroup}>
-                    <label className={styles.radioLabel}>
-                      <input
-                        type="radio"
-                        name="modality"
-                        value="presencial"
-                        checked={modality === "presencial"}
-                        onChange={(e) => setModality(e.target.value)}
-                      />
-                      Presencial
-                    </label>
-                    <label className={styles.radioLabel}>
-                      <input
-                        type="radio"
-                        name="modality"
-                        value="online"
-                        checked={modality === "online"}
-                        onChange={(e) => setModality(e.target.value)}
-                      />
-                      Online
-                    </label>
-                  </div>
-                </div>
                 <div className={styles.field}>
                   <span className={styles.label}>Modalidade</span>
                   <div className={styles.radioGroup}>
@@ -446,69 +484,6 @@ export default function Agendar({ onNavigate }) {
                 {loadingPatients && isAdmin && <p className={styles.muted}>Carregando pacientes...</p>}
                 {error && <p className={styles.error}>{error}</p>}
                 {message && <p className={styles.success}>{message}</p>}
-              </div>
-              <div className={styles.summary}>
-                <div className={styles.summaryRow}>
-                  <p className={styles.label}>Data</p>
-                  <p className={styles.value}>{formatDateDisplay(date)}</p>
-                </div>
-                <div className={styles.summaryRow}>
-                  <p className={styles.label}>Médico</p>
-                  <p className={styles.value}>
-                    {doctors.find((d) => d.id === selectedDoctor)?.name || "Selecione o médico"}
-                  </p>
-                </div>
-                <div className={styles.summaryRow}>
-                  <p className={styles.label}>Especialidade</p>
-                  <p className={styles.value}>
-                    {doctors.find((d) => d.id === selectedDoctor)?.specialty || "--"}
-                  </p>
-                </div>
-                {isAdmin && (
-                  <div className={styles.summaryRow}>
-                    <p className={styles.label}>Paciente</p>
-                    <p className={styles.value}>
-                      {patientOptions.find((p) => p.id === selectedPatientId)?.name || "Selecione o paciente"}
-                    </p>
-                  </div>
-                )}
-                <div className={styles.summaryRow}>
-                  <p className={styles.label}>Tipo</p>
-                  <p className={styles.value}>
-                    {types.find((t) => t.id === selectedType)?.name || "Selecione o tipo"}
-                  </p>
-                </div>
-                <div className={styles.summaryRow}>
-                  <p className={styles.label}>Modalidade</p>
-                  <p className={styles.value}>
-                    {modality === "presencial" ? "Presencial" : "Online"}
-                  </p>
-                </div>
-                <div className={styles.summaryRow}>
-                  <p className={styles.label}>Horário</p>
-                  <p className={styles.value}>{selectedTime || "Selecione um horário"}</p>
-                </div>
-              </div>
-            </article>
-            <article className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <h2 className={styles.cardTitle}>Confirmar</h2>
-                  <p className={styles.muted}>Confira os dados e finalize.</p>
-                </div>
-              </div>
-              <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.primary}
-                  onClick={handleBook}
-                  disabled={booking || !selectedTime || !selectedType || !selectedDoctor}
-                >
-                  {booking ? "Agendando..." : "Confirmar agendamento"}
-                </button>
-                <button type="button" className={styles.ghost} onClick={() => onNavigate("minha-agenda")}>
-                  Ir para minha agenda
-                </button>
               </div>
             </article>
           </section>

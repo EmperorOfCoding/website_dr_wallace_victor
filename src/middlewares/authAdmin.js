@@ -19,8 +19,8 @@ async function authAdmin(req, res, next) {
     const userId = payload.patient_id;
     let doctorId = payload.doctor_id;
 
-    // Recupera doctor_id se não veio no token
-    if (!doctorId) {
+    // Recupera doctor_id se não veio no token, mas APENAS se não for paciente
+    if (!doctorId && payload.role !== 'patient') {
       const admin = await adminService.findAdminById(userId);
       doctorId = admin?.doctor_id || null;
     }
