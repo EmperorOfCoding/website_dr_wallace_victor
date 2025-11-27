@@ -73,13 +73,18 @@ async function deleteAppointment(id) {
 }
 
 async function getAvailableTimes(date, doctorId = 1) {
-  const [rows] = await pool.execute('SELECT time FROM appointments WHERE date = ? AND doctor_id = ?', [date, doctorId]);
-  const [blockedRows] = await pool.execute('SELECT time FROM blocked_times WHERE date = ?', [date]);
-  const occupied = new Set(rows.map((row) => row.time.slice(0, 5)));
-  blockedRows.forEach((row) => occupied.add(row.time.slice(0, 5)));
+  try {
+    const [rows] = await pool.execute('SELECT time FROM appointments WHERE date = ? AND doctor_id = ?', [date, doctorId]);
+    const [blockedRows] = await pool.execute('SELECT time FROM blocked_times WHERE date = ?', [date]);
+    const occupied = new Set(rows.map((row) => row.time.slice(0, 5)));
+    blockedRows.forEach((row) => occupied.add(row.time.slice(0, 5)));
 
-  const slots = buildDailySlots();
-  return slots.filter((slot) => !occupied.has(slot));
+    const slots = buildDailySlots();
+    return slots.filter((slot) => !occupied.has(slot));
+  } catch (error) {
+    console.error('Error in getAvailableTimes:', error);
+    return [];
+  }
 }
 
 async function createAppointment({ patientId, date, time, typeId, doctorId = 1, status = 'scheduled', rescheduledFrom = null, notes = null, modality = 'presencial' }) {

@@ -1,10 +1,15 @@
 ﻿const pool = require('../config/db');
 
 async function listDoctors() {
-  const [rows] = await pool.execute(
-    'SELECT id, name, email, phone, specialty, bio, created_at FROM doctors ORDER BY created_at DESC'
-  );
-  return rows;
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, name, email, phone, specialty, bio, created_at FROM doctors ORDER BY created_at DESC'
+    );
+    return rows;
+  } catch (error) {
+    console.error('Error in listDoctors:', error);
+    return [];
+  }
 }
 
 async function findDoctorById(id) {

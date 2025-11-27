@@ -5,3 +5,19 @@ dist
 build
 *.log
 frontend/node_modules
+
+# Logs
+logs/
+
+# Test outputs
+*_output.json
+*_output.txt
+
+# Debug scripts
+debug_*.js
+
+# Temporary files
+test_*.js
+fix_*.js
+check_*.js
+verify_*.js

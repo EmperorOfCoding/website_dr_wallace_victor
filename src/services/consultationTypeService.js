@@ -44,28 +44,41 @@ async function createConsultationType({ name, duration, description }) {
 }
 
 async function listConsultationTypes() {
-  const [rows] = await pool.execute(
-    'SELECT id, name, duration_minutes AS duration, description, created_at FROM appointment_types ORDER BY created_at DESC'
-  );
-  return rows;
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, name, duration_minutes AS duration, description, created_at FROM appointment_types ORDER BY created_at DESC'
+    );
+    return rows;
+  } catch (error) {
+    console.error('Error in listConsultationTypes:', error);
+    return [];
+  }
 }
 
 async function listConsultationTypesForDoctor(doctorId) {
-  if (!doctorId) return listConsultationTypes();
-  const doctor = await doctorService.findDoctorById(doctorId);
-  if (!doctor) {
-    const error = new Error('DOCTOR_NOT_FOUND');
-    throw error;
+  try {
+    if (!doctorId) return listConsultationTypes();
+    const doctor = await doctorService.findDoctorById(doctorId);
+    if (!doctor) {
+      const error = new Error('DOCTOR_NOT_FOUND');
+      throw error;
+    }
+    const [rows] = await pool.execute(
+      `SELECT t.id, t.name, t.duration_minutes AS duration, t.description
+       FROM doctor_consultation_types dct
+       JOIN appointment_types t ON dct.type_id = t.id
+       WHERE dct.doctor_id = ?
+       ORDER BY t.name`,
+      [doctorId]
+    );
+    return rows;
+  } catch (error) {
+    console.error('Error in listConsultationTypesForDoctor:', error);
+    if (error.message === 'DOCTOR_NOT_FOUND') {
+      throw error;
+    }
+    return [];
   }
-  const [rows] = await pool.execute(
-    `SELECT t.id, t.name, t.duration_minutes AS duration, t.description
-     FROM doctor_consultation_types dct
-     JOIN appointment_types t ON dct.type_id = t.id
-     WHERE dct.doctor_id = ?
-     ORDER BY t.name`,
-    [doctorId]
-  );
-  return rows;
 }
 
 async function updateConsultationType(id, { name, duration, description }) {

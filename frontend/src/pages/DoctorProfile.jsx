@@ -1,75 +1,64 @@
-﻿import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useTheme } from "../App";
 import ProtectedPage from "../components/ProtectedPage";
 import { useAuth } from "../context/AuthContext";
-import DoctorProfile from "./DoctorProfile";
 import styles from "./Perfil.module.css";
 
-export default function Perfil({ onNavigate }) {
-  const { patient, token, isAdmin } = useAuth();
-  
-  // Route to doctor profile if user is admin (doctor)
-  if (isAdmin) {
-    return <DoctorProfile onNavigate={onNavigate} />;
-  }
-  
-  // Patient profile below
+export default function DoctorProfile({ onNavigate }) {
+  const { patient, token } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
   const [form, setForm] = useState({
+    name: "",
+    email: "",
     phone: "",
-    birthdate: "",
-    emergency_name: "",
-    emergency_phone: "",
-    allergies: "",
-    notes: "",
-    contact_preference: "whatsapp",
-    reminders_enabled: true,
+    specialty: "",
+    bio: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
 
-  const displayName = useMemo(() => patient?.name || "Paciente", [patient]);
-
   useEffect(() => {
-    loadProfile();
+    loadDoctorProfile();
   }, [patient?.id, token]);
 
-  const loadProfile = async () => {
+  const loadDoctorProfile = async () => {
     if (!patient?.id || !token) return;
     setLoading(true);
     try {
-      const resp = await fetch("/api/profile", {
+      const resp = await fetch("/api/doctors/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await resp.json().catch(() => ({}));
-      if (resp.ok && data.profile) {
-        setForm((prev) => ({
-          ...prev,
-          phone: data.profile.phone || patient?.phone || "",
-          birthdate: data.profile.birthdate?.split("T")[0] || "",
-          emergency_name: data.profile.emergency_name || "",
-          emergency_phone: data.profile.emergency_phone || "",
-          allergies: data.profile.allergies || "",
-          notes: data.profile.notes || "",
-          contact_preference: data.profile.contact_preference || "whatsapp",
-          reminders_enabled: data.profile.reminders_enabled !== false,
-        }));
-      } else if (patient?.phone) {
-        setForm((prev) => ({ ...prev, phone: patient.phone }));
+      if (resp.ok && data.doctor) {
+        setForm({
+          name: data.doctor.name || "",
+          email: data.doctor.email || "",
+          phone: data.doctor.phone || "",
+          specialty: data.doctor.specialty || "",
+          bio: data.doctor.bio || "",
+        });
+      } else {
+        // Fallback to patient data (which is actually doctor data in admin context)
+        setForm({
+          name: patient?.name || "",
+          email: patient?.email || "",
+          phone: patient?.phone || "",
+          specialty: "",
+          bio: "",
+        });
       }
     } catch (err) {
-      console.error("Error loading profile:", err);
+      console.error("Error loading doctor profile:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleChange = (field) => (event) => {
-    const value = field === "reminders_enabled" ? event.target.checked : event.target.value;
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: event.target.value }));
     setStatus("");
     setError("");
   };
@@ -83,13 +72,17 @@ export default function Perfil({ onNavigate }) {
     setError("");
     setStatus("");
     try {
-      const resp = await fetch("/api/profile", {
+      const resp = await fetch("/api/doctors/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          phone: form.phone,
+          specialty: form.specialty,
+          bio: form.bio,
+        }),
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok) {
@@ -105,14 +98,9 @@ export default function Perfil({ onNavigate }) {
   };
 
   const handleThemeChange = async () => {
-    // Calculate the new theme value BEFORE updating state
-    // Since React state updates are asynchronous, we need to use the current value
     const newDarkMode = !darkMode;
-
-    // Update UI state
     toggleTheme();
-
-    // Save to backend with the calculated new value
+    
     try {
       await fetch("/api/profile/theme", {
         method: "PUT",
@@ -133,20 +121,17 @@ export default function Perfil({ onNavigate }) {
         <div className={styles.container}>
           <header className={styles.hero}>
             <div>
-              <p className={styles.badge}>Conta do paciente</p>
-              <h1 className={styles.title}>Olá, {displayName}</h1>
+              <p className={styles.badge}>Perfil Médico</p>
+              <h1 className={styles.title}>Dr(a). {form.name || "Médico"}</h1>
               <p className={styles.lead}>
-                Revise seus dados, ajuste preferências de contato e mantenha informações de segurança sempre atualizadas.
+                Gerencie suas informações profissionais, especialidade e biografia que serão exibidas aos pacientes.
               </p>
               <div className={styles.actions}>
-                <button type="button" className={styles.primary} onClick={() => onNavigate("agendar")}>
-                  Agendar consulta
+                <button type="button" className={styles.primary} onClick={() => onNavigate("painel-medico")}>
+                  Painel administrativo
                 </button>
-                <button type="button" className={styles.secondary} onClick={() => onNavigate("minha-agenda")}>
-                  Ver minha agenda
-                </button>
-                <button type="button" className={styles.secondary} onClick={() => onNavigate("documentos")}>
-                  📄 Meus documentos
+                <button type="button" className={styles.secondary} onClick={() => onNavigate("painel-medico-agenda")}>
+                  Ver agenda
                 </button>
               </div>
             </div>
@@ -159,7 +144,7 @@ export default function Perfil({ onNavigate }) {
               <div className={styles.summaryRow}>
                 <div>
                   <p className={styles.summaryLabel}>E-mail</p>
-                  <p className={styles.summaryValue}>{patient?.email || "Não informado"}</p>
+                  <p className={styles.summaryValue}>{form.email || "Não informado"}</p>
                 </div>
               </div>
               <div className={styles.summaryRow}>
@@ -170,14 +155,11 @@ export default function Perfil({ onNavigate }) {
               </div>
               <div className={styles.summaryRow}>
                 <div>
-                  <p className={styles.summaryLabel}>Preferência de contato</p>
-                  <p className={styles.summaryValue}>
-                    {form.contact_preference === "whatsapp" ? "WhatsApp" : "E-mail"}
-                  </p>
+                  <p className={styles.summaryLabel}>Especialidade</p>
+                  <p className={styles.summaryValue}>{form.specialty || "Não informada"}</p>
                 </div>
-                <span className={styles.tag}>{form.reminders_enabled ? "Lembretes ativos" : "Lembretes desativados"}</span>
               </div>
-              <p className={styles.muted}>Seus dados são armazenados com segurança.</p>
+              <p className={styles.muted}>Seus dados profissionais são visíveis aos pacientes.</p>
             </motion.div>
           </header>
 
@@ -193,9 +175,9 @@ export default function Perfil({ onNavigate }) {
               >
                 <div className={styles.cardHeader}>
                   <div>
-                    <p className={styles.badge}>Contato e saúde</p>
-                    <h2 className={styles.cardTitle}>Dados principais</h2>
-                    <p className={styles.muted}>Atualize telefone, preferências de contato e observações importantes.</p>
+                    <p className={styles.badge}>Informações Profissionais</p>
+                    <h2 className={styles.cardTitle}>Dados do médico</h2>
+                    <p className={styles.muted}>Atualize suas informações profissionais e de contato.</p>
                   </div>
                   <button
                     type="button"
@@ -217,76 +199,26 @@ export default function Perfil({ onNavigate }) {
                       placeholder="(00) 00000-0000"
                     />
                   </label>
-                  <label className={styles.field} htmlFor="birthdate">
-                    Data de nascimento
+                  <label className={styles.field} htmlFor="specialty">
+                    Especialidade
                     <input
-                      id="birthdate"
-                      type="date"
-                      value={form.birthdate}
-                      onChange={handleChange("birthdate")}
-                    />
-                  </label>
-                  <label className={styles.field} htmlFor="contact_preference">
-                    Preferência de contato
-                    <select
-                      id="contact_preference"
-                      value={form.contact_preference}
-                      onChange={handleChange("contact_preference")}
-                    >
-                      <option value="whatsapp">WhatsApp</option>
-                      <option value="email">E-mail</option>
-                    </select>
-                  </label>
-                  <label className={styles.checkbox}>
-                    <input
-                      type="checkbox"
-                      checked={form.reminders_enabled}
-                      onChange={handleChange("reminders_enabled")}
-                    />
-                    Receber lembretes de consultas
-                  </label>
-                </div>
-                <div className={styles.formGrid}>
-                  <label className={styles.field} htmlFor="allergies">
-                    Alergias e alertas
-                    <textarea
-                      id="allergies"
-                      rows={3}
-                      value={form.allergies}
-                      onChange={handleChange("allergies")}
-                      placeholder="Descreva alergias, condições crônicas ou medicações relevantes."
-                    />
-                  </label>
-                  <label className={styles.field} htmlFor="notes">
-                    Observações
-                    <textarea
-                      id="notes"
-                      rows={3}
-                      value={form.notes}
-                      onChange={handleChange("notes")}
-                      placeholder="Informações adicionais que ajudem no atendimento."
-                    />
-                  </label>
-                </div>
-                <div className={styles.formGrid}>
-                  <label className={styles.field} htmlFor="emergency_name">
-                    Contato de emergência
-                    <input
-                      id="emergency_name"
+                      id="specialty"
                       type="text"
-                      value={form.emergency_name}
-                      onChange={handleChange("emergency_name")}
-                      placeholder="Nome do responsável"
+                      value={form.specialty}
+                      onChange={handleChange("specialty")}
+                      placeholder="Ex: Cardiologia, Pediatria, Clínico Geral"
                     />
                   </label>
-                  <label className={styles.field} htmlFor="emergency_phone">
-                    Telefone do contato
-                    <input
-                      id="emergency_phone"
-                      type="tel"
-                      value={form.emergency_phone}
-                      onChange={handleChange("emergency_phone")}
-                      placeholder="(00) 00000-0000"
+                </div>
+                <div className={styles.formGrid}>
+                  <label className={styles.field} htmlFor="bio">
+                    Biografia Profissional
+                    <textarea
+                      id="bio"
+                      rows={5}
+                      value={form.bio}
+                      onChange={handleChange("bio")}
+                      placeholder="Descreva sua formação, experiência e áreas de atuação. Esta informação será exibida aos pacientes."
                     />
                   </label>
                 </div>
@@ -337,35 +269,35 @@ export default function Perfil({ onNavigate }) {
               >
                 <div className={styles.cardHeader}>
                   <div>
-                    <p className={styles.badge}>Segurança</p>
-                    <h2 className={styles.cardTitle}>Dados da conta</h2>
-                    <p className={styles.muted}>Reveja informações chave e acesse ações rápidas.</p>
+                    <p className={styles.badge}>Conta</p>
+                    <h2 className={styles.cardTitle}>Informações da conta</h2>
+                    <p className={styles.muted}>Dados de acesso e identificação.</p>
                   </div>
                 </div>
                 <div className={styles.accountInfo}>
                   <div>
                     <p className={styles.summaryLabel}>Nome completo</p>
-                    <p className={styles.summaryValue}>{patient?.name || "Atualize seus dados"}</p>
+                    <p className={styles.summaryValue}>{form.name || "Não informado"}</p>
                   </div>
                   <div>
                     <p className={styles.summaryLabel}>E-mail</p>
-                    <p className={styles.summaryValue}>{patient?.email || "Não informado"}</p>
+                    <p className={styles.summaryValue}>{form.email || "Não informado"}</p>
                   </div>
                   <div>
-                    <p className={styles.summaryLabel}>ID do paciente</p>
+                    <p className={styles.summaryLabel}>ID do médico</p>
                     <p className={styles.summaryValue}>{patient?.id ?? "--"}</p>
                   </div>
                 </div>
                 <div className={styles.actionsRow}>
-                  <button type="button" className={styles.secondary} onClick={() => onNavigate("agendar")}>
-                    Agendar nova consulta
+                  <button type="button" className={styles.secondary} onClick={() => onNavigate("painel-medico-agenda")}>
+                    Gerenciar agenda
                   </button>
-                  <button type="button" className={styles.secondary} onClick={() => onNavigate("minha-agenda")}>
-                    Ver minha agenda
+                  <button type="button" className={styles.secondary} onClick={() => onNavigate("painel-medico-pacientes")}>
+                    Ver pacientes
                   </button>
                 </div>
                 <p className={styles.muted}>
-                  Caso precise atualizar e-mail ou senha, solicite suporte via "Esqueceu a senha?" na tela de login.
+                  Para alterar e-mail ou senha, entre em contato com o suporte técnico.
                 </p>
               </motion.section>
             </div>

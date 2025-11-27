@@ -75,8 +75,13 @@ async function forgotPassword(req, res) {
     const patient = await authService.findPatientByEmail(email);
 
     if (patient) {
-      const token = await authService.createPasswordResetRequest(patient.id);
-      await authService.sendResetEmail(email, token);
+      try {
+        const token = await authService.createPasswordResetRequest(patient.id);
+        await authService.sendResetEmail(email, token);
+      } catch (emailError) {
+        console.error('Error sending reset email:', emailError);
+        // Don't fail the request if email fails, for security reasons
+      }
     }
 
     return res.status(200).json({
@@ -84,6 +89,7 @@ async function forgotPassword(req, res) {
       message: 'Se o e-mail existir, enviaremos instruções para redefinir a senha.'
     });
   } catch (error) {
+    console.error('Error in forgotPassword:', error);
     return res.status(500).json({ status: 'error', message: 'Erro ao solicitar recuperação de senha.' });
   }
 }

@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+﻿import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import ExamPanel from "../components/ExamPanel";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
@@ -8,143 +9,58 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
-// Custom hook for debouncing
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-
 export default function AdminDashboard({ onNavigate }) {
   const { token } = useAuth();
-  const [appointments, setAppointments] = useState([]);
-  const [patients, setPatients] = useState([]);
-  const [date, setDate] = useState("");
-  const [search, setSearch] = useState("");
-  const [loadingAppt, setLoadingAppt] = useState(false);
-  const [loadingPatients, setLoadingPatients] = useState(false);
-  const [error, setError] = useState("");
-  const [selectedAppt, setSelectedAppt] = useState(null);
-  const [apptDocs, setApptDocs] = useState([]);
-  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [stats, setStats] = useState({ total: 0, today: 0, pending: 0, patients: 0 });
+  const [recentAppointments, setRecentAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedPatientForExams, setSelectedPatientForExams] = useState(null);
 
-  // Debounce search input to avoid excessive API calls
-  const debouncedSearch = useDebounce(search, 500);
+  useEffect(() =>{
+    loadDashboardData();
+  }, [token]);
 
-  useEffect(() => {
-    async function loadAppointments() {
-      setLoadingAppt(true);
-      setError("");
-      try {
-        const params = new URLSearchParams();
-        if (date) params.append("date", date);
-        if (debouncedSearch) params.append("patient", debouncedSearch);
-        const resp = await fetch(`/api/admin/appointments?${params.toString()}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (resp.ok) {
-          setAppointments(data.appointments || []);
-          setError("");
-        } else if (resp.status >= 500) {
-          throw new Error(data.message || "Não foi possível carregar agendamentos.");
-        } else {
-          // Erros 4xx tratam como lista vazia
-          setAppointments([]);
-          setError("");
-        }
-      } catch (err) {
-        setError(err.message || "Não foi possível carregar agendamentos.");
-      } finally {
-        setLoadingAppt(false);
-      }
-    }
-    async function loadPatients() {
-      setLoadingPatients(true);
-      try {
-        const params = new URLSearchParams();
-        params.append("limit", 5);
-        if (debouncedSearch) params.append("search", debouncedSearch);
-        const resp = await fetch(`/api/admin/patients?${params.toString()}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (resp.ok) {
-          setPatients(data.patients || []);
-        }
-      } catch (_) {
-        /* ignore silently */
-      } finally {
-        setLoadingPatients(false);
-      }
-    }
-    loadAppointments();
-    loadPatients();
-  }, [token, date, debouncedSearch]);
-
-  async function handleViewDetails(appt) {
-    setSelectedAppt(appt);
-    setApptDocs([]);
-    setLoadingDocs(true);
+  async function loadDashboardData() {
+    setLoading(true);
     try {
-      const resp = await fetch(`/api/documents?appointment_id=${appt.appointment_id}`, {
+      // Load appointments
+      const apptResp = await fetch("/api/admin/appointments?limit=5", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await resp.json().catch(() => ({}));
-      if (resp.ok) {
-        setApptDocs(data.documents || []);
-      }
-    } catch (err) {
-      console.error("Erro ao carregar documentos:", err);
-    } finally {
-      setLoadingDocs(false);
-    }
-  }
-
-  function closeDetails() {
-    setSelectedAppt(null);
-    setApptDocs([]);
-  }
-
-  async function handleDownload(docId, filename) {
-    try {
-      const resp = await fetch(`/api/documents/${docId}/download`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const apptData = await apptResp.json().catch(() => ({}));
+      
+      // Load patients count
+      const patientsResp = await fetch("/api/admin/patients", {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      const patientsData = await patientsResp.json().catch(() => ({}));
 
-      if (!resp.ok) {
-        const data = await resp.json().catch(() => ({}));
-        alert(data.message || "Erro ao baixar documento.");
-        return;
+      if (apptResp.ok) {
+        const appointments = apptData.appointments || [];
+        setRecentAppointments(appointments.slice(0, 5));
+        
+        // Calculate stats
+        const today = new Date().toISOString().split('T')[0];
+        setStats({
+          total: appointments.length,
+          today: appointments.filter(a => a.date === today).length,
+          pending: appointments.filter(a => a.status === 'scheduled').length,
+          patients: patientsData.patients?.length || 0
+        });
       }
-
-      const blob = await resp.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Erro ao baixar documento:", err);
-      alert("Erro ao baixar documento.");
+      console.error("Error loading dashboard:", err);
+    } finally {
+      setLoading(false);
     }
   }
+
+  const quickActions = [
+    { label: "Agendar Consulta", action: () => onNavigate("agendar"), color: "primary" },
+    { label: "Ver Pacientes", action: () => onNavigate("painel-medico-pacientes"), color: "secondary" },
+    { label: "Ver Agenda", action: () => onNavigate("painel-medico-agenda"), color: "secondary" },
+    { label: "Calendario", action: () => onNavigate("painel-medico-calendario"), color: "secondary" },
+  ];
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>
@@ -152,173 +68,150 @@ export default function AdminDashboard({ onNavigate }) {
         <div className={styles.container}>
           <header className={styles.hero}>
             <div>
-              <p className={styles.badge}>Admin</p>
-              <h1 className={styles.title}>Painel do Médico</h1>
-              <p className={styles.lead}>Consulte rapidamente os pacientes agendados e sua agenda diária.</p>
-              <div className={styles.actions}>
-                <button type="button" className={styles.primary} onClick={() => onNavigate("agendar")}>
-                  Agendar paciente
-                </button>
-                <button type="button" className={styles.secondary} onClick={() => onNavigate("home")}>
-                  Voltar ao site
-                </button>
-              </div>
-            </div>
-            <div className={styles.filters}>
-              <label className={styles.field} htmlFor="dateFilter">
-                Data
-                <input
-                  id="dateFilter"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
-              </label>
-              <label className={styles.field} htmlFor="search">
-                Buscar paciente
-                <input
-                  id="search"
-                  type="text"
-                  placeholder="Nome ou e-mail"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </label>
+              <p className={styles.badge}>Painel Médico</p>
+              <h1 className={styles.title}>Bem-vindo, Dr(a)!</h1>
+              <p className={styles.lead}>
+                Gerencie suas consultas, pacientes e agenda de forma eficiente.
+              </p>
             </div>
           </header>
 
-          <section className={styles.grid}>
-            <article className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <p className={styles.badge}>Agenda</p>
-                  <h2 className={styles.cardTitle}>Agendamentos</h2>
-                  <p className={styles.muted}>Próximos horários com dados do paciente.</p>
+          {/* Metrics Cards */}
+          <div className={styles.metricsCard}>
+            <section className={styles.metricsGrid}>
+              <motion.div
+                className={`${styles.metricCard} ${styles.metricPrimary}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <div className={styles.metricContent}>
+                  <p className={styles.metricValue}>{loading ? "..." : stats.total}</p>
+                  <p className={styles.metricLabel}>Total de Consultas</p>
                 </div>
-              </div>
-              {loadingAppt && <p className={styles.info}>Carregando agendamentos...</p>}
-              {error && <p className={styles.error}>{error}</p>}
-              {!loadingAppt && !error && appointments.length === 0 && (
-                <div className={styles.empty}>Nenhum agendamento encontrado.</div>
-              )}
-              {!loadingAppt && !error && appointments.length > 0 && (
-                <div className={styles.list}>
-                  {appointments.map((appt) => (
-                    <article key={appt.appointment_id} className={styles.row}>
-                      <div>
-                        <p className={styles.date}>{formatDate(appt.date)}</p>
-                        <p className={styles.time}>{appt.time?.slice(0, 5)}</p>
-                      </div>
-                      <div className={styles.detailBlock}>
-                        <p className={styles.patient}>{appt.patient_name}</p>
-                        <p className={styles.sub}>{appt.patient_email}</p>
-                      </div>
-                      <div className={styles.detailBlock}>
-                        <p className={styles.sub}>Tipo</p>
-                        <p className={styles.value}>{appt.type_name || appt.type_id}</p>
-                        <p className={styles.sub}>{appt.modality === 'online' ? 'Online' : 'Presencial'}</p>
-                      </div>
-                      <button
-                        type="button"
-                        className={styles.secondary}
-                        onClick={() => handleViewDetails(appt)}
-                        style={{ marginLeft: "auto" }}
-                      >
-                        Ver Detalhes
-                      </button>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </article>
+              </motion.div>
 
-            <article className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <p className={styles.badge}>Pacientes</p>
-                  <h2 className={styles.cardTitle}>Pacientes recentes</h2>
-                  <p className={styles.muted}>Lista rápida para contato.</p>
+              <motion.div
+                className={`${styles.metricCard} ${styles.metricSuccess}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className={styles.metricContent}>
+                  <p className={styles.metricValue}>{loading ? "..." : stats.today}</p>
+                  <p className={styles.metricLabel}>Consultas Hoje</p>
                 </div>
-                <button type="button" className={styles.secondary} onClick={() => onNavigate("perfil")}>
-                  Ver perfil
-                </button>
+              </motion.div>
+
+              <motion.div
+                className={`${styles.metricCard} ${styles.metricWarning}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <div className={styles.metricContent}>
+                  <p className={styles.metricValue}>{loading ? "..." : stats.pending}</p>
+                  <p className={styles.metricLabel}>Pendentes</p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className={`${styles.metricCard} ${styles.metricInfo}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <div className={styles.metricContent}>
+                  <p className={styles.metricValue}>{loading ? "..." : stats.patients}</p>
+                  <p className={styles.metricLabel}>Total de Pacientes</p>
+                </div>
+              </motion.div>
+            </section>
+          </div>
+
+          {/* Quick Actions */}
+          <div className={styles.actionsCard}>
+            <section className={styles.quickActionsSection}>
+              <div className={styles.quickActionsGrid}>
+                {quickActions.map((action, idx) => (
+                  <motion.button
+                    key={action.label}
+                    className={`${styles.quickActionCard} ${styles[action.color]}`}
+                    onClick={action.action}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 + idx * 0.05 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className={styles.actionLabel}>{action.label}</span>
+                  </motion.button>
+                ))}
               </div>
-              {loadingPatients && <p className={styles.info}>Carregando pacientes...</p>}
-              {!loadingPatients && patients.length === 0 && <div className={styles.empty}>Nenhum paciente encontrado.</div>}
-              {!loadingPatients && patients.length > 0 && (
-                <div className={styles.patientList}>
-                  {patients.map((p) => (
-                    <div key={p.id} className={styles.patientRow}>
-                      <div>
-                        <p className={styles.patient}>{p.name}</p>
-                        <p className={styles.sub}>{p.email}</p>
-                      </div>
-                      <div className={styles.patientActions}>
-                        <p className={styles.value}>{p.phone || "--"}</p>
-                        <button 
-                          className={styles.btnSmall}
-                          onClick={() => setSelectedPatientForExams(p.id)}
-                        >
-                          Exames
-                        </button>
-                      </div>
+            </section>
+          </div>
+
+          {/* Recent Appointments */}
+          <section className={styles.recentSection}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 className={styles.sectionTitle}>Consultas Recentes</h2>
+                <p className={styles.sectionSubtitle}>Últimas 5 consultas agendadas</p>
+              </div>
+              <button
+                className={styles.secondary}
+                onClick={() => onNavigate("painel-medico-agenda")}
+              >
+                Ver Todas
+              </button>
+            </div>
+
+            {loading && <p className={styles.info}>Carregando...</p>}
+            
+            {!loading && recentAppointments.length === 0 && (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>📭</div>
+                <p className={styles.emptyTitle}>Nenhuma consulta agendada</p>
+                <p className={styles.emptyText}>As próximas consultas aparecerão aqui.</p>
+              </div>
+            )}
+
+            {!loading && recentAppointments.length > 0 && (
+              <div className={styles.appointmentsList}>
+                {recentAppointments.map((appt, idx) => (
+                  <motion.div
+                    key={appt.appointment_id}
+                    className={styles.appointmentCard}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 + idx * 0.1 }}
+                  >
+                    <div className={styles.appointmentDate}>
+                      <p className={styles.dateDay}>{formatDate(appt.date)}</p>
+                      <p className={styles.dateTime}>{appt.time?.slice(0, 5)}</p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </article>
+                    <div className={styles.appointmentInfo}>
+                      <p className={styles.patientName}>{appt.patient_name}</p>
+                      <p className={styles.appointmentType}>{appt.type_name || "Consulta"}</p>
+                      <p className={styles.appointmentModality}>
+                        {appt.modality === 'online' ? '🌐 Online' : '🏥 Presencial'}
+                      </p>
+                    </div>
+                    <div className={styles.appointmentActions}>
+                      <span className={`${styles.statusBadge} ${styles[appt.status]}`}>
+                        {appt.status === 'scheduled' ? 'Agendado' : 
+                         appt.status === 'confirmed' ? 'Confirmado' :
+                         appt.status === 'completed' ? 'Concluído' : 'Cancelado'}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </section>
         </div>
       </div>
-      {selectedAppt && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h3>Detalhes do Agendamento</h3>
-              <button onClick={closeDetails} className={styles.closeBtn}>
-                &times;
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <p><strong>Paciente:</strong> {selectedAppt.patient_name}</p>
-              <p><strong>Data:</strong> {formatDate(selectedAppt.date)} - {selectedAppt.time?.slice(0, 5)}</p>
-              <p><strong>Tipo:</strong> {selectedAppt.type_name || selectedAppt.type_id}</p>
-              <p><strong>Modalidade:</strong> {selectedAppt.modality === 'online' ? 'Online' : 'Presencial'}</p>
-              
-              <div className={styles.section}>
-                <h4>Resumo do problema</h4>
-                <p className={styles.notes}>{selectedAppt.notes || "Nenhuma observação."}</p>
-              </div>
 
-              <div className={styles.section}>
-                <h4>Documentos anexados</h4>
-                {loadingDocs && <p>Carregando documentos...</p>}
-                {!loadingDocs && apptDocs.length === 0 && <p className={styles.muted}>Nenhum documento anexado.</p>}
-                {!loadingDocs && apptDocs.length > 0 && (
-                  <ul className={styles.docList}>
-                    {apptDocs.map((doc) => (
-                      <li key={doc.id}>
-                        <button
-                          type="button"
-                          className={styles.linkBtn}
-                          onClick={() => handleDownload(doc.id, doc.original_name)}
-                        >
-                          {doc.original_name}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-            <div className={styles.modalFooter}>
-              <button onClick={closeDetails} className={styles.primary}>
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {selectedPatientForExams && (
         <ExamPanel 
           patientId={selectedPatientForExams} 

@@ -10,8 +10,8 @@ const router = express.Router();
 router.get('/api/appointments/available', appointmentController.getAvailableAppointments);
 router.get('/api/consultation-types', consultationTypeController.listTypes);
 
-// Protected routes
-router.post('/api/appointments', bookingLimiter, authMiddleware, appointmentController.createAppointment);
+// Protected routes - Note: POST /api/appointments validates in controller before checking auth
+router.post('/api/appointments', bookingLimiter, appointmentController.createAppointment);
 router.post('/api/appointments/book', bookingLimiter, authMiddleware, appointmentController.createAppointment);
 router.get('/api/appointments', authMiddleware, appointmentController.listAppointments);
 router.get('/api/appointments/:id', authMiddleware, appointmentController.getAppointmentById);

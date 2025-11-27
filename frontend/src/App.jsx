@@ -1,4 +1,4 @@
-﻿import { AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { createContext, useContext, useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
@@ -87,8 +87,8 @@ function AppRoutes() {
    * Central navigation handler that converts legacy page names to React Router paths.
    * 
    * Supports three types of navigation:
-   * 1. Static mapped routes (e.g., "agendar" → "/agendar")
-   * 2. Dynamic routes with parameters (e.g., "avaliar/123" → "/avaliar/123")
+   * 1. Static mapped routes (e.g., "agendar" ? "/agendar")
+   * 2. Dynamic routes with parameters (e.g., "avaliar/123" ? "/avaliar/123")
    * 3. Routes with query parameters (e.g., "agendar?date=2024-01-15")
    * 
    * @param {string} path - Can be a routeMap key, a dynamic path, or path with query params
@@ -109,11 +109,11 @@ function AppRoutes() {
       "minha-agenda": "/minha-agenda",
       perfil: "/perfil",
       dashboard: "/dashboard",
-      admin: "/admin",
-      "admin-pacientes": "/admin/pacientes",
-      "admin-agenda": "/admin/agenda",
-      "admin-calendario": "/admin/calendario",
-      "admin-metricas": "/admin/metricas",
+      admin: "/painel-medico",
+      "painel-medico-pacientes": "/painel-medico/pacientes",
+      "painel-medico-agenda": "/painel-medico/agenda",
+      "painel-medico-calendario": "/painel-medico/calendario",
+      "painel-medico-metricas": "/painel-medico/metricas",
     };
 
     let route;
@@ -132,7 +132,7 @@ function AppRoutes() {
       route = `/${basePath}`;
       if (process.env.NODE_ENV === 'development') {
         console.warn(
-          `⚠️ Navigation to unmapped route: "${basePath}". ` +
+          `?? Navigation to unmapped route: "${basePath}". ` +
           `Consider adding it to routeMap in App.jsx for consistency.`
         );
       }
@@ -158,11 +158,11 @@ function AppRoutes() {
       "minha-agenda": "/minha-agenda",
       perfil: "/perfil",
       dashboard: "/dashboard",
-      admin: "/admin",
-      "admin-pacientes": "/admin/pacientes",
-      "admin-agenda": "/admin/agenda",
-      "admin-calendario": "/admin/calendario",
-      "admin-metricas": "/admin/metricas",
+      admin: "/painel-medico",
+      "painel-medico-pacientes": "/painel-medico/pacientes",
+      "painel-medico-agenda": "/painel-medico/agenda",
+      "painel-medico-calendario": "/painel-medico/calendario",
+      "painel-medico-metricas": "/painel-medico/metricas",
       avaliar: "/avaliar",
       documentos: "/documentos",
     };
@@ -205,7 +205,7 @@ function AppRoutes() {
             {/* Public Routes */}
             <Route path="/" element={
               isAuthenticated ? (
-                <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />
+                <Navigate to={isAdmin ? "/painel-medico" : "/dashboard"} replace />
               ) : (
                 <PageTransition><Home onNavigate={handleNavigate} /></PageTransition>
               )
@@ -276,7 +276,7 @@ function AppRoutes() {
 
             {/* Admin Routes */}
             <Route
-              path="/admin"
+              path="/painel-medico"
               element={
                 <ProtectedRoute adminOnly>
                   <PageTransition><AdminDashboard onNavigate={handleNavigate} /></PageTransition>
@@ -284,7 +284,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="/admin/pacientes"
+              path="/painel-medico/pacientes"
               element={
                 <ProtectedRoute adminOnly>
                   <PageTransition><AdminPatients onNavigate={handleNavigate} /></PageTransition>
@@ -292,7 +292,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="/admin/pacientes/:id"
+              path="/painel-medico/pacientes/:id"
               element={
                 <ProtectedRoute adminOnly>
                   <PageTransition><AdminPatientDetails onNavigate={handleNavigate} /></PageTransition>
@@ -300,7 +300,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="/admin/agenda"
+              path="/painel-medico/agenda"
               element={
                 <ProtectedRoute adminOnly>
                   <PageTransition><AdminAgenda onNavigate={handleNavigate} /></PageTransition>
@@ -308,7 +308,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="/admin/calendario"
+              path="/painel-medico/calendario"
               element={
                 <ProtectedRoute adminOnly>
                   <PageTransition><AdminCalendar onNavigate={handleNavigate} /></PageTransition>
@@ -316,7 +316,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="/admin/metricas"
+              path="/painel-medico/metricas"
               element={
                 <ProtectedRoute adminOnly>
                   <PageTransition><AdminMetrics onNavigate={handleNavigate} /></PageTransition>

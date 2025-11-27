@@ -1,29 +1,25 @@
 ﻿import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
 
 export default function Login({ onNavigate }) {
-  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [status, setStatus] = useState("");
-  const [recovering, setRecovering] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(false);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
+  const [recovering, setRecovering] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setStatus("Entrando...");
     setError("");
-    setStatus("");
-
-    if (!email || !password) {
-      setError("Preencha e-mail e senha.");
-      return;
-    }
-
-    const endpoint = isAdminMode ? "/api/admin/login" : "/api/auth/login";
 
     try {
+      const endpoint = isAdminMode ? "/api/admin/login" : "/api/auth/login";
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,32 +29,43 @@ export default function Login({ onNavigate }) {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || "Falha ao autenticar.");
+        throw new Error(data.message || "Falha no login.");
       }
 
-      const userPayload = data.patient || data.admin || data.user;
+      let userPayload = null;
+      if (data.token) {
+        try {
+          const payload = JSON.parse(atob(data.token.split('.')[1]));
+          userPayload = payload;
+        } catch (e) {
+          console.error("Error decoding token", e);
+        }
+      }
+
       login({ token: data.token, patient: userPayload });
       setStatus("Login realizado com sucesso.");
       if (isAdminMode) {
-        onNavigate("admin");
+        onNavigate("painel-medico");
       } else {
         onNavigate("dashboard");
       }
     } catch (err) {
-      setError(err.message || "Erro ao autenticar.");
+      setError(err.message || "Erro ao conectar com o servidor.");
+      setStatus("");
     }
-  };
+  }
 
-  const handleForgotPassword = async () => {
+  async function handleRecover(e) {
+    e.preventDefault();
     if (!email) {
-      setError("Informe o e-mail para recuperar a senha.");
+      setError("Digite seu e-mail para recuperar a senha.");
       return;
     }
+    setStatus("Enviando...");
     setError("");
-    setStatus("");
-    setRecovering(true);
+
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch("/api/auth/recover-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -76,20 +83,23 @@ export default function Login({ onNavigate }) {
     } finally {
       setRecovering(false);
     }
-  };
+  }
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <div className={styles.headerRow}>
-          <h1 className={styles.title}>Acessar minha conta</h1>
-          <label className={styles.switchLabel}>
+        <h1 className={styles.title}>
+          {recovering ? "Recuperar Senha" : "Bem-vindo de volta"}
+        </h1>
+        
+        <div className={styles.toggleContainer}>
+          <label className={styles.toggleLabel}>
             <input
               type="checkbox"
               checked={isAdminMode}
               onChange={(e) => setIsAdminMode(e.target.checked)}
             />
-            <span>Sou administrador</span>
+            <span>Sou médico</span>
           </label>
         </div>
         <p className={styles.subtitle}>
@@ -97,52 +107,67 @@ export default function Login({ onNavigate }) {
             ? "Acesse para gerenciar agenda e pacientes."
             : "Agende consultas e acompanhe seus horários."}
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={recovering ? handleRecover : handleSubmit}>
           <label className={styles.label} htmlFor="email">
             E-mail
             <input
               id="email"
-              className={styles.input}
               type="email"
+              className={styles.input}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@exemplo.com"
+              required
             />
           </label>
-          <label className={styles.label} htmlFor="password">
-            Senha
-            <input
-              id="password"
-              className={styles.input}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Sua senha"
-            />
-          </label>
+
+          {!recovering && (
+            <label className={styles.label} htmlFor="password">
+              Senha
+              <input
+                id="password"
+                type="password"
+                className={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </label>
+          )}
+
           {error && <p className={styles.error}>{error}</p>}
           {status && <p className={styles.status}>{status}</p>}
-          <button className={styles.button} type="submit">
-            Entrar
+
+          <button type="submit" className={styles.button}>
+            {recovering ? "Enviar Link" : "Entrar"}
           </button>
-          <div className={styles.helperRow}>
-            <button
-              className={styles.link}
-              type="button"
-              onClick={handleForgotPassword}
-              disabled={recovering}
-            >
-              {recovering ? "Enviando..." : "Esqueceu a senha?"}
-            </button>
-            <button
-              className={styles.link}
-              type="button"
-              onClick={() => onNavigate("cadastro")}
-            >
-              Criar conta
-            </button>
-          </div>
         </form>
+
+        <div className={styles.links}>
+          <button
+            type="button"
+            className={styles.linkButton}
+            onClick={() => {
+              setRecovering(!recovering);
+              setError("");
+              setStatus("");
+            }}
+          >
+            {recovering ? "Voltar para Login" : "Esqueci minha senha"}
+          </button>
+          
+          {!recovering && !isAdminMode && (
+            <p className={styles.registerText}>
+              Ainda não tem conta?{" "}
+              <button
+                type="button"
+                className={styles.linkButton}
+                onClick={() => onNavigate("cadastro")}
+              >
+                Cadastre-se
+              </button>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

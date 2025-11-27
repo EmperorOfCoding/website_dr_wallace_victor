@@ -8,25 +8,25 @@ export default function Header({ currentPage, onNavigate, isAuthenticated, isAdm
 
   const links = isAdmin
     ? [
-        { key: "admin", label: "Painel", icon: "📊" },
-        { key: "admin-agenda", label: "Agenda", icon: "📅" },
-        { key: "admin-calendario", label: "Calendário", icon: "🗓️" },
-        { key: "admin-metricas", label: "Métricas", icon: "📈" },
-        { key: "admin-pacientes", label: "Pacientes", icon: "👥" },
+        { key: "painel-medico", label: "Painel", icon: "📊" },
+        { key: "painel-medico-agenda", label: "Agenda", icon: "📅" },
+        { key: "painel-medico-calendario", label: "Calendario", icon: "🗓️" },
+        { key: "painel-medico-metricas", label: "Metricas", icon: "📈" },
+        { key: "painel-medico-pacientes", label: "Pacientes", icon: "👥" },
       ]
     : isAuthenticated
     ? [] // No public links for authenticated patients
     : [
         { key: "home", label: "Home", icon: "🏠" },
         { key: "sobre", label: "Sobre", icon: "👨‍⚕️" },
-        { key: "servicos", label: "Serviços", icon: "🩺" },
+        { key: "servicos", label: "Servicos", icon: "🩺" },
         { key: "contato", label: "Contato", icon: "📞" },
       ];
 
   const authLinks =
     !isAdmin && isAuthenticated
       ? [
-          { key: "dashboard", label: "Início", icon: "🏠" },
+          { key: "dashboard", label: "Inicio", icon: "🏠" },
           { key: "agendar", label: "Agendar", icon: "➕" },
           { key: "minha-agenda", label: "Minha Agenda", icon: "📋" },
           { key: "exames", label: "Exames", icon: "🧪" },

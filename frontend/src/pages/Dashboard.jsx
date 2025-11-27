@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import ProtectedPage from "../components/ProtectedPage";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Dashboard.module.css";
@@ -88,7 +88,7 @@ export default function Dashboard({ onNavigate }) {
               </p>
               <div className={styles.actions}>
                 <button type="button" className={styles.primary} onClick={() => onNavigate("agendar")}>
-                  Nova consulta
+                  Agendar nova consulta
                 </button>
                 <button type="button" className={styles.secondary} onClick={() => onNavigate("minha-agenda")}>
                   Minha agenda
@@ -132,7 +132,13 @@ export default function Dashboard({ onNavigate }) {
                   <div className={styles.nextDetails}>
                     <p className={styles.type}>{nextAppointment.typeName || "Consulta"}</p>
                     <p className={styles.duration}>{nextAppointment.durationMinutes || "--"} min</p>
-                    <span className={styles.status}>{nextAppointment.status}</span>
+                    <span className={styles.status}>
+                      {nextAppointment.status === 'scheduled' ? 'AGENDADO' : 
+                       nextAppointment.status === 'confirmed' ? 'CONFIRMADO' :
+                       nextAppointment.status === 'completed' ? 'CONCLUÍDO' :
+                       nextAppointment.status === 'cancelled' ? 'CANCELADO' :
+                       nextAppointment.status.toUpperCase()}
+                    </span>
                   </div>
                 </div>
               )}

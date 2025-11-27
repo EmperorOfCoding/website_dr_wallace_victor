@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import styles from "./DocumentUpload.module.css";
@@ -70,6 +70,7 @@ export default function DocumentUpload({ onNavigate }) {
     const allowedTypes = [
       "image/jpeg",
       "image/png",
+      "image/jpg",
       "image/gif",
       "application/pdf",
       "application/msword",

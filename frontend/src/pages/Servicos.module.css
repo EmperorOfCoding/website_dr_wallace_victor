@@ -1,142 +1,230 @@
 .page {
   min-height: 100vh;
   padding: 64px 24px 80px;
-  background: var(--bg-gradient);
+  background: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 .container {
-  max-width: 1160px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 48px;
 }
 
 .header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   text-align: center;
 }
 
 .title {
-  font-size: 32px;
+  font-size: 42px;
   font-weight: 800;
-  color: var(--text-primary);
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
 }
 
 .subtitle {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--text-secondary);
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
 
 .card {
   background: var(--bg-card);
-  border-radius: 16px;
-  padding: 18px 18px 16px;
+  border-radius: 20px;
+  padding: 28px;
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
 }
 
-.cardHeader {
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-gradient);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.iconWrapper {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  justify-content: center;
+  margin-bottom: 8px;
 }
 
 .icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: var(--primary-light);
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: var(--primary-gradient);
   display: grid;
   place-items: center;
-  font-size: 18px;
+  font-size: 36px;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
+  transition: transform var(--transition-normal);
+}
+
+.card:hover .icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
 }
 
 .cardTitle {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  text-align: center;
 }
 
 .duration {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--primary);
   font-weight: 600;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .description {
   font-size: 15px;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
   margin: 0;
+  text-align: center;
+  flex: 1;
 }
 
 .cta {
-  margin-top: 6px;
-  align-self: flex-start;
-  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
+  margin-top: auto;
+  background: var(--primary-gradient);
   color: #ffffff;
   border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-size: 14px;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(59, 91, 253, 0.2);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(59, 91, 253, 0.26);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4);
 }
 
 .cta:active {
   transform: translateY(0);
-  opacity: 0.96;
+}
+
+.arrow {
+  font-size: 18px;
+  transition: transform var(--transition-normal);
+}
+
+.cta:hover .arrow {
+  transform: translateX(4px);
 }
 
 .status {
   text-align: center;
   color: var(--primary);
   font-weight: 600;
+  font-size: 16px;
+  padding: 32px;
 }
 
 .error {
   text-align: center;
   color: var(--danger);
   font-weight: 600;
+  font-size: 16px;
+  padding: 32px;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
+  .page {
+    padding: 48px 16px 64px;
+  }
+
   .title {
-    font-size: 38px;
+    font-size: 32px;
+  }
+
+  .subtitle {
+    font-size: 16px;
   }
 
   .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .card {
+    padding: 24px;
+  }
+
+  .icon {
+    width: 64px;
+    height: 64px;
+    font-size: 32px;
   }
 }
 
-@media (min-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+@media (max-width: 480px) {
+  .title {
+    font-size: 28px;
+  }
+
+  .container {
+    gap: 32px;
   }
 }

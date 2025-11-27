@@ -95,7 +95,7 @@ export default function AdminMetrics({ onNavigate }) {
             <button
               type="button"
               className={styles.secondary}
-              onClick={() => onNavigate("admin")}
+              onClick={() => onNavigate("painel-medico")}
             >
               Voltar ao painel
             </button>
