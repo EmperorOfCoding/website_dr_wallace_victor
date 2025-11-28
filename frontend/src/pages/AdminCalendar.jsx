@@ -5,6 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminCalendar.module.css";
+import { API_BASE_URL } from "../config";
 
 export default function AdminCalendar({ onNavigate }) {
   const { token } = useAuth();
@@ -21,7 +22,7 @@ export default function AdminCalendar({ onNavigate }) {
   const loadAppointments = async () => {
     setLoading(true);
     try {
-      const resp = await fetch("/api/admin/appointments?limit=500", {
+      const resp = await fetch(`${API_BASE_URL}/api/admin/appointments?limit=500", {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const data = await resp.json().catch(() => ({}));
@@ -79,7 +80,7 @@ export default function AdminCalendar({ onNavigate }) {
     if (!selectedEvent) return;
     
     try {
-      const resp = await fetch(`/api/admin/appointments/${selectedEvent.id}/cancel`, {
+      const resp = await fetch(`${API_BASE_URL}/api/admin/appointments/${selectedEvent.id}/cancel`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

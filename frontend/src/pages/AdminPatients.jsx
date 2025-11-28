@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminPatients.module.css";
+import { API_BASE_URL } from "../config";
 
 function decodeDoctorId(token) {
   if (!token) return null;
@@ -32,7 +33,7 @@ export default function AdminPatients({ onNavigate }) {
         params.append("limit", 50);
         if (doctorId) params.append("doctor_id", doctorId);
         if (search) params.append("search", search);
-        const resp = await fetch(`/api/admin/patients?${params.toString()}`, {
+        const resp = await fetch(`${API_BASE_URL}/api/admin/patients?${params.toString()}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await resp.json().catch(() => ({}));

@@ -4,6 +4,7 @@ import { useTheme } from "../App";
 import ProtectedPage from "../components/ProtectedPage";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Perfil.module.css";
+import { API_BASE_URL } from "../config";
 
 export default function DoctorProfile({ onNavigate }) {
   const { patient, token } = useAuth();
@@ -28,7 +29,7 @@ export default function DoctorProfile({ onNavigate }) {
     if (!patient?.id || !token) return;
     setLoading(true);
     try {
-      const resp = await fetch("/api/doctors/profile", {
+      const resp = await fetch(`${API_BASE_URL}/api/doctors/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await resp.json().catch(() => ({}));
@@ -72,7 +73,7 @@ export default function DoctorProfile({ onNavigate }) {
     setError("");
     setStatus("");
     try {
-      const resp = await fetch("/api/doctors/profile", {
+      const resp = await fetch(`${API_BASE_URL}/api/doctors/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +103,7 @@ export default function DoctorProfile({ onNavigate }) {
     toggleTheme();
     
     try {
-      await fetch("/api/profile/theme", {
+      await fetch(`${API_BASE_URL}/api/profile/theme", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

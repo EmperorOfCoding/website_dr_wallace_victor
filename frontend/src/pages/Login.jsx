@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
 
@@ -20,7 +21,7 @@ export default function Login({ onNavigate }) {
 
     try {
       const endpoint = isAdminMode ? "/api/admin/login" : "/api/auth/login";
-      const response = await fetch(endpoint, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -65,7 +66,7 @@ export default function Login({ onNavigate }) {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/recover-password", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/recover-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

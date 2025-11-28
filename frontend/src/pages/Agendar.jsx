@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProtectedPage from "../components/ProtectedPage";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Agendar.module.css";
 
@@ -60,7 +61,7 @@ export default function Agendar({ onNavigate }) {
   useEffect(() => {
     async function loadDoctors() {
       try {
-        const resp = await fetch("/api/doctors");
+        const resp = await fetch(`${API_BASE_URL}/api/doctors`);
         const data = await resp.json().catch(() => ({}));
         if (resp.ok && Array.isArray(data.doctors)) {
           setDoctors(data.doctors);
@@ -84,7 +85,7 @@ export default function Agendar({ onNavigate }) {
       // Load original appointment data
       async function loadOriginalAppointment() {
         try {
-          const resp = await fetch(`/api/appointments/${rescheduleId}`, {
+          const resp = await fetch(`${API_BASE_URL}/api/appointments/${rescheduleId}`, {
             headers: token ? { Authorization: `Bearer ${token}` } : undefined,
           });
           const data = await resp.json().catch(() => ({}));
@@ -129,7 +130,7 @@ export default function Agendar({ onNavigate }) {
       setMessage("");
       setSelectedTime("");
       try {
-        const resp = await fetch(`/api/appointments/available?date=${date}&doctor_id=${selectedDoctor}`, {
+        const resp = await fetch(`${API_BASE_URL}/api/appointments/available?date=${date}&doctor_id=${selectedDoctor}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));
@@ -148,7 +149,7 @@ export default function Agendar({ onNavigate }) {
     async function loadTypes() {
       if (!selectedDoctor) return;
       try {
-        const resp = await fetch(`/api/consultation-types?doctor_id=${selectedDoctor}`, {
+        const resp = await fetch(`${API_BASE_URL}/api/consultation-types?doctor_id=${selectedDoctor}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));
@@ -177,7 +178,7 @@ export default function Agendar({ onNavigate }) {
         const params = new URLSearchParams();
         params.append("limit", 50);
         if (patientSearch) params.append("search", patientSearch);
-        const resp = await fetch(`/api/admin/patients?${params.toString()}`, {
+        const resp = await fetch(`${API_BASE_URL}/api/admin/patients?${params.toString()}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));
@@ -217,7 +218,7 @@ export default function Agendar({ onNavigate }) {
     setError("");
     setMessage("");
     try {
-      const resp = await fetch("/api/appointments/book", {
+      const resp = await fetch(`${API_BASE_URL}/api/appointments/book`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -251,7 +252,7 @@ export default function Agendar({ onNavigate }) {
         formData.append("file", file);
 
         try {
-          await fetch("/api/documents/upload", {
+          await fetch(`${API_BASE_URL}/api/documents/upload`, {
             method: "POST",
             headers: {
               ...(token ? { Authorization: `Bearer ${token}` } : {}),

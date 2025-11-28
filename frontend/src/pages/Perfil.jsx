@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "../App";
 import ProtectedPage from "../components/ProtectedPage";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import DoctorProfile from "./DoctorProfile";
 import styles from "./Perfil.module.css";
@@ -41,7 +42,7 @@ export default function Perfil({ onNavigate }) {
     if (!patient?.id || !token) return;
     setLoading(true);
     try {
-      const resp = await fetch("/api/profile", {
+      const resp = await fetch(`${API_BASE_URL}/api/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await resp.json().catch(() => ({}));
@@ -83,7 +84,7 @@ export default function Perfil({ onNavigate }) {
     setError("");
     setStatus("");
     try {
-      const resp = await fetch("/api/profile", {
+      const resp = await fetch(`${API_BASE_URL}/api/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +115,7 @@ export default function Perfil({ onNavigate }) {
 
     // Save to backend with the calculated new value
     try {
-      await fetch("/api/profile/theme", {
+      await fetch(`${API_BASE_URL}/api/profile/theme`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

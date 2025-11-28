@@ -2,6 +2,7 @@
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminAgenda.module.css";
+import { API_BASE_URL } from "../config";
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });
@@ -43,7 +44,7 @@ export default function AdminAgenda({ onNavigate }) {
         const params = new URLSearchParams();
         if (date) params.append("date", date);
         if (debouncedSearch) params.append("patient", debouncedSearch);
-        const resp = await fetch(`/api/admin/appointments?${params.toString()}`, {
+        const resp = await fetch(`${API_BASE_URL}/api/admin/appointments?${params.toString()}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await resp.json().catch(() => ({}));

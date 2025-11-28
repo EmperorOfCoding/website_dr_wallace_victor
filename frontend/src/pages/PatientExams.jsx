@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ProtectedPage from "../components/ProtectedPage";
 import { useAuth } from "../context/AuthContext";
 import styles from "./PatientExams.module.css";
+import { API_BASE_URL } from "../config";
 
 export default function PatientExams({ onNavigate }) {
   const { token, patient } = useAuth();
@@ -12,7 +13,7 @@ export default function PatientExams({ onNavigate }) {
     if (!patient?.id) return;
     setLoading(true);
     try {
-      const resp = await fetch(`/api/exams?patient_id=${patient.id}`, {
+      const resp = await fetch(`${API_BASE_URL}/api/exams?patient_id=${patient.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await resp.json();
@@ -94,7 +95,7 @@ export default function PatientExams({ onNavigate }) {
                     <div className={styles.actions}>
                       {exam.document_id ? (
                         <a 
-                          href={`/api/documents/${exam.document_id}/download`}
+                          href={`${API_BASE_URL}/api/documents/${exam.document_id}/download`}
                           className={styles.downloadBtn}
                           target="_blank"
                           rel="noopener noreferrer"

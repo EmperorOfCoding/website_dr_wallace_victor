@@ -24,7 +24,7 @@ export default function Servicos({ onNavigate }) {
 
     async function loadServices() {
       try {
-        const response = await fetch("/api/consultation-types");
+        const response = await fetch(`${API_BASE_URL}/api/consultation-types`);
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
           throw new Error(data.message || "Falha ao carregar serviços.");

@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import ProtectedPage from "../components/ProtectedPage";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Dashboard.module.css";
 
@@ -38,7 +39,7 @@ export default function Dashboard({ onNavigate }) {
       setLoading(true);
       setError("");
       try {
-        const resp = await fetch(`/api/appointments?patient_id=${patient.id}`, {
+        const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patient.id}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));

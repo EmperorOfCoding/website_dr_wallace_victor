@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import styles from "./DocumentUpload.module.css";
+import { API_BASE_URL } from "../config";
 
 export default function DocumentUpload({ onNavigate }) {
   const { appointmentId } = useParams();
@@ -117,7 +118,7 @@ export default function DocumentUpload({ onNavigate }) {
       }
 
       try {
-        const resp = await fetch("/api/documents/upload", {
+        const resp = await fetch(`${API_BASE_URL}/api/documents/upload", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -177,7 +178,7 @@ export default function DocumentUpload({ onNavigate }) {
 
   const handleDownload = async (docId, filename) => {
     try {
-      const resp = await fetch(`/api/documents/${docId}/download`, {
+      const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}/download`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -215,7 +216,7 @@ export default function DocumentUpload({ onNavigate }) {
     if (!window.confirm("Deseja realmente excluir este documento?")) return;
 
     try {
-      const resp = await fetch(`/api/documents/${docId}`, {
+      const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

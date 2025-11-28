@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminMetrics.module.css";
+import { API_BASE_URL } from "../config";
 
 const COLORS = ["#3b5bfd", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 
@@ -43,7 +44,7 @@ export default function AdminMetrics({ onNavigate }) {
   const loadMetrics = async () => {
     setLoading(true);
     try {
-      const resp = await fetch(`/api/admin/metrics?period=${period}`, {
+      const resp = await fetch(`${API_BASE_URL}/api/admin/metrics?period=${period}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const data = await resp.json().catch(() => ({}));

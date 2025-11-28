@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import styles from "./ExamPanel.module.css";
+import { API_BASE_URL } from "../config";
 
 export default function ExamPanel({ patientId, onClose }) {
   const { token } = useAuth();
@@ -18,7 +19,7 @@ export default function ExamPanel({ patientId, onClose }) {
   async function loadExams() {
     setLoading(true);
     try {
-      const resp = await fetch(`/api/exams?patient_id=${patientId}`, {
+      const resp = await fetch(`${API_BASE_URL}/api/exams?patient_id=${patientId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await resp.json();
@@ -38,7 +39,7 @@ export default function ExamPanel({ patientId, onClose }) {
 
     setRequesting(true);
     try {
-      const resp = await fetch("/api/exams", {
+      const resp = await fetch(`${API_BASE_URL}/api/exams", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +75,7 @@ export default function ExamPanel({ patientId, onClose }) {
     formData.append("description", "Resultado de Exame");
 
     try {
-      const resp = await fetch("/api/documents/upload", {
+      const resp = await fetch(`${API_BASE_URL}/api/documents/upload", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -136,7 +137,7 @@ export default function ExamPanel({ patientId, onClose }) {
                   <div className={styles.actions}>
                     {exam.document_id ? (
                       <a 
-                        href={`/api/documents/${exam.document_id}/download`}
+                        href={`${API_BASE_URL}/api/documents/${exam.document_id}/download`}
                         className={styles.link}
                         target="_blank"
                         rel="noopener noreferrer"

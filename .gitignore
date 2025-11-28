@@ -24,3 +24,4 @@ test_*.js
 fix_*.js
 check_*.js
 verify_*.js
+.vercel

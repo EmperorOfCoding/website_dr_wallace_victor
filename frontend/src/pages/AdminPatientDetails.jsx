@@ -4,6 +4,7 @@ import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
 import docStyles from "./DocumentUpload.module.css"; // Reuse document styles
+import { API_BASE_URL } from "../config";
 
 export default function AdminPatientDetails({ onNavigate }) {
   const { id } = useParams();
@@ -25,7 +26,7 @@ export default function AdminPatientDetails({ onNavigate }) {
     setLoading(true);
     try {
       // Fetch Patient Details
-      const patientResp = await fetch(`/api/admin/patients/${id}`, {
+      const patientResp = await fetch(`${API_BASE_URL}/api/admin/patients/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const patientData = await patientResp.json();
@@ -45,7 +46,7 @@ export default function AdminPatientDetails({ onNavigate }) {
 
   const loadDocuments = async () => {
     try {
-      const docResp = await fetch(`/api/documents?patient_id=${id}`, {
+      const docResp = await fetch(`${API_BASE_URL}/api/documents?patient_id=${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const docData = await docResp.json();
@@ -83,7 +84,7 @@ export default function AdminPatientDetails({ onNavigate }) {
         formData.append("description", "Enviado pelo médico");
 
         try {
-            const resp = await fetch("/api/documents/upload", {
+            const resp = await fetch(`${API_BASE_URL}/api/documents/upload", {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData,
@@ -110,7 +111,7 @@ export default function AdminPatientDetails({ onNavigate }) {
 
   const handleDownload = async (docId, filename) => {
     try {
-      const resp = await fetch(`/api/documents/${docId}/download`, {
+      const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}/download`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!resp.ok) throw new Error("Erro ao baixar");
@@ -132,7 +133,7 @@ export default function AdminPatientDetails({ onNavigate }) {
   const handleDelete = async (docId) => {
     if (!window.confirm("Tem certeza que deseja excluir este documento?")) return;
     try {
-      const resp = await fetch(`/api/documents/${docId}?patient_id=${id}`, { // patient_id might be needed for check? No, backend handles it.
+      const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}?patient_id=${id}`, { // patient_id might be needed for check? No, backend handles it.
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

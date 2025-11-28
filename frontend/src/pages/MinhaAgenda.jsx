@@ -1,6 +1,7 @@
 ﻿import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ProtectedPage from "../components/ProtectedPage";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./MinhaAgenda.module.css";
 
@@ -38,7 +39,7 @@ export default function MinhaAgenda({ onNavigate }) {
     setLoading(true);
     setError("");
     try {
-      const resp = await fetch(`/api/appointments?patient_id=${patient.id}`, {
+      const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patient.id}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const data = await resp.json().catch(() => ({}));
@@ -73,7 +74,7 @@ export default function MinhaAgenda({ onNavigate }) {
     if (!selectedAppointment) return;
     setCancellingId(selectedAppointment.id);
     try {
-      const resp = await fetch(`/api/appointments/${selectedAppointment.id}/cancel`, {
+      const resp = await fetch(`${API_BASE_URL}/api/appointments/${selectedAppointment.id}/cancel`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -1,4 +1,5 @@
 ﻿import { useState } from "react";
+import { API_BASE_URL } from "../config";
 import styles from "./Register.module.css";
 
 export default function Register({ onNavigate }) {
@@ -27,7 +28,7 @@ export default function Register({ onNavigate }) {
     }
 
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -61,7 +62,7 @@ export default function Register({ onNavigate }) {
     setRecoverMessage("");
     setRecovering(true);
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.email }),
