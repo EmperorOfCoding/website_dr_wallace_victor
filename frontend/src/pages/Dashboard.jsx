@@ -34,7 +34,11 @@ export default function Dashboard({ onNavigate }) {
 
   useEffect(() => {
     async function load() {
-      if (!patient?.id) return;
+      if (!patient?.id) {
+        setLoading(false);
+        setError("Não foi possível identificar o paciente.");
+        return;
+      }
       setLoading(true);
       setError("");
       try {
@@ -132,7 +136,7 @@ export default function Dashboard({ onNavigate }) {
                   <div className={styles.nextDetails}>
                     <p className={styles.type}>{nextAppointment.typeName || "Consulta"}</p>
                     <p className={styles.duration}>{nextAppointment.durationMinutes || "--"} min</p>
-                    <span className={styles.status}>
+                    <span className={nextAppointment.status === 'cancelled' ? styles.statusCancelled : styles.status}>
                       {nextAppointment.status === 'scheduled' ? 'AGENDADO' : 
                        nextAppointment.status === 'confirmed' ? 'CONFIRMADO' :
                        nextAppointment.status === 'completed' ? 'CONCLUÍDO' :

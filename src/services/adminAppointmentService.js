@@ -36,6 +36,7 @@ async function getAppointments({ date, page = 1, limit = 10, search = '', doctor
   const selectQuery = `
     SELECT
       a.id AS appointment_id,
+      a.patient_id,
       a.date,
       a.time,
       a.time,

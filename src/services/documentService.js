@@ -66,7 +66,6 @@ async function saveDocument(patientId, file, appointmentId = null, description =
       file.originalname,
       file.mimetype,
       file.size,
-      file.size,
       description,
       examRequestId,
       type
@@ -83,7 +82,6 @@ async function saveDocument(patientId, file, appointmentId = null, description =
     filename,
     original_name: file.originalname,
     mimetype: file.mimetype,
-    size_bytes: file.size,
     size_bytes: file.size,
     description,
     exam_request_id: examRequestId,

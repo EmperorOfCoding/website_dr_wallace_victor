@@ -14,6 +14,7 @@ router.get('/api/consultation-types', consultationTypeController.listTypes);
 router.post('/api/appointments', bookingLimiter, appointmentController.createAppointment);
 router.post('/api/appointments/book', bookingLimiter, authMiddleware, appointmentController.createAppointment);
 router.get('/api/appointments', authMiddleware, appointmentController.listAppointments);
+router.get('/api/appointments/:id/details', authMiddleware, appointmentController.getAppointmentDetails);
 router.get('/api/appointments/:id', authMiddleware, appointmentController.getAppointmentById);
 router.put('/api/appointments/:id', authMiddleware, appointmentController.updateAppointment);
 router.delete('/api/appointments/:id', authMiddleware, appointmentController.cancelAppointment);

@@ -1,57 +1,97 @@
 .page {
   min-height: 100vh;
-  background: var(--bg-gradient);
+  background: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color: var(--text-primary);
+  padding: 24px;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background decoration */
+.page::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: 0;
+}
+
+.page::after {
+  content: "";
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: 0;
 }
 
 .card {
   width: 100%;
-  max-width: 480px;
+  max-width: 460px;
   background: var(--bg-card);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 20px;
+  padding: 48px 40px;
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-lg);
-  display: grid;
-  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
 }
 
 .title {
   margin: 0;
-  font-size: 22px;
+  font-size: 32px;
   font-weight: 800;
   color: var(--text-primary);
+  text-align: center;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
 .subtitle {
-  margin: 0 0 4px;
+  margin: -8px 0 8px;
   color: var(--text-secondary);
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   font-weight: 600;
   color: var(--text-primary);
+  font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .input {
   width: 100%;
   border-radius: 12px;
-  border: 1px solid var(--border-color);
-  padding: 12px;
-  font-size: 15px;
+  border: 2px solid #e2e8f0;
+  padding: 16px 18px;
+  font-size: 16px;
   background-color: var(--bg-input, #ffffff) !important;
   color: #0f172a !important;
   -webkit-text-fill-color: #0f172a !important;
   opacity: 1 !important;
   caret-color: #0f172a;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .input::placeholder {
@@ -63,7 +103,8 @@
 .input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
+  box-shadow: 0 0 0 4px var(--primary-light);
+  transform: translateY(-1px);
 }
 
 /* Fix autofill styling - Light mode */
@@ -104,47 +145,84 @@
 }
 
 .error {
-  color: var(--danger);
-  font-size: 13px;
+  color: #dc2626;
+  font-size: 14px;
   margin: 0;
+  padding: 14px 16px;
+  background: #fee2e2;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 500;
+  border-left: 4px solid #dc2626;
 }
 
 .button {
-  margin-top: 6px;
-  background: linear-gradient(135deg, #3b5bfd 0%, #2b4ddc 100%);
+  margin-top: 12px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
   color: #ffffff;
   border: none;
-  padding: 12px 18px;
+  padding: 18px;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 12px 28px rgba(59, 91, 253, 0.25);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+  letter-spacing: 0.02em;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .status {
-  color: var(--secondary);
-  font-weight: 700;
+  color: #059669;
+  font-weight: 600;
+  text-align: center;
+  padding: 14px 16px;
+  background: #d1fae5;
+  border-radius: 10px;
+  border-left: 4px solid #059669;
 }
 
-.helperRow {
+.links {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 4px;
 }
 
-.link {
+.linkButton {
   background: none;
   border: none;
   color: var(--primary);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   padding: 0;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
-.link:disabled {
+.linkButton:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.linkButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.registerText {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
 }

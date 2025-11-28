@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
 
@@ -42,7 +42,10 @@ export default function Login({ onNavigate }) {
         }
       }
 
-      login({ token: data.token, patient: userPayload });
+      // Use patient data from response if available, otherwise fallback to token payload
+      const patientData = data.patient || userPayload;
+      
+      login({ token: data.token, patient: patientData });
       setStatus("Login realizado com sucesso.");
       if (isAdminMode) {
         onNavigate("painel-medico");

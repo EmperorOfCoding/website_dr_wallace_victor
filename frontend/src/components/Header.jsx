@@ -9,7 +9,7 @@ export default function Header({ currentPage, onNavigate, isAuthenticated, isAdm
   const links = isAdmin
     ? [
         { key: "painel-medico", label: "Painel", icon: "📊" },
-        { key: "painel-medico-agenda", label: "Agenda", icon: "📅" },
+        { key: "painel-medico-agenda", label: "Agenda Clínica", icon: "📅" },
         { key: "painel-medico-calendario", label: "Calendario", icon: "🗓️" },
         { key: "painel-medico-metricas", label: "Metricas", icon: "📈" },
         { key: "painel-medico-pacientes", label: "Pacientes", icon: "👥" },

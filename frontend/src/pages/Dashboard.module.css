@@ -204,6 +204,15 @@
   font-size: 13px;
 }
 
+.statusCancelled {
+  background: #fee2e2;
+  color: #ef4444;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

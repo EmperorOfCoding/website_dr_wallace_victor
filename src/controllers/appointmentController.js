@@ -99,17 +99,34 @@ async function createAppointment(req, res) {
 
 async function listAppointments(req, res) {
   try {
-    const { patient_id: patientId, page = 1, limit = 10 } = req.query || {};
+    const { patient_id: patientId, doctor_id: doctorId, page = 1, limit = 10 } = req.query || {};
 
-    if (!patientId) {
-      return res.status(400).json({ status: 'error', message: 'Paciente é obrigatório.' });
+    // Must have either patient_id or doctor_id
+    if (!patientId && !doctorId) {
+      return res.status(400).json({ status: 'error', message: 'Paciente ou médico é obrigatório.' });
     }
 
-    const { appointments, pagination } = await appointmentService.listAppointmentsByPatient(
-      patientId,
-      Number(page),
-      Number(limit)
-    );
+    let appointments, pagination;
+
+    if (patientId) {
+      // Query by patient
+      const result = await appointmentService.listAppointmentsByPatient(
+        patientId,
+        Number(page),
+        Number(limit)
+      );
+      appointments = result.appointments;
+      pagination = result.pagination;
+    } else {
+      // Query by doctor
+      const result = await appointmentService.listAppointmentsByDoctor(
+        doctorId,
+        Number(page),
+        Number(limit)
+      );
+      appointments = result.appointments;
+      pagination = result.pagination;
+    }
 
     // Format response to match expected frontend structure (adding hasReview)
     const formattedAppointments = appointments.map(appt => ({
@@ -319,6 +336,80 @@ async function cancelAppointmentWithReason(req, res) {
   }
 }
 
+async function getAppointmentDetails(req, res) {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.patient_id;
+    const isAdmin = req.user?.role === 'admin';
+
+    if (!id) {
+      return res.status(400).json({ status: 'error', message: 'ID da consulta não fornecido.' });
+    }
+
+    // Fetch appointment with all related information
+    const [rows] = await pool.execute(`
+      SELECT 
+        a.id,
+        a.patient_id,
+        a.doctor_id,
+        a.date,
+        a.time,
+        a.status,
+        a.modality,
+        a.notes,
+        a.cancellation_reason,
+        a.created_at,
+        p.name AS patient_name,
+        p.email AS patient_email,
+        p.phone AS patient_phone,
+        d.name AS doctor_name,
+        d.specialty AS doctor_specialty,
+        d.email AS doctor_email,
+        t.name AS type_name,
+        t.duration AS duration_minutes,
+        t.description AS type_description
+      FROM appointments a
+      JOIN patients p ON p.id = a.patient_id
+      LEFT JOIN doctors d ON d.id = a.doctor_id
+      LEFT JOIN appointment_types t ON t.id = a.type_id
+      WHERE a.id = ?
+    `, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ status: 'error', message: 'Consulta não encontrada.' });
+    }
+
+    const appointment = rows[0];
+
+    // Authorization check: patients can only view their own appointments
+    if (!isAdmin && appointment.patient_id !== userId) {
+      return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+    }
+
+    // Fetch associated documents
+    const [documents] = await pool.execute(`
+      SELECT id, original_name, size_bytes, uploaded_at
+      FROM documents
+      WHERE patient_id = ? AND appointment_id = ?
+    `, [appointment.patient_id, id]);
+
+    // Check if appointment has a review
+    const hasReview = await reviewService.hasReview(id);
+
+    return res.status(200).json({
+      status: 'success',
+      appointment: {
+        ...appointment,
+        documents: documents || [],
+        hasReview
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching appointment details:', error);
+    return res.status(500).json({ status: 'error', message: 'Erro ao carregar detalhes da consulta.' });
+  }
+}
+
 module.exports = {
   createAppointment,
   listAppointments,
@@ -327,4 +418,5 @@ module.exports = {
   updateAppointment,
   cancelAppointment,
   cancelAppointmentWithReason,
+  getAppointmentDetails,
 };

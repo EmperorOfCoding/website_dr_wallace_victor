@@ -10,12 +10,14 @@ import AdminMetrics from "./pages/AdminMetrics";
 import AdminPatientDetails from "./pages/AdminPatientDetails";
 import AdminPatients from "./pages/AdminPatients";
 import Agendar from "./pages/Agendar";
+import AppointmentDetails from "./pages/AppointmentDetails";
 import Contato from "./pages/Contato";
 import Dashboard from "./pages/Dashboard";
 import DocumentUpload from "./pages/DocumentUpload";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MinhaAgenda from "./pages/MinhaAgenda";
+import PatientExams from "./pages/PatientExams";
 import Perfil from "./pages/Perfil";
 import Register from "./pages/Register";
 import ReviewAppointment from "./pages/ReviewAppointment";
@@ -270,6 +272,22 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <PageTransition><DocumentUpload onNavigate={handleNavigate} /></PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/consulta/:id"
+              element={
+                <ProtectedRoute>
+                  <PageTransition><AppointmentDetails onNavigate={handleNavigate} /></PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/exames"
+              element={
+                <ProtectedRoute>
+                  <PageTransition><PatientExams onNavigate={handleNavigate} /></PageTransition>
                 </ProtectedRoute>
               }
             />

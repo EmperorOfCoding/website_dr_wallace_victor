@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
-import styles from "./AdminDashboard.module.css";
+import styles from "./AdminPatientDetails.module.css";
 import docStyles from "./DocumentUpload.module.css"; // Reuse document styles
 
 export default function AdminPatientDetails({ onNavigate }) {
@@ -10,6 +10,7 @@ export default function AdminPatientDetails({ onNavigate }) {
   const { token } = useAuth();
   const [patient, setPatient] = useState(null);
   const [documents, setDocuments] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -35,6 +36,9 @@ export default function AdminPatientDetails({ onNavigate }) {
 
       // Fetch Documents
       loadDocuments();
+      
+      // Fetch Appointments
+      loadAppointments();
 
     } catch (err) {
       setError(err.message);
@@ -54,6 +58,20 @@ export default function AdminPatientDetails({ onNavigate }) {
       }
     } catch (err) {
       console.error("Erro ao carregar documentos", err);
+    }
+  };
+
+  const loadAppointments = async () => {
+    try {
+      const resp = await fetch(`/api/appointments?patient_id=${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        setAppointments(data.appointments || []);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar consultas", err);
     }
   };
 
@@ -228,6 +246,42 @@ export default function AdminPatientDetails({ onNavigate }) {
                                     <button onClick={() => handleDelete(doc.id)} className={docStyles.deleteBtn} title="Excluir">🗑️</button>
                                 </div>
                             </div>
+                        ))
+                    )}
+                </div>
+            </section>
+
+            {/* Appointments Section */}
+            <section className={styles.card}>
+                <h2 className={styles.cardTitle}>Histórico de Consultas</h2>
+                <div className={styles.grid} style={{ marginTop: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+                    {appointments.length === 0 ? (
+                        <p className={styles.muted}>Nenhuma consulta registrada.</p>
+                    ) : (
+                        appointments.map((appt) => (
+                          <div key={appt.id} className={styles.nextCard} style={{ background: 'var(--bg-hover)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '16px' }}>
+                            <div>
+                              <p className={styles.date}>{new Date(appt.date).toLocaleDateString()}</p>
+                              <p className={styles.time}>{appt.time?.slice(0, 5)}</p>
+                            </div>
+                            <div className={styles.nextDetails} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px', marginTop: '8px' }}>
+                              <p className={styles.type} style={{ margin: 0 }}>{appt.typeName || "Consulta"}</p>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                                <p className={styles.duration} style={{ margin: 0 }}>{appt.durationMinutes || "--"} min</p>
+                                <span className={
+                                  appt.status === 'cancelled' ? styles.statusCancelled : 
+                                  appt.status === 'confirmed' ? styles.statusConfirmed : 
+                                  styles.statusBadge
+                                } style={{ fontSize: '12px', padding: '4px 8px' }}>
+                                  {appt.status === 'scheduled' ? 'AGENDADO' :
+                                   appt.status === 'confirmed' ? 'CONFIRMADO' :
+                                   appt.status === 'completed' ? 'CONCLUÍDO' :
+                                   appt.status === 'cancelled' ? 'CANCELADO' :
+                                   appt.status.toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         ))
                     )}
                 </div>

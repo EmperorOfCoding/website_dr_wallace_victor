@@ -217,19 +217,26 @@ export default function Agendar({ onNavigate }) {
     setError("");
     setMessage("");
     try {
-      const resp = await fetch("/api/appointments/book", {
-        method: "POST",
+      // If rescheduling, update the existing appointment instead of creating a new one
+      const isRescheduling = !!rescheduleFromId;
+      const endpoint = isRescheduling 
+        ? `/api/appointments/${rescheduleFromId}` 
+        : "/api/appointments/book";
+      const method = isRescheduling ? "PUT" : "POST";
+
+      const resp = await fetch(endpoint, {
+        method,
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          patient_id: isAdmin ? selectedPatientId : patient?.id,
-          doctor_id: selectedDoctor,
-          type_id: selectedType,
+          ...(isRescheduling ? {} : { patient_id: isAdmin ? selectedPatientId : patient?.id }),
+          ...(isRescheduling ? {} : { doctor_id: selectedDoctor }),
+          ...(isRescheduling ? {} : { type_id: selectedType }),
           date,
           time: selectedTime,
-          ...(rescheduleFromId ? { rescheduled_from: rescheduleFromId } : {}),
+          ...(isRescheduling ? { type_id: selectedType } : {}),
           notes,
           modality,
         }),
@@ -239,8 +246,8 @@ export default function Agendar({ onNavigate }) {
         throw new Error(data.message || "Não foi possível agendar.");
       }
 
-      // Upload file if selected
-      if (file && data.appointment_id) {
+      // Upload file if selected (only for new appointments)
+      if (file && !isRescheduling && data.appointment_id) {
         const formData = new FormData();
         // Append text fields BEFORE file to ensure they are available in req.body
         formData.append("appointment_id", data.appointment_id);
@@ -273,7 +280,12 @@ export default function Agendar({ onNavigate }) {
       
       setMessage(rescheduleFromId ? "Consulta reagendada com sucesso." : "Consulta agendada com sucesso.");
       setSelectedTime("");
-      onNavigate("minha-agenda");
+      
+      if (isAdmin) {
+        onNavigate("painel-medico-agenda");
+      } else {
+        onNavigate("minha-agenda");
+      }
     } catch (err) {
       setError(err.message || "Não foi possível agendar.");
     } finally {

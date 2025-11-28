@@ -24,7 +24,7 @@ async function updateProfile(req, res) {
 
     const profileData = {
       phone: req.body.phone,
-      birthdate: req.body.birthdate,
+      birthdate: req.body.birthdate || null,
       emergency_name: req.body.emergency_name,
       emergency_phone: req.body.emergency_phone,
       allergies: req.body.allergies,

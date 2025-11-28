@@ -137,24 +137,29 @@ export default function Register({ onNavigate }) {
           <button className={styles.button} type="submit">
             Cadastrar
           </button>
-          <div className={styles.helperRow}>
+        </form>
+
+        <div className={styles.links}>
+          <button
+            className={styles.linkButton}
+            type="button"
+            onClick={handleForgotPassword}
+            disabled={recovering}
+          >
+            {recovering ? "Enviando..." : "Esqueci minha senha"}
+          </button>
+          
+          <p className={styles.registerText}>
+            Já tem conta?{" "}
             <button
-              className={styles.link}
-              type="button"
-              onClick={handleForgotPassword}
-              disabled={recovering}
-            >
-              {recovering ? "Enviando..." : "Esqueceu a senha?"}
-            </button>
-            <button
-              className={styles.link}
+              className={styles.linkButton}
               type="button"
               onClick={() => onNavigate("login")}
             >
-              Já tenho conta
+              Fazer login
             </button>
-          </div>
-        </form>
+          </p>
+        </div>
       </div>
     </div>
   );

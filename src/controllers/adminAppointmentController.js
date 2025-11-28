@@ -28,6 +28,7 @@ async function listAppointments(req, res) {
 
     const appointments = result.appointments.map((item) => ({
       appointment_id: item.appointment_id,
+      patient_id: item.patient_id,
       date: item.date,
       time: item.time,
       type_id: item.type_id,

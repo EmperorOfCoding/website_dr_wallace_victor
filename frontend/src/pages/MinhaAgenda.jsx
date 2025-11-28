@@ -34,7 +34,12 @@ export default function MinhaAgenda({ onNavigate }) {
   }, [patient?.id, token]);
 
   const loadAppointments = async () => {
-    if (!patient?.id) return;
+    if (!patient?.id) {
+      setLoading(false);
+      setError("Não foi possível identificar o paciente. Tente fazer login novamente.");
+      return;
+    }
+    
     setLoading(true);
     setError("");
     try {

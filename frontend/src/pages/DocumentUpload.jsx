@@ -20,7 +20,10 @@ export default function DocumentUpload({ onNavigate }) {
   }, [patient?.id, appointmentId, token]);
 
   const loadDocuments = async (showLoading = true) => {
-    if (!patient?.id) return;
+    if (!patient?.id) {
+      if (showLoading) setLoading(false);
+      return;
+    }
     if (showLoading) setLoading(true);
     try {
       const url = appointmentId

@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Legend,
+    Line,
+    LineChart,
+    Pie,
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
 } from "recharts";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminMetrics.module.css";
@@ -198,11 +198,11 @@ export default function AdminMetrics({ onNavigate }) {
                           data={metrics.appointmentsByType}
                           cx="50%"
                           cy="50%"
-                          labelLine={false}
+                          labelLine={true}
                           label={({ name, percent }) =>
                             `${name} (${(percent * 100).toFixed(0)}%)`
                           }
-                          outerRadius={100}
+                          outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
                         >
@@ -214,6 +214,7 @@ export default function AdminMetrics({ onNavigate }) {
                           ))}
                         </Pie>
                         <Tooltip />
+                        <Legend />
                       </PieChart>
                     </ResponsiveContainer>
                   ) : (

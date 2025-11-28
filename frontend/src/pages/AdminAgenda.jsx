@@ -101,8 +101,6 @@ export default function AdminAgenda({ onNavigate }) {
                 <p className={styles.muted}>Veja rapidamente quem está agendado.</p>
               </div>
             </div>
-            {loading && <p className={styles.info}>Carregando...</p>}
-            {error && <p className={styles.error}>{error}</p>}
             {!loading && !error && appointments.length === 0 && (
               <div className={styles.empty}>Nenhum horário encontrado.</div>
             )}
@@ -121,6 +119,24 @@ export default function AdminAgenda({ onNavigate }) {
                     <div className={styles.detailBlock}>
                       <p className={styles.sub}>Tipo</p>
                       <p className={styles.value}>{appt.type_name || appt.type_id}</p>
+                    </div>
+                    <div className={styles.actions}>
+                      <button
+                        type="button"
+                        className={styles.actionBtn}
+                        onClick={() => onNavigate(`painel-medico/pacientes/${appt.patient_id}`)}
+                        title="Ver perfil do paciente"
+                      >
+                        👤 Perfil
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.actionBtn}
+                        onClick={() => onNavigate(`documentos/${appt.appointment_id}`)}
+                        title="Ver documentos da consulta"
+                      >
+                        📄 Documentos
+                      </button>
                     </div>
                   </article>
                 ))}

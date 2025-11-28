@@ -197,6 +197,58 @@ async function listAppointmentsByPatient(patientId, page = 1, limit = 10) {
   };
 }
 
+async function listAppointmentsByDoctor(doctorId, page = 1, limit = 10) {
+  const offset = (page - 1) * limit;
+
+  // Get total count for pagination
+  const [countRows] = await pool.execute(
+    'SELECT COUNT(*) as total FROM appointments WHERE doctor_id = ?',
+    [doctorId]
+  );
+  const total = countRows[0].total;
+
+  // Get appointments with patient info and review status
+  const [rows] = await pool.execute(
+    `
+      SELECT 
+        a.id,
+        a.date,
+        a.time,
+        a.status,
+        a.modality,
+        a.notes,
+        a.cancellation_reason AS cancellationReason,
+        a.type_id AS typeId,
+        t.name AS typeName,
+        t.duration_minutes AS durationMinutes,
+        p.id AS patientId,
+        p.name AS patientName,
+        p.email AS patientEmail,
+        p.phone AS patientPhone,
+        r.id AS reviewId,
+        r.rating AS reviewRating
+      FROM appointments a
+      LEFT JOIN appointment_types t ON a.type_id = t.id
+      LEFT JOIN patients p ON a.patient_id = p.id
+      LEFT JOIN appointment_reviews r ON a.id = r.appointment_id
+      WHERE a.doctor_id = ?
+      ORDER BY a.date DESC, a.time DESC
+      LIMIT ? OFFSET ?
+    `,
+    [doctorId, limit.toString(), offset.toString()]
+  );
+
+  return {
+    appointments: rows,
+    pagination: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      pages: Math.ceil(total / limit)
+    }
+  };
+}
+
 module.exports = {
   isSlotAvailable,
   checkAppointmentExists,
@@ -205,5 +257,6 @@ module.exports = {
   deleteAppointment,
   getAvailableTimes,
   createAppointment,
-  listAppointmentsByPatient
+  listAppointmentsByPatient,
+  listAppointmentsByDoctor
 };
