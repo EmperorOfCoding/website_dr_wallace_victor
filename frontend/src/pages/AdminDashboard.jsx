@@ -25,13 +25,13 @@ export default function AdminDashboard({ onNavigate }) {
     setLoading(true);
     try {
       // Load appointments
-      const apptResp = await fetch(`${API_BASE_URL}/api/admin/appointments?limit=5", {
+      const apptResp = await fetch(`${API_BASE_URL}/api/admin/appointments?limit=5`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const apptData = await apptResp.json().catch(() => ({}));
       
       // Load patients count
-      const patientsResp = await fetch(`${API_BASE_URL}/api/admin/patients", {
+      const patientsResp = await fetch(`${API_BASE_URL}/api/admin/patients`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const patientsData = await patientsResp.json().catch(() => ({}));
