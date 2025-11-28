@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
-import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import { useEffect, useRef, useState } from "react";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminCalendar.module.css";
-import { API_BASE_URL } from "../config";
 
 export default function AdminCalendar({ onNavigate }) {
   const { token } = useAuth();
@@ -22,7 +22,7 @@ export default function AdminCalendar({ onNavigate }) {
   const loadAppointments = async () => {
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE_URL}/api/admin/appointments?limit=500", {
+      const resp = await fetch(`${API_BASE_URL}/api/admin/appointments?limit=500`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const data = await resp.json().catch(() => ({}));

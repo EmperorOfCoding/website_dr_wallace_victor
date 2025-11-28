@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./DocumentUpload.module.css";
-import { API_BASE_URL } from "../config";
 
 export default function DocumentUpload({ onNavigate }) {
   const { appointmentId } = useParams();
@@ -118,7 +118,7 @@ export default function DocumentUpload({ onNavigate }) {
       }
 
       try {
-        const resp = await fetch(`${API_BASE_URL}/api/documents/upload", {
+        const resp = await fetch(`${API_BASE_URL}/api/documents/upload`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

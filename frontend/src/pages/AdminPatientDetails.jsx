@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProtectedAdmin from "../components/ProtectedAdmin";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
 import docStyles from "./DocumentUpload.module.css"; // Reuse document styles
-import { API_BASE_URL } from "../config";
 
 export default function AdminPatientDetails({ onNavigate }) {
   const { id } = useParams();
@@ -84,7 +84,7 @@ export default function AdminPatientDetails({ onNavigate }) {
         formData.append("description", "Enviado pelo médico");
 
         try {
-            const resp = await fetch(`${API_BASE_URL}/api/documents/upload", {
+            const resp = await fetch(`${API_BASE_URL}/api/documents/upload`, {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData,
