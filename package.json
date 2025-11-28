@@ -4,12 +4,11 @@
   "description": "API para agendamento de consultas do Dr. Wallace Victor",
   "main": "src/server.js",
   "scripts": {
-    "start": "npm run migrate && node src/server.js",
+    "start": "node src/server.js",
     "dev": "node src/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "migrate": "node scripts/run-migrations.js"
+    "test:coverage": "jest --coverage"
   },
   "keywords": [
     "appointments",
