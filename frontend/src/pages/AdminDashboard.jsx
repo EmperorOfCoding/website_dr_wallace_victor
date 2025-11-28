@@ -206,6 +206,31 @@ export default function AdminDashboard({ onNavigate }) {
                       </span>
                     </div>
                   </motion.div>
+                )))}
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+
+      {selectedPatientForExams && (
+        <ExamPanel 
+          patientId={selectedPatientForExams} 
+          onClose={() => setSelectedPatientForExams(null)} 
+        />
+      )}
+    </ProtectedAdmin>
+  );
+}
+                    </div>
+                    <div className={styles.appointmentActions}>
+                      <span className={`${styles.statusBadge} ${styles[appt.status]}`}>
+                        {appt.status === 'scheduled' ? 'Agendado' : 
+                         appt.status === 'confirmed' ? 'Confirmado' :
+                         appt.status === 'completed' ? 'Concluído' : 'Cancelado'}
+                      </span>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             )}
