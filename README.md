@@ -93,6 +93,29 @@ npm run dev
 npm run build
 ```
 
+## 🚀 Deploy
+
+### Vercel (Frontend)
+
+O frontend está configurado para deploy no Vercel. Veja o guia completo em [DEPLOY.md](DEPLOY.md).
+
+**Resumo rápido:**
+1. Faça deploy do backend em Railway, Render ou similar
+2. Conecte o repositório ao Vercel
+3. Configure a variável `VITE_API_URL` com a URL do backend
+4. Deploy automático!
+
+### Backend
+
+Recomendamos hospedar o backend em:
+- **Railway** - Deploy automático via Git
+- **Render** - Free tier disponível
+- **Heroku** - Tradicional e confiável
+- **DigitalOcean** - App Platform
+
+Veja instruções detalhadas em [DEPLOY.md](DEPLOY.md).
+```
+
 ## ⚙️ Configuração
 
 ### Variáveis de Ambiente (.env)
