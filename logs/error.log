@@ -1,0 +1,81 @@
+2025-11-27 17:08:34 [ERROR]: Failed to send confirmation for appointment 27: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 17:22:08 [ERROR]: Failed to send cancellation for appointment 22: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 17:23:47 [ERROR]: Failed to send confirmation for appointment 28: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 17:31:56 [ERROR]: Failed to send confirmation for appointment 29: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 17:48:30 [ERROR]: Failed to send cancellation for appointment 29: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 17:48:38 [ERROR]: Failed to send cancellation for appointment 28: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 17:58:38 [ERROR]: Failed to send confirmation for appointment 30: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 17:59:39 [ERROR]: Failed to send confirmation for appointment 31: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 18:03:53 [ERROR]: Failed to send confirmation for appointment 32: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 18:04:10 [ERROR]: Failed to send confirmation for appointment 33: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 18:04:35 [ERROR]: Failed to send confirmation for appointment 34: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 18:23:28 [ERROR]: Failed to send confirmation for appointment 35: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 20:49:15 [ERROR]: Failed to send confirmation for appointment 36: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 20:49:29 [ERROR]: Failed to send confirmation for appointment 37: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-27 20:49:38 [ERROR]: Failed to send confirmation for appointment 38: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 49: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 48: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 43: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 42: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 41: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 40: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 37: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 34: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 33: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 32: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 26: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-29 16:52:00 [ERROR]: Failed to send notification 31: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)

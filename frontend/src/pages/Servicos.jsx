@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config";
 import styles from "./Servicos.module.css";
 
 // Function to get icon based on service name
@@ -35,6 +36,7 @@ export default function Servicos({ onNavigate }) {
       } catch (err) {
         if (isMounted) {
           setError("Não foi possível carregar os serviços. Tente novamente em instantes.");
+          console.error(err);
         }
       } finally {
         if (isMounted) {

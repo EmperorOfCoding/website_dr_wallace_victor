@@ -10,6 +10,7 @@ import AdminMetrics from "./pages/AdminMetrics";
 import AdminPatientDetails from "./pages/AdminPatientDetails";
 import AdminPatients from "./pages/AdminPatients";
 import Agendar from "./pages/Agendar";
+import AppointmentDetails from "./pages/AppointmentDetails";
 import Contato from "./pages/Contato";
 import Dashboard from "./pages/Dashboard";
 import DocumentUpload from "./pages/DocumentUpload";
@@ -270,6 +271,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <PageTransition><DocumentUpload onNavigate={handleNavigate} /></PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/consulta/:appointmentId"
+              element={
+                <ProtectedRoute>
+                  <PageTransition><AppointmentDetails onNavigate={handleNavigate} /></PageTransition>
                 </ProtectedRoute>
               }
             />

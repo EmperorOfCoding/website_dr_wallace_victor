@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="description"
+    content="Sistema de agendamento de consultas do Dr. Wallace Victor - Clínica Geral e Medicina da Família" />
+  <meta name="theme-color" content="#3b5bfd" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Dr. Wallace" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo_wallace_victor.png" />
+  <link rel="apple-touch-icon" href="/logo_wallace_victor.png" />
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <title>Dr. Wallace Victor - Agendamento de Consultas</title>
+  <script type="module" crossorigin src="/assets/index-BtG_ZTh8.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-D9M149Sk.css">
+</head>
+
+<body>
+  <!-- Skip link for accessibility -->
+  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+  <div id="root"></div>
+
+
+  <!-- Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('SW registration failed:', error);
+          });
+      });
+    }
+  </script>
+</body>
+
+</html>
