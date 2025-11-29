@@ -1,33 +1,15 @@
 -- ================================================
 -- DDL Completo - Sistema Dr. Wallace Victor
--- Compatível com MySQL 8.0+
+-- Compatível com MySQL 8.0 RDS AWS
+-- Versão Simplificada para Execução Direta
 -- ================================================
 -- 
--- Notas de compatibilidade MySQL 8.0:
--- - Usa utf8mb4_unicode_ci (compatível, MySQL 8.0 padrão é utf8mb4_0900_ai_ci)
--- - Múltiplas colunas TIMESTAMP com DEFAULT CURRENT_TIMESTAMP são suportadas
--- - Triggers usam DELIMITER para compatibilidade
--- - Foreign keys e índices seguem sintaxe padrão MySQL 8.0
--- - TINYINT(1) para booleanos (MySQL 8.0 ignora largura mas aceita)
---
-
--- ================================================
--- INSTRUÇÕES DE EXECUÇÃO NO RDS:
--- ================================================
--- 1. Certifique-se de que o banco 'dr_wallace' existe:
---    CREATE DATABASE IF NOT EXISTS dr_wallace 
---      CHARACTER SET utf8mb4 
---      COLLATE utf8mb4_unicode_ci;
---
--- 2. Selecione o banco ANTES de executar este script:
---    USE dr_wallace;
---
--- 3. Depois execute este arquivo completo
+-- INSTRUÇÕES:
+-- 1. Conecte-se ao RDS e selecione o banco: USE dr_wallace;
+-- 2. Execute este arquivo completo
 -- ================================================
 
--- ===========================================
 -- Tabela: patients
--- ===========================================
 CREATE TABLE IF NOT EXISTS patients (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -37,9 +19,7 @@ CREATE TABLE IF NOT EXISTS patients (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
 -- Tabela: appointment_types
--- ===========================================
 CREATE TABLE IF NOT EXISTS appointment_types (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -48,9 +28,7 @@ CREATE TABLE IF NOT EXISTS appointment_types (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
 -- Tabela: doctors
--- ===========================================
 CREATE TABLE IF NOT EXISTS doctors (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -62,9 +40,7 @@ CREATE TABLE IF NOT EXISTS doctors (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: doctor_consultation_types (tipos por médico)
--- ===========================================
+-- Tabela: doctor_consultation_types
 CREATE TABLE IF NOT EXISTS doctor_consultation_types (
   doctor_id INT NOT NULL,
   type_id INT NOT NULL,
@@ -73,9 +49,7 @@ CREATE TABLE IF NOT EXISTS doctor_consultation_types (
   CONSTRAINT fk_dct_type FOREIGN KEY (type_id) REFERENCES appointment_types(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: doctor_patients (vínculo médico-paciente)
--- ===========================================
+-- Tabela: doctor_patients
 CREATE TABLE IF NOT EXISTS doctor_patients (
   doctor_id INT NOT NULL,
   patient_id INT NOT NULL,
@@ -85,9 +59,7 @@ CREATE TABLE IF NOT EXISTS doctor_patients (
   CONSTRAINT fk_dp_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: appointments (com campos extras para cancelamento/reagendamento)
--- ===========================================
+-- Tabela: appointments
 CREATE TABLE IF NOT EXISTS appointments (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
@@ -104,30 +76,16 @@ CREATE TABLE IF NOT EXISTS appointments (
   confirmation_sent TINYINT(1) DEFAULT 0,
   reminder_sent TINYINT(1) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
   INDEX idx_appointments_date (date),
   INDEX idx_appointments_status (status),
   INDEX idx_appointments_patient_date (patient_id, date),
-
-  CONSTRAINT fk_appointments_patient 
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-
-  CONSTRAINT fk_appointments_type 
-    FOREIGN KEY (type_id) REFERENCES appointment_types(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-
-  CONSTRAINT fk_appointments_doctor
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-
-  CONSTRAINT uc_appointments_unique_slot 
-    UNIQUE (doctor_id, date, time)
+  CONSTRAINT fk_appointments_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_appointments_type FOREIGN KEY (type_id) REFERENCES appointment_types(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_appointments_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT uc_appointments_unique_slot UNIQUE (doctor_id, date, time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
 -- Tabela: admins
--- ===========================================
 CREATE TABLE IF NOT EXISTS admins (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -140,37 +98,27 @@ CREATE TABLE IF NOT EXISTS admins (
   CONSTRAINT uc_admin_doctor UNIQUE (doctor_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
 -- Tabela: password_resets
--- ===========================================
 CREATE TABLE IF NOT EXISTS password_resets (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
   token VARCHAR(255) NOT NULL,
   expires_at DATETIME NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-  CONSTRAINT fk_password_resets_patient 
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT fk_password_resets_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
 -- Tabela: blocked_times
--- ===========================================
 CREATE TABLE IF NOT EXISTS blocked_times (
   id INT AUTO_INCREMENT PRIMARY KEY,
   date DATE NOT NULL,
   time TIME NOT NULL,
   reason VARCHAR(255),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
   CONSTRAINT uc_blocked_times UNIQUE (date, time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: patient_profiles (dados adicionais do paciente)
--- ===========================================
+-- Tabela: patient_profiles
 CREATE TABLE IF NOT EXISTS patient_profiles (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
@@ -185,16 +133,11 @@ CREATE TABLE IF NOT EXISTS patient_profiles (
   dark_mode TINYINT(1) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  
   UNIQUE KEY uk_profile_patient (patient_id),
-  CONSTRAINT fk_profile_patient 
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT fk_profile_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: appointment_reviews (avaliações pós-consulta)
--- ===========================================
+-- Tabela: appointment_reviews
 CREATE TABLE IF NOT EXISTS appointment_reviews (
   id INT AUTO_INCREMENT PRIMARY KEY,
   appointment_id INT NOT NULL,
@@ -203,23 +146,14 @@ CREATE TABLE IF NOT EXISTS appointment_reviews (
   rating TINYINT NOT NULL,
   comment TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
   INDEX idx_reviews_doctor (doctor_id),
   UNIQUE KEY uk_review_appointment (appointment_id),
-  CONSTRAINT fk_review_appointment 
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_review_patient 
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_review_doctor 
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT fk_review_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_review_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_review_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: exam_requests (solicitações de exames)
--- ===========================================
+-- Tabela: exam_requests
 CREATE TABLE IF NOT EXISTS exam_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
@@ -229,24 +163,15 @@ CREATE TABLE IF NOT EXISTS exam_requests (
   status VARCHAR(50) NOT NULL DEFAULT 'requested',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  
   INDEX idx_exam_patient (patient_id),
   INDEX idx_exam_doctor (doctor_id),
   INDEX idx_exam_appointment (appointment_id),
-  CONSTRAINT fk_exam_patient 
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_exam_doctor 
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_exam_appointment 
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
-    ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT fk_exam_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_exam_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_exam_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: patient_documents (upload de documentos)
--- ===========================================
+-- Tabela: patient_documents
 CREATE TABLE IF NOT EXISTS patient_documents (
   id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT NOT NULL,
@@ -259,24 +184,15 @@ CREATE TABLE IF NOT EXISTS patient_documents (
   exam_request_id INT,
   type VARCHAR(50) DEFAULT 'document',
   uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
   INDEX idx_document_patient (patient_id),
   INDEX idx_document_appointment (appointment_id),
   INDEX idx_document_exam_request (exam_request_id),
-  CONSTRAINT fk_document_patient 
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_document_appointment 
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
-    ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT fk_document_exam_request 
-    FOREIGN KEY (exam_request_id) REFERENCES exam_requests(id)
-    ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT fk_document_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_document_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT fk_document_exam_request FOREIGN KEY (exam_request_id) REFERENCES exam_requests(id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: email_logs (registro de e-mails enviados)
--- ===========================================
+-- Tabela: email_logs
 CREATE TABLE IF NOT EXISTS email_logs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   recipient_email VARCHAR(255) NOT NULL,
@@ -287,17 +203,12 @@ CREATE TABLE IF NOT EXISTS email_logs (
   error_message TEXT,
   sent_at TIMESTAMP NULL DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
   INDEX idx_email_status (status),
   INDEX idx_email_type (email_type),
-  CONSTRAINT fk_email_appointment 
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
-    ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT fk_email_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Tabela: notification_queue (fila de lembretes)
--- ===========================================
+-- Tabela: notification_queue
 CREATE TABLE IF NOT EXISTS notification_queue (
   id INT AUTO_INCREMENT PRIMARY KEY,
   appointment_id INT NOT NULL,
@@ -308,23 +219,13 @@ CREATE TABLE IF NOT EXISTS notification_queue (
   error_message TEXT,
   processed_at TIMESTAMP NULL DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
   INDEX idx_notification_scheduled (scheduled_for, status),
   INDEX idx_notification_appointment (appointment_id),
-  CONSTRAINT fk_notification_appointment 
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_notification_patient 
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT fk_notification_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_notification_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===========================================
--- Triggers para validar rating (1-5)
--- ===========================================
--- Nota: Removido DELIMITER para compatibilidade com RDS
--- Execute os triggers separadamente se necessário
-
+-- Triggers (execute separadamente se houver problemas)
 DROP TRIGGER IF EXISTS trg_review_rating_check;
 
 CREATE TRIGGER trg_review_rating_check
@@ -347,7 +248,3 @@ BEGIN
   END IF;
 END;
 
--- ===========================================
--- Mensagem de conclusão
--- ===========================================
-SELECT 'Schema criado com sucesso!' AS status;

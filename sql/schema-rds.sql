@@ -1,29 +1,16 @@
 -- ================================================
 -- DDL Completo - Sistema Dr. Wallace Victor
--- Compatível com MySQL 8.0+
+-- Compatível com MySQL 8.0 RDS AWS
 -- ================================================
 -- 
--- Notas de compatibilidade MySQL 8.0:
--- - Usa utf8mb4_unicode_ci (compatível, MySQL 8.0 padrão é utf8mb4_0900_ai_ci)
--- - Múltiplas colunas TIMESTAMP com DEFAULT CURRENT_TIMESTAMP são suportadas
--- - Triggers usam DELIMITER para compatibilidade
--- - Foreign keys e índices seguem sintaxe padrão MySQL 8.0
--- - TINYINT(1) para booleanos (MySQL 8.0 ignora largura mas aceita)
+-- INSTRUÇÕES DE EXECUÇÃO:
+-- 1. Conecte-se ao RDS MySQL
+-- 2. Execute: USE dr_wallace; (ou selecione o banco no cliente)
+-- 3. Execute este arquivo completo
 --
-
--- ================================================
--- INSTRUÇÕES DE EXECUÇÃO NO RDS:
--- ================================================
--- 1. Certifique-se de que o banco 'dr_wallace' existe:
---    CREATE DATABASE IF NOT EXISTS dr_wallace 
---      CHARACTER SET utf8mb4 
---      COLLATE utf8mb4_unicode_ci;
+-- Se o banco não existir, crie primeiro:
+-- CREATE DATABASE dr_wallace CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 --
--- 2. Selecione o banco ANTES de executar este script:
---    USE dr_wallace;
---
--- 3. Depois execute este arquivo completo
--- ================================================
 
 -- ===========================================
 -- Tabela: patients
@@ -322,9 +309,7 @@ CREATE TABLE IF NOT EXISTS notification_queue (
 -- ===========================================
 -- Triggers para validar rating (1-5)
 -- ===========================================
--- Nota: Removido DELIMITER para compatibilidade com RDS
--- Execute os triggers separadamente se necessário
-
+-- Nota: No RDS, execute os triggers separadamente se DELIMITER causar problemas
 DROP TRIGGER IF EXISTS trg_review_rating_check;
 
 CREATE TRIGGER trg_review_rating_check
@@ -351,3 +336,4 @@ END;
 -- Mensagem de conclusão
 -- ===========================================
 SELECT 'Schema criado com sucesso!' AS status;
+
