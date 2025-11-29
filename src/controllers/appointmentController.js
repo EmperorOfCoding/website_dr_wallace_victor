@@ -30,7 +30,25 @@ async function createAppointment(req, res) {
       modality = 'presencial',
     } = req.body || {};
 
+    // Debug logging
+    console.log('📋 Booking request body:', {
+      patientId,
+      date,
+      time,
+      typeId,
+      doctorId,
+      modality,
+      notes,
+      rescheduledFrom
+    });
+
     if (!patientId || !date || !time || !typeId) {
+      console.error('❌ Missing fields:', {
+        hasPatientId: !!patientId,
+        hasDate: !!date,
+        hasTime: !!time,
+        hasTypeId: !!typeId
+      });
       return res.status(400).json({ status: 'error', message: 'Campos obrigatórios ausentes.' });
     }
 

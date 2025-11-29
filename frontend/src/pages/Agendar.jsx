@@ -218,6 +218,20 @@ export default function Agendar({ onNavigate }) {
     setError("");
     setMessage("");
     try {
+      // Get patient_id - try from patient object first, then from token
+      let patientIdToUse = isAdmin ? selectedPatientId : patient?.id;
+      
+      // Fallback: if patient.id is undefined, try to extract from token
+      if (!isAdmin && !patientIdToUse && token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          patientIdToUse = payload.patient_id || payload.patientId;
+          console.log('📝 Extracted patient_id from token:', patientIdToUse);
+        } catch (e) {
+          console.error('Failed to decode token:', e);
+        }
+      }
+
       const resp = await fetch(`${API_BASE_URL}/api/appointments/book`, {
         method: "POST",
         headers: {
@@ -225,7 +239,7 @@ export default function Agendar({ onNavigate }) {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          patient_id: isAdmin ? selectedPatientId : patient?.id,
+          patient_id: patientIdToUse,
           doctor_id: selectedDoctor,
           type_id: selectedType,
           date,

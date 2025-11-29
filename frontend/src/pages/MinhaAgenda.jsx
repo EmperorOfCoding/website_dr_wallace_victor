@@ -35,11 +35,29 @@ export default function MinhaAgenda({ onNavigate }) {
   }, [patient?.id, token]);
 
   const loadAppointments = async () => {
-    if (!patient?.id) return;
+    // Get patient_id - try from patient object first, then from token
+    let patientIdToUse = patient?.id;
+    
+    // Fallback: if patient.id is undefined, try to extract from token
+    if (!patientIdToUse && token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        patientIdToUse = payload.patient_id || payload.patientId;
+        console.log('📝 [MinhaAgenda] Extracted patient_id from token:', patientIdToUse);
+      } catch (e) {
+        console.error('[MinhaAgenda] Failed to decode token:', e);
+      }
+    }
+    
+    if (!patientIdToUse) {
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     setError("");
     try {
-      const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patient.id}`, {
+      const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patientIdToUse}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const data = await resp.json().catch(() => ({}));

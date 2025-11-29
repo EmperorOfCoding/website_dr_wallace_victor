@@ -17,6 +17,7 @@ import DocumentUpload from "./pages/DocumentUpload";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MinhaAgenda from "./pages/MinhaAgenda";
+import PatientExams from "./pages/PatientExams";
 import Perfil from "./pages/Perfil";
 import Register from "./pages/Register";
 import ReviewAppointment from "./pages/ReviewAppointment";
@@ -110,6 +111,7 @@ function AppRoutes() {
       "minha-agenda": "/minha-agenda",
       perfil: "/perfil",
       dashboard: "/dashboard",
+      exames: "/exames",
       admin: "/painel-medico",
       "painel-medico-pacientes": "/painel-medico/pacientes",
       "painel-medico-agenda": "/painel-medico/agenda",
@@ -159,6 +161,7 @@ function AppRoutes() {
       "minha-agenda": "/minha-agenda",
       perfil: "/perfil",
       dashboard: "/dashboard",
+      exames: "/exames",
       admin: "/painel-medico",
       "painel-medico-pacientes": "/painel-medico/pacientes",
       "painel-medico-agenda": "/painel-medico/agenda",
@@ -247,6 +250,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <PageTransition><Dashboard onNavigate={handleNavigate} /></PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/exames"
+              element={
+                <ProtectedRoute>
+                  <PageTransition><PatientExams onNavigate={handleNavigate} /></PageTransition>
                 </ProtectedRoute>
               }
             />
