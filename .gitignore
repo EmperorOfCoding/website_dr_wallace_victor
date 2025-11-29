@@ -1,28 +1,28 @@
-# node_modules
-# .env
-# .DS_Store
-# dist
-# build
-# *.log
-# frontend/node_modules
-# frontend/.env
-# frontend/.env.local
-# frontend/.env.production
+node_modules
+.env
+.DS_Store
+dist
+build
+*.log
+frontend/node_modules
+frontend/.env
+frontend/.env.local
+frontend/.env.production
 
-# # Logs
-# logs/
+# Logs
+logs/
 
-# # Test outputs
-# *_output.json
-# *_output.txt
+# Test outputs
+*_output.json
+*_output.txt
 
-# # Debug scripts
-# debug_*.js
+# Debug scripts
+debug_*.js
 
-# # Temporary files
-# test_*.js
-# fix_*.js
-# check_*.js
-# verify_*.js
-# .vercel
+# Temporary files
+test_*.js
+fix_*.js
+check_*.js
+verify_*.js
+.vercel
 node_modules
