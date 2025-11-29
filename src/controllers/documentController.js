@@ -42,6 +42,15 @@ async function uploadDocument(req, res) {
         // If doctor, patient_id must be in body. If patient, use from token.
         let patientId = isDoctor ? req.body.patient_id : req.user?.patient_id;
 
+        // Debug logging
+        console.log('📤 Upload document request:', {
+            isDoctor,
+            patient_id_from_body: req.body.patient_id,
+            patient_id_from_user: req.user?.patient_id,
+            patientId_final: patientId,
+            has_file: !!req.file
+        });
+
         if (!patientId) {
             return res.status(400).json({ status: 'error', message: 'ID do paciente é obrigatório.' });
         }
@@ -53,7 +62,23 @@ async function uploadDocument(req, res) {
             return res.status(400).json({ status: 'error', message: 'Nenhum arquivo enviado.' });
         }
 
+        // Check file size (10MB limit to avoid MySQL packet size issues)
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        if (req.file.size > MAX_FILE_SIZE) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Arquivo muito grande. Tamanho máximo: 10MB'
+            });
+        }
+
         const { appointment_id, description, exam_request_id, type } = req.body;
+
+        console.log('📂 File details:', {
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size,
+            size_formatted: `${(req.file.size / 1024 / 1024).toFixed(2)} MB`
+        });
 
         const document = await documentService.saveDocument(
             patientId,
