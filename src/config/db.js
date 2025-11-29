@@ -9,7 +9,24 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  dateStrings: true
+  dateStrings: true,
+  connectTimeout: 10000, // 10 segundos
+  acquireTimeout: 10000, // 10 segundos
+  timeout: 10000, // 10 segundos
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
 });
+
+// Test connection on startup
+pool.getConnection()
+  .then(connection => {
+    console.log('✅ Database connection established');
+    connection.release();
+  })
+  .catch(err => {
+    console.error('❌ Database connection failed:', err.message);
+    console.error('💡 Verifique as variáveis de ambiente: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME');
+    console.error('💡 Verifique se o RDS Security Group permite conexões do Railway');
+  });
 
 module.exports = pool;

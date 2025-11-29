@@ -6,11 +6,11 @@ const { logger } = require('../middlewares/logger');
 // Schedule notifications for a new appointment
 async function scheduleNotifications(appointmentId, patientId, date, time) {
   const appointmentDateTime = new Date(`${date}T${time}`);
-  
+
   // Schedule 24h reminder
   const reminder24h = new Date(appointmentDateTime);
   reminder24h.setHours(reminder24h.getHours() - 24);
-  
+
   if (reminder24h > new Date()) {
     await pool.execute(
       `INSERT INTO notification_queue 
@@ -23,7 +23,7 @@ async function scheduleNotifications(appointmentId, patientId, date, time) {
   // Schedule 1h reminder
   const reminder1h = new Date(appointmentDateTime);
   reminder1h.setHours(reminder1h.getHours() - 1);
-  
+
   if (reminder1h > new Date()) {
     await pool.execute(
       `INSERT INTO notification_queue 
@@ -48,19 +48,29 @@ async function cancelNotifications(appointmentId) {
 async function processPendingNotifications() {
   try {
     // Get notifications that should be sent now
-    const [notifications] = await pool.execute(
-      `SELECT nq.*, p.email as patient_email, p.name as patient_name,
-              a.date, a.time, d.name as doctor_name, at.name as type_name
-       FROM notification_queue nq
-       JOIN patients p ON nq.patient_id = p.id
-       JOIN appointments a ON nq.appointment_id = a.id
-       JOIN doctors d ON a.doctor_id = d.id
-       JOIN appointment_types at ON a.type_id = at.id
-       WHERE nq.status = 'pending' 
-         AND nq.scheduled_for <= NOW()
-         AND a.status NOT IN ('cancelled', 'completed')
-       LIMIT 50`
-    );
+    let notifications;
+    try {
+      [notifications] = await pool.execute(
+        `SELECT nq.*, p.email as patient_email, p.name as patient_name,
+                a.date, a.time, d.name as doctor_name, at.name as type_name
+         FROM notification_queue nq
+         JOIN patients p ON nq.patient_id = p.id
+         JOIN appointments a ON nq.appointment_id = a.id
+         JOIN doctors d ON a.doctor_id = d.id
+         JOIN appointment_types at ON a.type_id = at.id
+         WHERE nq.status = 'pending' 
+           AND nq.scheduled_for <= NOW()
+           AND a.status NOT IN ('cancelled', 'completed')
+         LIMIT 50`
+      );
+    } catch (dbError) {
+      // Se erro de conexão, retorna array vazio para não travar
+      if (dbError.code === 'ETIMEDOUT' || dbError.code === 'ECONNREFUSED' || dbError.code === 'ENOTFOUND') {
+        logger.warn('Database connection unavailable, skipping notification processing');
+        return;
+      }
+      throw dbError;
+    }
 
     for (const notification of notifications) {
       try {
@@ -174,10 +184,19 @@ async function sendCancellationNotification(appointmentId, reason) {
 
 // Start the notification scheduler (runs every minute)
 function startNotificationScheduler() {
-  cron.schedule('* * * * *', () => {
-    processPendingNotifications();
-  });
-  logger.info('Notification scheduler started');
+  // Verificar conexão antes de iniciar
+  pool.getConnection()
+    .then(connection => {
+      connection.release();
+      cron.schedule('* * * * *', () => {
+        processPendingNotifications();
+      });
+      logger.info('Notification scheduler started');
+    })
+    .catch(err => {
+      logger.warn('Notification scheduler not started - database connection unavailable');
+      logger.warn('Scheduler will be retried on next server restart');
+    });
 }
 
 module.exports = {
