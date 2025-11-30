@@ -35,11 +35,27 @@ export default function Dashboard({ onNavigate }) {
 
   useEffect(() => {
     async function load() {
-      if (!patient?.id) return;
+      // Fallback: try to get patient_id from token if not in context
+      let patientId = patient?.id;
+      if (!patientId && token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          patientId = payload.patient_id;
+          console.log("Extracted patient_id from token:", patientId);
+        } catch (e) {
+          console.error("Error decoding token:", e);
+        }
+      }
+
+      if (!patientId) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError("");
       try {
-        const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patient.id}`, {
+        const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patientId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));

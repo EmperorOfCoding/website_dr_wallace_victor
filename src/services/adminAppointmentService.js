@@ -7,7 +7,7 @@ function normalizePagination(page = 1, limit = 10) {
   return { safePage, safeLimit, offset };
 }
 
-async function getAppointments({ date, page = 1, limit = 10, search = '', doctorId }) {
+async function getAppointments({ date, startDate, endDate, page = 1, limit = 10, search = '', doctorId }) {
   const { safePage, safeLimit, offset } = normalizePagination(page, limit);
 
   const params = [];
@@ -21,6 +21,16 @@ async function getAppointments({ date, page = 1, limit = 10, search = '', doctor
   if (date) {
     where.push('a.date = ?');
     params.push(date);
+  } else {
+    // Support date range if specific date not provided
+    if (startDate) {
+      where.push('a.date >= ?');
+      params.push(startDate);
+    }
+    if (endDate) {
+      where.push('a.date <= ?');
+      params.push(endDate);
+    }
   }
 
   if (search) {

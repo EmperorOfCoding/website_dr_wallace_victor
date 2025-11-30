@@ -39,15 +39,15 @@ async function createOrUpdateProfile(patientId, profileData) {
            dark_mode = COALESCE(?, dark_mode)
        WHERE patient_id = ?`,
       [
-        phone,
-        birthdate,
-        emergency_name,
-        emergency_phone,
-        allergies,
-        notes,
-        contact_preference,
-        reminders_enabled,
-        dark_mode,
+        phone === undefined ? null : phone,
+        birthdate === undefined ? null : birthdate,
+        emergency_name === undefined ? null : emergency_name,
+        emergency_phone === undefined ? null : emergency_phone,
+        allergies === undefined ? null : allergies,
+        notes === undefined ? null : notes,
+        contact_preference === undefined ? null : contact_preference,
+        reminders_enabled === undefined ? null : reminders_enabled,
+        dark_mode === undefined ? null : dark_mode,
         patientId,
       ]
     );
@@ -77,7 +77,7 @@ async function createOrUpdateProfile(patientId, profileData) {
 
 async function updateDarkMode(patientId, darkMode) {
   const existing = await getProfileByPatientId(patientId);
-  
+
   if (existing) {
     await pool.execute(
       `UPDATE patient_profiles SET dark_mode = ? WHERE patient_id = ?`,

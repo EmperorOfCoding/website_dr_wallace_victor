@@ -17,14 +17,14 @@ function isWithinWorkingHours(time) {
 
 async function listAppointments(req, res) {
   try {
-    const { date, page = 1, limit = 10, patient: search = '' } = req.query || {};
+    const { date, startDate, endDate, page = 1, limit = 10, patient: search = '' } = req.query || {};
     const doctorId = req.user?.doctor_id;
 
     if (date && !isValidDate(date)) {
       return res.status(400).json({ status: 'error', message: 'Data inválida.' });
     }
 
-    const result = await adminAppointmentService.getAppointments({ date, page, limit, search, doctorId });
+    const result = await adminAppointmentService.getAppointments({ date, startDate, endDate, page, limit, search, doctorId });
 
     const appointments = result.appointments.map((item) => ({
       appointment_id: item.appointment_id,

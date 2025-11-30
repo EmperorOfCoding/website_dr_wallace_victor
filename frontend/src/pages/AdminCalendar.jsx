@@ -2,7 +2,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./AdminCalendar.module.css";
@@ -15,27 +15,34 @@ export default function AdminCalendar({ onNavigate }) {
   const [modalOpen, setModalOpen] = useState(false);
   const calendarRef = useRef(null);
 
-  useEffect(() => {
-    loadAppointments();
-  }, [token]);
-
-  const loadAppointments = async () => {
+  const loadAppointments = async (startStr, endStr) => {
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE_URL}/api/admin/appointments?limit=500`, {
+      // Use a large limit to ensure we get all appointments in the range
+      // Backend now supports startDate and endDate filtering
+      let url = `${API_BASE_URL}/api/admin/appointments?limit=1000`;
+      
+      if (startStr && endStr) {
+        url += `&startDate=${startStr}&endDate=${endStr}`;
+      }
+
+      const resp = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data.appointments) {
         const calendarEvents = data.appointments.map((appt) => ({
-          id: appt.id,
-          title: `${appt.patientName || "Paciente"} - ${appt.typeName || "Consulta"}`,
+          id: appt.appointment_id || appt.id, // Handle both structures if backend changed
+          title: `${appt.patient_name || appt.patientName || "Paciente"} - ${appt.type_name || appt.typeName || "Consulta"}`,
           start: `${appt.date}T${appt.time}`,
           end: calculateEndTime(appt.date, appt.time, appt.durationMinutes || 30),
-          backgroundColor: getStatusColor(appt.status),
-          borderColor: getStatusColor(appt.status),
+          backgroundColor: getStatusColor(appt.status || "scheduled"),
+          borderColor: getStatusColor(appt.status || "scheduled"),
           extendedProps: {
             ...appt,
+            patientName: appt.patient_name || appt.patientName,
+            patientEmail: appt.patient_email || appt.patientEmail,
+            typeName: appt.type_name || appt.typeName,
           },
         }));
         setEvents(calendarEvents);
@@ -45,6 +52,14 @@ export default function AdminCalendar({ onNavigate }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDatesSet = (dateInfo) => {
+    // FullCalendar provides startStr and endStr in ISO format
+    // We need YYYY-MM-DD
+    const start = dateInfo.startStr.split('T')[0];
+    const end = dateInfo.endStr.split('T')[0];
+    loadAppointments(start, end);
   };
 
   const calculateEndTime = (date, time, durationMinutes) => {
@@ -166,6 +181,7 @@ export default function AdminCalendar({ onNavigate }) {
             events={events}
             eventClick={handleEventClick}
             dateClick={handleDateClick}
+            datesSet={handleDatesSet}
             slotMinTime="07:00:00"
             slotMaxTime="20:00:00"
             allDaySlot={false}
