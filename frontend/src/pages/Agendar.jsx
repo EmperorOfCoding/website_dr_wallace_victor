@@ -288,7 +288,9 @@ export default function Agendar({ onNavigate }) {
       
       setMessage(rescheduleFromId ? "Consulta reagendada com sucesso." : "Consulta agendada com sucesso.");
       setSelectedTime("");
-      onNavigate("minha-agenda");
+      
+      // Redirect admin to medical panel agenda, patient to their agenda
+      onNavigate(isAdmin ? "painel-medico-agenda" : "minha-agenda");
     } catch (err) {
       setError(err.message || "Não foi possível agendar.");
     } finally {

@@ -6,11 +6,13 @@ export default defineConfig({
   base: '/',
   server: {
     port: 5173,
+    strictPort: true,
+    host: 'localhost',
     hmr: {
-      host: 'localhost',
       protocol: 'ws',
+      host: 'localhost',
       port: 5173,
-      timeout: 30000,
+      clientPort: 5173,
     },
     proxy: {
       '/api': {

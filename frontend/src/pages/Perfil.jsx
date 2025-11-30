@@ -39,7 +39,25 @@ export default function Perfil({ onNavigate }) {
   }, [patient?.id, token]);
 
   const loadProfile = async () => {
-    if (!patient?.id || !token) return;
+    // Get patient_id - try from patient object first, then from token
+    let patientIdToUse = patient?.id;
+    
+    // Fallback: if patient.id is undefined, try to extract from token
+    if (!patientIdToUse && token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        patientIdToUse = payload.patient_id || payload.patientId;
+        console.log('📝 [Perfil] Extracted patient_id from token:', patientIdToUse);
+      } catch (e) {
+        console.error('[Perfil] Failed to decode token:', e);
+      }
+    }
+    
+    if (!patientIdToUse || !token) {
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/profile`, {
@@ -63,6 +81,10 @@ export default function Perfil({ onNavigate }) {
       }
     } catch (err) {
       console.error("Error loading profile:", err);
+      // Set phone from patient context as fallback
+      if (patient?.phone) {
+        setForm((prev) => ({ ...prev, phone: patient.phone }));
+      }
     } finally {
       setLoading(false);
     }

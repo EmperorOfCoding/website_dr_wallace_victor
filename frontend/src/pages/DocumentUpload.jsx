@@ -21,12 +21,30 @@ export default function DocumentUpload({ onNavigate }) {
   }, [patient?.id, appointmentId, token]);
 
   const loadDocuments = async (showLoading = true) => {
-    if (!patient?.id) return;
+    // Get patient_id - try from patient object first, then from token
+    let patientIdToUse = patient?.id;
+    
+    // Fallback: if patient.id is undefined, try to extract from token
+    if (!patientIdToUse && token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        patientIdToUse = payload.patient_id || payload.patientId;
+        console.log('📝 [DocumentUpload] Extracted patient_id from token:', patientIdToUse);
+      } catch (e) {
+        console.error('[DocumentUpload] Failed to decode token:', e);
+      }
+    }
+    
+    if (!patientIdToUse) {
+      if (showLoading) setLoading(false);
+      return;
+    }
+    
     if (showLoading) setLoading(true);
     try {
       const url = appointmentId
         ? `/api/documents?appointment_id=${appointmentId}`
-        : `/api/documents?patient_id=${patient.id}`;
+        : `/api/documents?patient_id=${patientIdToUse}`;
       const resp = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });

@@ -165,25 +165,149 @@ export default function AdminPatientDetails({ onNavigate }) {
           </header>
 
           <div className={styles.grid}>
-            {/* Info Card */}
+            {/* Patient Info Card - Enhanced Design */}
             <section className={styles.card}>
-                <h2 className={styles.cardTitle}>Informações Pessoais</h2>
-                <div className={styles.infoGrid}>
-                    <div className={styles.infoItem}>
-                        <label>Data de Nascimento</label>
-                        <p>{patient.birthdate ? new Date(patient.birthdate).toLocaleDateString() : "Não informado"}</p>
+                <div className={styles.cardHeader}>
+                    <div>
+                        <h2 className={styles.cardTitle}>📋 Informações Pessoais</h2>
+                        <p className={styles.cardSubtitle}>Dados completos do paciente</p>
                     </div>
-                    <div className={styles.infoItem}>
-                        <label>Contato de Emergência</label>
-                        <p>{patient.emergency_name || "Não informado"} {patient.emergency_phone ? `(${patient.emergency_phone})` : ""}</p>
+                </div>
+                <div style={{ 
+                    display: 'grid', 
+                    gap: '1.5rem', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' 
+                }}>
+                    {/* Contact Info Group */}
+                    <div style={{ 
+                        padding: '1.25rem', 
+                        background: 'var(--bg-primary)', 
+                        borderRadius: '0.75rem',
+                        border: '1px solid var(--border-color)'
+                    }}>
+                        <h3 style={{ 
+                            fontSize: '0.875rem', 
+                            fontWeight: '600', 
+                            color: 'var(--text-muted)',
+                            marginBottom: '1rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em'
+                        }}>📱 Contato</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Email</p>
+                                <p style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                                    {patient.email || "Não informado"}
+                                </p>
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Telefone</p>
+                                <p style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                                    {patient.phone || "Não informado"}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <div className={styles.infoItem}>
-                        <label>Alergias</label>
-                        <p>{patient.allergies || "Nenhuma registrada"}</p>
+
+                    {/* Personal Info Group */}
+                    <div style={{ 
+                        padding: '1.25rem', 
+                        background: 'var(--bg-primary)', 
+                        borderRadius: '0.75rem',
+                        border: '1px solid var(--border-color)'
+                    }}>
+                        <h3 style={{ 
+                            fontSize: '0.875rem', 
+                            fontWeight: '600', 
+                            color: 'var(--text-muted)',
+                            marginBottom: '1rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em'
+                        }}>👤 Dados Pessoais</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Data de Nascimento</p>
+                                <p style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                                    {patient.birthdate ? new Date(patient.birthdate).toLocaleDateString('pt-BR') : "Não informado"}
+                                </p>
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Idade</p>
+                                <p style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                                    {patient.birthdate ? `${Math.floor((new Date() - new Date(patient.birthdate)) / (365.25 * 24 * 60 * 60 * 1000))} anos` : "Não informado"}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                     <div className={styles.infoItem}>
-                        <label>Observações</label>
-                        <p>{patient.notes || "Nenhuma"}</p>
+
+                    {/* Emergency Contact Group */}
+                    <div style={{ 
+                        padding: '1.25rem', 
+                        background: 'var(--bg-primary)', 
+                        borderRadius: '0.75rem',
+                        border: '1px solid var(--border-color)'
+                    }}>
+                        <h3 style={{ 
+                            fontSize: '0.875rem', 
+                            fontWeight: '600', 
+                            color: 'var(--text-muted)',
+                            marginBottom: '1rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em'
+                        }}>🚨 Emergência</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Nome</p>
+                                <p style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                                    {patient.emergency_name || "Não informado"}
+                                </p>
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Telefone</p>
+                                <p style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                                    {patient.emergency_phone || "Não informado"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Medical Info - Full Width */}
+                <div style={{ 
+                    marginTop: '1.5rem',
+                    padding: '1.25rem', 
+                    background: 'var(--bg-primary)', 
+                    borderRadius: '0.75rem',
+                    border: '1px solid var(--border-color)'
+                }}>
+                    <h3 style={{ 
+                        fontSize: '0.875rem', 
+                        fontWeight: '600', 
+                        color: 'var(--text-muted)',
+                        marginBottom: '1rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                    }}>⚕️ Informações Médicas</h3>
+                    <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+                        <div>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Alergias</p>
+                            <p style={{ 
+                                fontSize: '1rem', 
+                                fontWeight: '500', 
+                                color: patient.allergies ? 'var(--error)' : 'var(--text-primary)',
+                                padding: '0.5rem',
+                                background: patient.allergies ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                                borderRadius: '0.5rem'
+                            }}>
+                                {patient.allergies || "Nenhuma registrada"}
+                            </p>
+                        </div>
+                        <div>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Observações</p>
+                            <p style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                                {patient.notes || "Nenhuma"}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>

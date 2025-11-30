@@ -57,7 +57,7 @@ export default function AdminDashboard({ onNavigate }) {
   }
 
   const quickActions = [
-    { label: "Agendar Consulta", action: () => onNavigate("agendar"), color: "primary" },
+    { label: "Agendar Paciente", action: () => onNavigate("agendar"), color: "primary" },
     { label: "Ver Pacientes", action: () => onNavigate("painel-medico-pacientes"), color: "secondary" },
     { label: "Ver Agenda", action: () => onNavigate("painel-medico-agenda"), color: "secondary" },
     { label: "Calendario", action: () => onNavigate("painel-medico-calendario"), color: "secondary" },
