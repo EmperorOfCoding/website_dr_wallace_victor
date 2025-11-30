@@ -79,3 +79,12 @@ Error: getaddrinfo ENOTFOUND smtp.example.com
 2025-11-29 16:52:00 [ERROR]: Failed to send notification 31: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
 Error: getaddrinfo ENOTFOUND smtp.example.com
     at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-11-30 16:04:00 [ERROR]: Error processing notifications: read ECONNRESET {"code":"ECONNRESET","errno":-4077}
+Error: read ECONNRESET
+    at PromisePool.execute (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\node_modules\mysql2\lib\promise\pool.js:54:22)
+    at processPendingNotifications (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\src\services\notificationService.js:53:36)
+    at C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\src\services\notificationService.js:192:9
+    at Runner.onMatch (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\node_modules\node-cron\dist\cjs\tasks\inline-scheduled-task.js:69:20)
+    at Timeout._onTimeout (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\node_modules\node-cron\dist\cjs\scheduler\runner.js:70:55)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7)

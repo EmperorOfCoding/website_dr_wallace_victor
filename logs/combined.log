@@ -1623,3 +1623,24 @@ Error: getaddrinfo ENOTFOUND smtp.example.com
 2025-11-29 22:28:42 [INFO]: Request completed {"method":"PUT","url":"/api/profile","status":200,"duration":"354ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
 2025-11-29 22:28:48 [INFO]: Request completed {"method":"GET","url":"/api/profile","status":200,"duration":"117ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
 2025-11-29 22:28:48 [INFO]: Request completed {"method":"GET","url":"/api/profile","status":200,"duration":"117ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
+2025-11-30 13:39:38 [INFO]: Servidor iniciado na porta 3000
+2025-11-30 13:39:38 [INFO]: Notification scheduler started
+2025-11-30 13:39:58 [INFO]: Request completed {"method":"GET","url":"/api/consultation-types","status":200,"duration":"240ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
+2025-11-30 13:39:58 [INFO]: Request completed {"method":"GET","url":"/api/consultation-types","status":200,"duration":"249ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
+2025-11-30 14:02:54 [INFO]: Servidor iniciado na porta 3000
+2025-11-30 14:02:54 [INFO]: Notification scheduler started
+2025-11-30 14:03:12 [INFO]: SIGINT received. Shutting down gracefully...
+2025-11-30 14:03:46 [INFO]: Servidor iniciado na porta 3000
+2025-11-30 14:03:46 [INFO]: Notification scheduler started
+2025-11-30 16:04:00 [ERROR]: Error processing notifications: read ECONNRESET {"code":"ECONNRESET","errno":-4077}
+Error: read ECONNRESET
+    at PromisePool.execute (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\node_modules\mysql2\lib\promise\pool.js:54:22)
+    at processPendingNotifications (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\src\services\notificationService.js:53:36)
+    at C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\src\services\notificationService.js:192:9
+    at Runner.onMatch (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\node_modules\node-cron\dist\cjs\tasks\inline-scheduled-task.js:69:20)
+    at Timeout._onTimeout (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\node_modules\node-cron\dist\cjs\scheduler\runner.js:70:55)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7)
+2025-11-30 17:16:33 [INFO]: SIGINT received. Shutting down gracefully...
+2025-11-30 17:16:36 [INFO]: Servidor iniciado na porta 3000
+2025-11-30 17:16:36 [INFO]: Notification scheduler started
