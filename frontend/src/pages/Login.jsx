@@ -27,6 +27,7 @@ export default function Login({ onNavigate }) {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Important: Send cookies automatically
         body: JSON.stringify({ email, password }),
       });
 
@@ -36,17 +37,12 @@ export default function Login({ onNavigate }) {
         throw new Error(data.message || "Falha no login.");
       }
 
-      let userPayload = null;
-      if (data.token) {
-        try {
-          const payload = JSON.parse(atob(data.token.split('.')[1]));
-          userPayload = payload;
-        } catch (e) {
-          console.error("Error decoding token", e);
-        }
-      }
-
-      login({ token: data.token, patient: userPayload });
+      // No token in response - it's in httpOnly cookie
+      // Just pass the patient/admin data
+      login({ 
+        patient: data.patient || data.admin,
+      });
+      
       setStatus("Login realizado com sucesso.");
       if (isAdminMode) {
         onNavigate("painel-medico");

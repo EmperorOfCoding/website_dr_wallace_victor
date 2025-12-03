@@ -9,6 +9,7 @@ const consultationTypeController = require('../controllers/consultationTypeContr
 const router = express.Router();
 
 router.post('/api/admin/login', adminAuthController.login);
+router.post('/api/admin/logout', adminAuthController.logout);
 router.get('/api/admin/patients', authAdmin, patientController.listPatients);
 router.get('/api/admin/patients/:id', authAdmin, patientController.getPatientDetails);
 router.get('/api/admin/appointments', authAdmin, adminAppointmentController.listAppointments);

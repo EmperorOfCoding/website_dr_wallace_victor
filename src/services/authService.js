@@ -3,6 +3,10 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 const crypto = require('crypto');
 const { sendPasswordResetEmail } = require('./emailService');
+const { ensureJwtSecret } = require('../utils/securityUtils');
+
+// Validate JWT secret on module load
+ensureJwtSecret();
 
 async function findPatientByEmail(email) {
   try {
@@ -18,7 +22,7 @@ async function findPatientByEmail(email) {
 }
 
 async function hashPassword(password) {
-  const saltRounds = 10;
+  const saltRounds = 12; // Increased from 10 for better security
   return bcrypt.hash(password, saltRounds);
 }
 
@@ -58,7 +62,8 @@ function generateToken(patient) {
     role: patient.role || 'patient'
   };
 
-  const secret = process.env.JWT_SECRET || 'default_jwt_secret';
+  // No fallback - will throw if JWT_SECRET not configured
+  const secret = process.env.JWT_SECRET;
 
   return jwt.sign(payload, secret, { expiresIn: '2h' });
 }

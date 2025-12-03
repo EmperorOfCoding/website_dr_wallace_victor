@@ -2,6 +2,8 @@
 const reviewService = require('../services/reviewService');
 const { scheduleNotifications, cancelNotifications, sendBookingConfirmation, sendCancellationNotification } = require('../services/notificationService');
 const pool = require('../config/db');
+const AppointmentDTO = require('../dto/appointmentDTO');
+const { isAdmin, canAccess } = require('../utils/dtoUtils');
 
 function isValidDate(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -117,7 +119,21 @@ async function createAppointment(req, res) {
 
 async function listAppointments(req, res) {
   try {
-    const { patient_id: patientId, page = 1, limit = 10 } = req.query || {};
+    const { patient_id: requestedPatientId, page = 1, limit = 10 } = req.query || {};
+    const userIsAdmin = isAdmin(req.user);
+
+    // Determine which patient_id to use
+    let patientId;
+    if (requestedPatientId) {
+      // Validate that user can access this patient's data
+      if (!canAccess(req.user, requestedPatientId)) {
+        return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+      }
+      patientId = requestedPatientId;
+    } else {
+      // Use authenticated user's patient_id
+      patientId = req.user?.patient_id;
+    }
 
     if (!patientId) {
       return res.status(400).json({ status: 'error', message: 'Paciente é obrigatório.' });
@@ -129,13 +145,15 @@ async function listAppointments(req, res) {
       Number(limit)
     );
 
-    // Format response to match expected frontend structure (adding hasReview)
-    const formattedAppointments = appointments.map(appt => ({
-      ...appt,
-      hasReview: !!appt.reviewId,
-      reviewId: undefined, // Optional: clean up if not needed
-      reviewRating: undefined // Optional: clean up if not needed
-    }));
+    // Apply DTOs based on user role
+    const formattedAppointments = appointments.map(appt => {
+      const dto = AppointmentDTO.toListDTO(appt, userIsAdmin);
+      // Add hasReview flag for frontend compatibility
+      return {
+        ...dto,
+        hasReview: !!appt.reviewId,
+      };
+    });
 
     return res.status(200).json({
       status: 'success',
@@ -173,17 +191,22 @@ async function getAppointmentById(req, res) {
     const appointment = rows[0];
 
     // Check ownership (patient can only see their own, admin can see all)
-    const isAdmin = req.user?.doctor_id;
-    if (!isAdmin && appointment.patient_id !== patientId) {
+    const userIsAdmin = isAdmin(req.user);
+    if (!canAccess(req.user, appointment.patient_id)) {
       return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
     }
 
     // Get review if exists
     const review = await reviewService.getReviewByAppointmentId(id);
 
+    // Apply DTO based on user role
+    const appointmentDTO = userIsAdmin
+      ? AppointmentDTO.toAdminDTO(appointment)
+      : AppointmentDTO.toPatientDTO(appointment);
+
     return res.status(200).json({
       status: 'success',
-      appointment,
+      appointment: appointmentDTO,
       review,
     });
   } catch (error) {
@@ -236,6 +259,11 @@ async function updateAppointment(req, res) {
       return res.status(404).json({ status: 'error', message: 'Agendamento não encontrado.' });
     }
 
+    // Validate ownership
+    if (!canAccess(req.user, appointment.patient_id)) {
+      return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+    }
+
     const newDateTime = new Date(`${date}T${time}:00`);
     if (Number.isNaN(newDateTime.getTime()) || newDateTime <= new Date()) {
       return res.status(400).json({ status: 'error', message: 'Não é possível mover para um horário passado.' });
@@ -277,6 +305,11 @@ async function cancelAppointment(req, res) {
       return res.status(404).json({ status: 'error', message: 'Agendamento não encontrado.' });
     }
 
+    // Validate ownership
+    if (!canAccess(req.user, appointment.patient_id)) {
+      return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+    }
+
     const appointmentDateTime = new Date(`${appointment.date}T${appointment.time}`);
     if (appointmentDateTime <= new Date()) {
       return res.status(400).json({ status: 'error', message: 'Não é possível cancelar um agendamento passado.' });
@@ -305,6 +338,11 @@ async function cancelAppointmentWithReason(req, res) {
     const appointment = await appointmentService.checkAppointmentExists(id);
     if (!appointment) {
       return res.status(404).json({ status: 'error', message: 'Agendamento não encontrado.' });
+    }
+
+    // Validate ownership
+    if (!canAccess(req.user, appointment.patient_id)) {
+      return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
     }
 
     const appointmentDateTime = new Date(`${appointment.date}T${appointment.time}`);

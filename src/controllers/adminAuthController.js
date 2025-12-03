@@ -1,4 +1,5 @@
 ﻿const adminService = require('../services/adminService');
+const { setAuthCookie, clearAuthCookie } = require('../utils/cookieUtils');
 
 async function login(req, res) {
   try {
@@ -20,9 +21,12 @@ async function login(req, res) {
     }
 
     const token = adminService.generateToken(admin);
+
+    // Set httpOnly cookie instead of returning token
+    setAuthCookie(res, token);
+
     return res.status(200).json({
       status: 'success',
-      token,
       admin: {
         id: admin.id,
         name: admin.name,
@@ -36,4 +40,16 @@ async function login(req, res) {
   }
 }
 
-module.exports = { login };
+async function logout(req, res) {
+  try {
+    clearAuthCookie(res);
+    return res.status(200).json({
+      status: 'success',
+      message: 'Logout realizado com sucesso.'
+    });
+  } catch (error) {
+    return res.status(500).json({ status: 'error', message: 'Erro ao realizar logout.' });
+  }
+}
+
+module.exports = { login, logout };

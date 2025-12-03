@@ -1,18 +1,26 @@
 ﻿const jwt = require('jsonwebtoken');
 const adminService = require('../services/adminService');
+const { ensureJwtSecret } = require('../utils/securityUtils');
+const { getAuthToken } = require('../utils/cookieUtils');
+
+// Validate JWT secret on module load
+ensureJwtSecret();
 
 async function authAdmin(req, res, next) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Get token from cookie or Authorization header
+    const token = getAuthToken(req);
+
+    if (!token) {
       return res.status(401).json({ status: 'error', message: 'Acesso não autorizado.' });
     }
 
-    const token = authHeader.split(' ')[1];
     let payload;
     try {
-      payload = jwt.verify(token, process.env.JWT_SECRET || 'default_jwt_secret');
+      // No fallback - will use validated JWT_SECRET from env
+      payload = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
+      // Don't leak token validation errors
       return res.status(401).json({ status: 'error', message: 'Acesso não autorizado.' });
     }
 
@@ -29,6 +37,7 @@ async function authAdmin(req, res, next) {
     req.user = { ...payload, doctor_id: doctorId };
     return next();
   } catch (error) {
+    console.error('Auth middleware error:', error.message);
     return res.status(500).json({ status: 'error', message: 'Erro de autorização.' });
   }
 }

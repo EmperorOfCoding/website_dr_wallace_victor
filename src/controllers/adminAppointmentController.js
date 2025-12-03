@@ -1,6 +1,7 @@
 ﻿const adminAppointmentService = require('../services/adminAppointmentService');
 const appointmentService = require('../services/appointmentService');
 const blockedTimeService = require('../services/blockedTimeService');
+const AppointmentDTO = require('../dto/appointmentDTO');
 
 function isValidDate(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -26,7 +27,8 @@ async function listAppointments(req, res) {
 
     const result = await adminAppointmentService.getAppointments({ date, startDate, endDate, page, limit, search, doctorId });
 
-    const appointments = result.appointments.map((item) => ({
+    // Apply DTOs for admin view
+    const appointments = result.appointments.map(item => ({
       appointment_id: item.appointment_id,
       date: item.date,
       time: item.time,
@@ -35,7 +37,9 @@ async function listAppointments(req, res) {
       patient_email: item.patient_email,
       doctor_id: item.doctor_id,
       type_name: item.type_name,
-      notes: item.notes
+      notes: item.notes,
+      status: item.status,
+      modality: item.modality,
     }));
 
     return res.status(200).json({

@@ -1,6 +1,10 @@
 ﻿const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { ensureJwtSecret } = require('../utils/securityUtils');
+
+// Validate JWT secret on module load
+ensureJwtSecret();
 
 async function findAdminByEmail(email) {
   // agora doctors são as contas admin
@@ -37,7 +41,10 @@ function generateToken(admin) {
     role: 'admin',
     doctor_id: admin.doctor_id,
   };
-  const secret = process.env.JWT_SECRET || 'default_jwt_secret';
+
+  // No fallback - will throw if JWT_SECRET not configured
+  const secret = process.env.JWT_SECRET;
+
   return jwt.sign(payload, secret, { expiresIn: '4h' });
 }
 

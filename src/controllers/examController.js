@@ -1,4 +1,6 @@
 const examService = require('../services/examService');
+const ExamDTO = require('../dto/examDTO');
+const { isAdmin, canAccess } = require('../utils/dtoUtils');
 
 async function createRequest(req, res) {
     try {
@@ -29,23 +31,33 @@ async function createRequest(req, res) {
 
 async function listRequests(req, res) {
     try {
-        const { patient_id } = req.query;
+        const { patient_id: requestedPatientId } = req.query;
         const user = req.user;
+        const userIsAdmin = isAdmin(user);
 
-        // If patient, can only see own exams
-        if (!user.doctor_id && user.patient_id && Number(patient_id) !== Number(user.patient_id)) {
-            return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+        // Determine which patient_id to use
+        let patientId;
+        if (requestedPatientId) {
+            // Validate access to this patient's data
+            if (!canAccess(user, requestedPatientId)) {
+                return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+            }
+            patientId = requestedPatientId;
+        } else {
+            // Use authenticated user's patient_id
+            patientId = user?.patient_id;
         }
 
-        // If doctor, can see any patient's exams (or we could restrict to their patients)
-        // For now, allow doctor to see exams for the patient they are viewing
-
-        if (!patient_id) {
+        if (!patientId) {
             return res.status(400).json({ status: 'error', message: 'ID do paciente necessário.' });
         }
 
-        const exams = await examService.getExamRequestsByPatient(patient_id);
-        res.json({ status: 'success', exams });
+        const exams = await examService.getExamRequestsByPatient(patientId);
+
+        // Apply DTOs based on user role
+        const examsDTO = exams.map(exam => ExamDTO.toListDTO(exam, userIsAdmin));
+
+        res.json({ status: 'success', exams: examsDTO });
     } catch (error) {
         console.error('Error listing exam requests:', error);
         res.status(500).json({ status: 'error', message: 'Erro ao listar exames.' });

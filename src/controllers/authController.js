@@ -1,8 +1,6 @@
 const authService = require('../services/authService');
-
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+const { validatePassword, validateEmail, validateName, validatePhone } = require('../utils/securityUtils');
+const { setAuthCookie, clearAuthCookie } = require('../utils/cookieUtils');
 
 async function register(req, res) {
   try {
@@ -12,8 +10,30 @@ async function register(req, res) {
       return res.status(400).json({ status: 'error', message: 'Campos obrigatórios ausentes.' });
     }
 
-    if (!isValidEmail(email)) {
+    // Validate and sanitize name
+    const nameValidation = validateName(name);
+    if (!nameValidation.valid) {
+      return res.status(400).json({ status: 'error', message: nameValidation.error });
+    }
+
+    // Validate email
+    if (!validateEmail(email)) {
       return res.status(400).json({ status: 'error', message: 'E-mail inválido.' });
+    }
+
+    // Validate phone
+    if (!validatePhone(phone)) {
+      return res.status(400).json({ status: 'error', message: 'Telefone inválido. Use o formato: (XX) XXXXX-XXXX' });
+    }
+
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Senha não atende aos requisitos de segurança.',
+        errors: passwordValidation.errors
+      });
     }
 
     const existing = await authService.findPatientByEmail(email);
@@ -22,7 +42,12 @@ async function register(req, res) {
     }
 
     const passwordHash = await authService.hashPassword(password);
-    const patientId = await authService.createPatient({ name, email, phone, passwordHash });
+    const patientId = await authService.createPatient({
+      name: nameValidation.sanitized,
+      email: email.toLowerCase().trim(),
+      phone: phone.trim(),
+      passwordHash
+    });
 
     return res.status(201).json({
       status: 'success',
@@ -30,6 +55,7 @@ async function register(req, res) {
       patient_id: patientId
     });
   } catch (error) {
+    console.error('Error in register:', error.message);
     return res.status(500).json({ status: 'error', message: 'Erro ao criar conta.' });
   }
 }
@@ -50,9 +76,11 @@ async function login(req, res) {
 
     const token = authService.generateToken(patient);
 
+    // Set httpOnly cookie instead of returning token
+    setAuthCookie(res, token);
+
     return res.status(200).json({
       status: 'success',
-      token,
       patient: {
         id: patient.id,
         name: patient.name,
@@ -61,6 +89,18 @@ async function login(req, res) {
     });
   } catch (error) {
     return res.status(500).json({ status: 'error', message: 'Erro ao realizar login.' });
+  }
+}
+
+async function logout(req, res) {
+  try {
+    clearAuthCookie(res);
+    return res.status(200).json({
+      status: 'success',
+      message: 'Logout realizado com sucesso.'
+    });
+  } catch (error) {
+    return res.status(500).json({ status: 'error', message: 'Erro ao realizar logout.' });
   }
 }
 
@@ -118,6 +158,7 @@ async function resetPassword(req, res) {
 module.exports = {
   register,
   login,
+  logout,
   forgotPassword,
   resetPassword
 };

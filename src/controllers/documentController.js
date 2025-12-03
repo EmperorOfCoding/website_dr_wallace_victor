@@ -1,23 +1,30 @@
 const documentService = require('../services/documentService');
 const path = require('path');
 const fs = require('fs');
+const DocumentDTO = require('../dto/documentDTO');
+const { isAdmin, canAccess } = require('../utils/dtoUtils');
 
 async function getDocuments(req, res) {
     try {
-        // Allow doctor to pass patient_id via query, otherwise use authenticated user's patient_id
-        const patientId = req.query.patient_id || req.user?.patient_id;
+        const requestedPatientId = req.query.patient_id;
         const appointmentId = req.query.appointment_id;
+        const userIsAdmin = isAdmin(req.user);
 
-        // If it's a doctor request (has doctor_id in user object), they can access any patient's documents
-        const isDoctor = !!req.user?.doctor_id;
+        // Determine which patient_id to use
+        let patientId;
+        if (requestedPatientId) {
+            // Validate access to this patient's data
+            if (!canAccess(req.user, requestedPatientId)) {
+                return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
+            }
+            patientId = requestedPatientId;
+        } else {
+            // Use authenticated user's patient_id
+            patientId = req.user?.patient_id;
+        }
 
         if (!patientId && !appointmentId) {
             return res.status(400).json({ status: 'error', message: 'Paciente ou consulta é obrigatório.' });
-        }
-
-        // If not a doctor and trying to access another patient's documents (if patientId is provided and differs)
-        if (!isDoctor && patientId && Number(patientId) !== Number(req.user?.patient_id)) {
-            return res.status(403).json({ status: 'error', message: 'Acesso negado.' });
         }
 
         let documents;
@@ -27,7 +34,10 @@ async function getDocuments(req, res) {
             documents = await documentService.getDocumentsByPatientId(patientId);
         }
 
-        return res.status(200).json({ status: 'success', documents });
+        // Apply DTOs based on user role
+        const documentsDTO = documents.map(doc => DocumentDTO.toListDTO(doc, userIsAdmin));
+
+        return res.status(200).json({ status: 'success', documents: documentsDTO });
     } catch (error) {
         console.error('Error getting documents:', error);
         return res.status(500).json({ status: 'error', message: 'Erro ao buscar documentos.' });

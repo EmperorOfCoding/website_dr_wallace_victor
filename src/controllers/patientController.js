@@ -1,4 +1,5 @@
 ﻿const patientService = require('../services/patientService');
+const PatientDTO = require('../dto/patientDTO');
 
 async function listPatients(req, res) {
   try {
@@ -6,13 +7,8 @@ async function listPatients(req, res) {
     const doctorId = req.user?.doctor_id || req.query?.doctor_id;
     const result = await patientService.getPatients(page, limit, search, doctorId);
 
-    const patients = result.patients.map((p) => ({
-      id: p.id,
-      name: p.name,
-      email: p.email,
-      phone: p.phone,
-      created_at: p.created_at
-    }));
+    // Apply DTOs to protect patient data
+    const patients = result.patients.map(p => PatientDTO.toListDTO(p));
 
     return res.status(200).json({
       status: 'success',
@@ -37,7 +33,10 @@ async function getPatientDetails(req, res) {
       return res.status(404).json({ status: 'error', message: 'Paciente não encontrado.' });
     }
 
-    return res.status(200).json({ status: 'success', patient });
+    // Apply DTO for admin view (includes all fields)
+    const patientDTO = PatientDTO.toAdminDTO(patient);
+
+    return res.status(200).json({ status: 'success', patient: patientDTO });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('getPatientDetails error', error);

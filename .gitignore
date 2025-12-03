@@ -26,3 +26,10 @@ check_*.js
 verify_*.js
 .vercel
 node_modules
+
+#SQL
+schema.sql
+schema-rds.sql
+schema-rds-simple.sql
+dml.sql
+
