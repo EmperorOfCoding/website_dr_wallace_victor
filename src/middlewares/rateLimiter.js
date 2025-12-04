@@ -29,10 +29,10 @@ const apiLimiter = rateLimit({
     skipSuccessfulRequests: false,
 });
 
-// Stricter limiter for authentication routes - REDUCED from 10 to 5
-const authLimiter = rateLimit({
+// Stricter limiter for login (prevent brute force)
+const loginLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: isDevelopment ? 1000 : 5, // REDUCED: Limit each IP to 5 login attempts per hour
+    max: isDevelopment ? 1000 : 10, // Limit each IP to 10 login attempts per hour
     message: {
         status: 'error',
         message: 'Muitas tentativas de login. Tente novamente em 1 hora.',
@@ -40,14 +40,39 @@ const authLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     skip: (req) => isDevelopment && isLocalhost(req.ip),
-    // Make subsequent requests slower
     skipFailedRequests: false,
 });
 
-// Limiter for appointment booking - REDUCED from 20 to 15
+// More permissive limiter for registration
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: isDevelopment ? 1000 : 50, // Allow 50 registration attempts per hour
+    message: {
+        status: 'error',
+        message: 'Muitas tentativas de cadastro. Tente novamente em 1 hora.',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => isDevelopment && isLocalhost(req.ip),
+});
+
+// General auth limiter for password reset (medium restriction)
+const authLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: isDevelopment ? 1000 : 15, // 15 attempts per hour
+    message: {
+        status: 'error',
+        message: 'Muitas tentativas. Tente novamente em 1 hora.',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => isDevelopment && isLocalhost(req.ip),
+});
+
+// Limiter for appointment booking
 const bookingLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: isDevelopment ? 1000 : 15, // REDUCED: Limit each IP to 15 bookings per hour
+    max: isDevelopment ? 1000 : 30, // Limit each IP to 30 bookings per hour
     message: {
         status: 'error',
         message: 'Muitos agendamentos. Tente novamente mais tarde.',
@@ -57,10 +82,10 @@ const bookingLimiter = rateLimit({
     skip: (req) => isDevelopment && isLocalhost(req.ip),
 });
 
-// Limiter for file uploads - REDUCED from 30 to 20
+// Limiter for file uploads
 const uploadLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: isDevelopment ? 1000 : 20, // REDUCED: Limit each IP to 20 uploads per hour
+    max: isDevelopment ? 1000 : 30, // Limit each IP to 30 uploads per hour
     message: {
         status: 'error',
         message: 'Muitos uploads. Tente novamente mais tarde.',
@@ -72,6 +97,8 @@ const uploadLimiter = rateLimit({
 
 module.exports = {
     apiLimiter,
+    loginLimiter,
+    registerLimiter,
     authLimiter,
     bookingLimiter,
     uploadLimiter,
