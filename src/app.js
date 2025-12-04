@@ -48,7 +48,7 @@ app.use(helmet({
 // Trust proxy for rate limiting behind reverse proxy
 app.set('trust proxy', 1);
 
-// CORS configuration - NO WILDCARD!
+// CORS configuration - Allow production + Vercel preview deployments
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
   : ['http://localhost:5173', 'http://localhost:3000']; // Development defaults
@@ -58,12 +58,20 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
 
+    // Check if origin is in the allowed list
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked request from origin: ${origin}`);
-      callback(new Error('Origem não permitida pelo CORS'));
+      return callback(null, true);
     }
+
+    // Allow Vercel preview deployments (*.vercel.app)
+    // This includes: website-dr-wallace-victor-*.vercel.app
+    if (origin && origin.endsWith('.vercel.app')) {
+      console.log(`✅ Allowing Vercel preview deployment: ${origin}`);
+      return callback(null, true);
+    }
+
+    console.warn(`❌ CORS blocked request from origin: ${origin}`);
+    callback(new Error('Origem não permitida pelo CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
