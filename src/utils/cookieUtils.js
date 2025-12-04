@@ -14,7 +14,7 @@ function getCookieConfig() {
     return {
         httpOnly: true, // Inaccessível via JavaScript (proteção XSS)
         secure: isProduction, // HTTPS only em produção
-        sameSite: isProduction ? 'strict' : 'lax', // Proteção CSRF
+        sameSite: isProduction ? 'none' : 'lax', // 'none' permite cross-origin (Vercel -> Railway)
         maxAge: 24 * 60 * 60 * 1000, // 24 horas em milliseconds
         path: '/', // Disponível em todas as rotas
     };
@@ -38,7 +38,7 @@ function clearAuthCookie(res) {
     res.clearCookie(JWT_COOKIE_NAME, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
     });
 }
