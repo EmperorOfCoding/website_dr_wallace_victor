@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import ExamPanel from "../components/ExamPanel";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { useAuth } from "../context/AuthContext";
+import { apiGet } from "../utils/api";
 import styles from "./AdminDashboard.module.css";
-import { API_BASE_URL } from "../config";
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });
@@ -25,15 +25,11 @@ export default function AdminDashboard({ onNavigate }) {
     setLoading(true);
     try {
       // Load appointments
-      const apptResp = await fetch(`${API_BASE_URL}/api/admin/appointments?limit=5`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const apptResp = await apiGet('/api/admin/appointments?limit=5');
       const apptData = await apptResp.json().catch(() => ({}));
       
       // Load patients count
-      const patientsResp = await fetch(`${API_BASE_URL}/api/admin/patients`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const patientsResp = await apiGet('/api/admin/patients');
       const patientsData = await patientsResp.json().catch(() => ({}));
 
       if (apptResp.ok) {

@@ -30,6 +30,7 @@ export default function DoctorProfile({ onNavigate }) {
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/doctors/profile`, {
+        credentials: 'include',
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await resp.json().catch(() => ({}));
@@ -75,6 +76,7 @@ export default function DoctorProfile({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/doctors/profile`, {
         method: "PUT",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -105,6 +107,7 @@ export default function DoctorProfile({ onNavigate }) {
     try {
       await fetch(`${API_BASE_URL}/api/profile/theme`, {
         method: "PUT",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

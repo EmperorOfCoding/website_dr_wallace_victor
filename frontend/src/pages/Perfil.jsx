@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "../App";
 import ProtectedPage from "../components/ProtectedPage";
-import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
+import { apiGet, apiPut } from "../utils/api";
 import DoctorProfile from "./DoctorProfile";
 import styles from "./Perfil.module.css";
 
@@ -58,11 +58,10 @@ export default function Perfil({ onNavigate }) {
       return;
     }
     
+    
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE_URL}/api/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const resp = await apiGet('/api/profile');
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data.profile) {
         setForm((prev) => ({
@@ -106,14 +105,7 @@ export default function Perfil({ onNavigate }) {
     setError("");
     setStatus("");
     try {
-      const resp = await fetch(`${API_BASE_URL}/api/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
+      const resp = await apiPut('/api/profile', form);
       const data = await resp.json().catch(() => ({}));
       if (resp.ok) {
         setStatus("Perfil atualizado com sucesso!");
@@ -137,14 +129,7 @@ export default function Perfil({ onNavigate }) {
 
     // Save to backend with the calculated new value
     try {
-      await fetch(`${API_BASE_URL}/api/profile/theme`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ dark_mode: newDarkMode }),
-      });
+      await apiPut('/api/profile/theme', { dark_mode: newDarkMode });
     } catch (err) {
       // Silent fail for theme preference
     }
