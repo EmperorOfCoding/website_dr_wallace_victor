@@ -47,7 +47,7 @@ export default function Perfil({ onNavigate }) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         patientIdToUse = payload.patient_id || payload.patientId;
-        console.log('📝 [Perfil] Extracted patient_id from token:', patientIdToUse);
+
       } catch (e) {
         console.error('[Perfil] Failed to decode token:', e);
       }

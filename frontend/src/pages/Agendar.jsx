@@ -226,7 +226,7 @@ export default function Agendar({ onNavigate }) {
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           patientIdToUse = payload.patient_id || payload.patientId;
-          console.log('📝 Extracted patient_id from token:', patientIdToUse);
+
         } catch (e) {
           console.error('Failed to decode token:', e);
         }

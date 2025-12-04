@@ -41,7 +41,7 @@ export default function Dashboard({ onNavigate }) {
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           patientId = payload.patient_id;
-          console.log("Extracted patient_id from token:", patientId);
+
         } catch (e) {
           console.error("Error decoding token:", e);
         }

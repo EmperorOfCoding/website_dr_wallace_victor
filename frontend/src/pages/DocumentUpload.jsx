@@ -29,7 +29,7 @@ export default function DocumentUpload({ onNavigate }) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         patientIdToUse = payload.patient_id || payload.patientId;
-        console.log('📝 [DocumentUpload] Extracted patient_id from token:', patientIdToUse);
+
       } catch (e) {
         console.error('[DocumentUpload] Failed to decode token:', e);
       }

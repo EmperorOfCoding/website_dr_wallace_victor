@@ -43,7 +43,7 @@ export default function MinhaAgenda({ onNavigate }) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         patientIdToUse = payload.patient_id || payload.patientId;
-        console.log('📝 [MinhaAgenda] Extracted patient_id from token:', patientIdToUse);
+
       } catch (e) {
         console.error('[MinhaAgenda] Failed to decode token:', e);
       }
