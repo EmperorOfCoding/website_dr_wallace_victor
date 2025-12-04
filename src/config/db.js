@@ -9,10 +9,10 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  maxIdle: 10, // Máximo de conexões ociosas
+  idleTimeout: 60000, // Timeout para conexões ociosas (60 segundos)
   dateStrings: true,
-  connectTimeout: 10000, // 10 segundos
-  acquireTimeout: 10000, // 10 segundos
-  timeout: 10000, // 10 segundos
+  connectTimeout: 10000, // 10 segundos (tempo para estabelecer conexão)
   enableKeepAlive: true,
   keepAliveInitialDelay: 0
 });
