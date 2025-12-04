@@ -56,6 +56,7 @@ export default function Register({ onNavigate }) {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include', // Send cookies
         body: JSON.stringify({
           name: form.name,
           email: form.email,

@@ -56,6 +56,7 @@ export default function Dashboard({ onNavigate }) {
       setError("");
       try {
         const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patientId}`, {
+          credentials: 'include', // Send cookies for authentication
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         const data = await resp.json().catch(() => ({}));

@@ -58,6 +58,7 @@ export default function MinhaAgenda({ onNavigate }) {
     setError("");
     try {
       const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patientIdToUse}`, {
+        credentials: 'include', // Send cookies for authentication
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const data = await resp.json().catch(() => ({}));
@@ -94,6 +95,7 @@ export default function MinhaAgenda({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/appointments/${selectedAppointment.id}/cancel`, {
         method: "PUT",
+        credentials: 'include', // Send cookies
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
