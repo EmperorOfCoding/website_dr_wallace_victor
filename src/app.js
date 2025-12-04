@@ -63,6 +63,12 @@ app.use(cors({
       return callback(null, true);
     }
 
+    // Allow localhost for development (always, regardless of CORS_ORIGIN env)
+    if (origin && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))) {
+      console.log(`✅ Allowing localhost for development: ${origin}`);
+      return callback(null, true);
+    }
+
     // Allow Vercel preview deployments (*.vercel.app)
     // This includes: website-dr-wallace-victor-*.vercel.app
     if (origin && origin.endsWith('.vercel.app')) {
