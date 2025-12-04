@@ -1,5 +1,0 @@
-[build]
-env = ["CORS_ORIGIN"]
-
-[deploy]
-env = ["CORS_ORIGIN"]
