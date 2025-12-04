@@ -37,19 +37,38 @@ export default function Login({ onNavigate }) {
         throw new Error(data.message || "Falha no login.");
       }
 
+      // Debug logging for mobile issues
+      console.log('[Login] Response status:', response.status);
+      console.log('[Login] Response data:', data);
+      console.log('[Login] Patient data:', data.patient);
+      console.log('[Login] Admin data:', data.admin);
+
+      // Verify we have user data before login
+      const userData = data.patient || data.admin;
+      if (!userData) {
+        console.error('[Login] No patient/admin data in response!', data);
+        throw new Error("Erro: dados do usuário não encontrados na resposta.");
+      }
+
       // No token in response - it's in httpOnly cookie
       // Just pass the patient/admin data
+      console.log('[Login] Calling login with userData:', userData);
       login({ 
-        patient: data.patient || data.admin,
+        patient: userData,
       });
       
       setStatus("Login realizado com sucesso.");
-      if (isAdminMode) {
-        onNavigate("painel-medico");
-      } else {
-        onNavigate("dashboard");
-      }
+      
+      // Small delay before navigation to ensure state is updated
+      setTimeout(() => {
+        if (isAdminMode) {
+          onNavigate("painel-medico");
+        } else {
+          onNavigate("dashboard");
+        }
+      }, 100);
     } catch (err) {
+      console.error('[Login] Error:', err);
       setError(err.message || "Erro ao conectar com o servidor.");
       setStatus("");
     } finally {

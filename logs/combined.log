@@ -1698,3 +1698,6 @@ Error: read ECONNRESET
 2025-12-04 15:32:17 [INFO]: SIGINT received. Shutting down gracefully...
 2025-12-04 15:32:19 [INFO]: Servidor iniciado na porta 3000
 2025-12-04 15:32:19 [INFO]: Notification scheduler started
+2025-12-04 15:37:06 [INFO]: SIGINT received. Shutting down gracefully...
+2025-12-04 15:37:08 [INFO]: Servidor iniciado na porta 3000
+2025-12-04 15:37:08 [INFO]: Notification scheduler started
