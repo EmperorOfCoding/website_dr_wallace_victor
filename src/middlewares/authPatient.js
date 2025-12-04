@@ -5,22 +5,22 @@
 
 const jwt = require('jsonwebtoken');
 const { ensureJwtSecret } = require('../utils/securityUtils');
+const { getAuthToken } = require('../utils/cookieUtils');
 
 // Validate JWT secret on module load
 ensureJwtSecret();
 
 async function authPatient(req, res, next) {
     try {
-        const authHeader = req.headers.authorization;
+        // Get token from cookie or Authorization header
+        const token = getAuthToken(req);
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        if (!token) {
             return res.status(401).json({
                 status: 'error',
                 message: 'Autenticação necessária.'
             });
         }
-
-        const token = authHeader.split(' ')[1];
 
         let payload;
         try {
