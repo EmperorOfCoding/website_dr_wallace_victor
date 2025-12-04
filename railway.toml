@@ -1,5 +1,19 @@
 [build]
-env = ["CORS_ORIGIN", "DB_HOST", "DB_NAME", "DB_PASSWORD", "DB_PORT", "DB_USER", "JWT_SECRET"]
+builder = "NIXPACKS"
+buildCommand = "npm install"
 
 [deploy]
-env = ["CORS_ORIGIN", "DB_HOST", "DB_NAME", "DB_PASSWORD", "DB_PORT", "DB_USER", "JWT_SECRET"]
+startCommand = "npm start"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[deploy.healthcheck]
+path = "/api/health"
+timeout = 300
+interval = 30
+
+[build.env]
+NODE_ENV = "production"
+
+[deploy.env]
+NODE_ENV = "production"
