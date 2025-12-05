@@ -37,16 +37,20 @@ export default function Login({ onNavigate }) {
         throw new Error(data.message || "Falha no login.");
       }
 
-      // Verify we have user data before login
-      const userData = data.patient || data.admin;
-      if (!userData) {
+      // Verify we have user data before login and pass correct structure to AuthContext
+      if (isAdminMode && data.admin) {
+        // Admin login: pass admin data as 'admin' property
+        login({ 
+          admin: data.admin,
+        });
+      } else if (!isAdminMode && data.patient) {
+        // Patient login: pass patient data as 'patient' property
+        login({ 
+          patient: data.patient,
+        });
+      } else {
         throw new Error("Erro: dados do usuário não encontrados na resposta.");
       }
-
-      // No token in response - it's in httpOnly cookie
-      login({ 
-        patient: userData,
-      });
       
       setStatus("Login realizado com sucesso.");
       
