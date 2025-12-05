@@ -7,7 +7,7 @@ import styles from "./DocumentUpload.module.css";
 
 export default function DocumentUpload({ onNavigate }) {
   const { appointmentId } = useParams();
-  const { patient, token } = useAuth();
+  const { patient } = useAuth();
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -18,22 +18,11 @@ export default function DocumentUpload({ onNavigate }) {
 
   useEffect(() => {
     loadDocuments();
-  }, [patient?.id, appointmentId, token]);
+  }, [patient?.id, appointmentId]);
 
   const loadDocuments = async (showLoading = true) => {
-    // Get patient_id - try from patient object first, then from token
-    let patientIdToUse = patient?.id;
-    
-    // Fallback: if patient.id is undefined, try to extract from token
-    if (!patientIdToUse && token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        patientIdToUse = payload.patient_id || payload.patientId;
-
-      } catch (e) {
-        console.error('[DocumentUpload] Failed to decode token:', e);
-      }
-    }
+    // Get patient_id from patient object
+    const patientIdToUse = patient?.id;
     
     if (!patientIdToUse) {
       if (showLoading) setLoading(false);

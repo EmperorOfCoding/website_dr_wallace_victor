@@ -1,19 +1,10 @@
 ﻿import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ProtectedAdmin from "../components/ProtectedAdmin";
-import { useAuth } from "../context/AuthContext";
-import styles from "./AdminPatients.module.css";
 import { API_BASE_URL } from "../config";
+import styles from "./AdminPatients.module.css";
 
-function decodeDoctorId(token) {
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
-    return payload.doctor_id || null;
-  } catch (_) {
-    return null;
-  }
-}
+
 
 export default function AdminPatients({ onNavigate }) {
     const [patients, setPatients] = useState([]);
@@ -21,7 +12,7 @@ export default function AdminPatients({ onNavigate }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const doctorId = useMemo(() => decodeDoctorId(token), [token]);
+
 
   useEffect(() => {
     async function load() {
@@ -30,7 +21,6 @@ export default function AdminPatients({ onNavigate }) {
       try {
         const params = new URLSearchParams();
         params.append("limit", 50);
-        if (doctorId) params.append("doctor_id", doctorId);
         if (search) params.append("search", search);
         const resp = await fetch(`${API_BASE_URL}/api/admin/patients?${params.toString()}`, {
           credentials: 'include', // Send cookies
@@ -51,7 +41,7 @@ export default function AdminPatients({ onNavigate }) {
       }
     }
     load();
-  }, [search, doctorId]);
+  }, [search]);
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>

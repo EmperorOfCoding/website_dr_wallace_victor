@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import styles from "./Perfil.module.css";
 
 export default function DoctorProfile({ onNavigate }) {
-  const { patient, token } = useAuth();
+  const { patient } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
   const [form, setForm] = useState({
     name: "",
@@ -23,10 +23,10 @@ export default function DoctorProfile({ onNavigate }) {
 
   useEffect(() => {
     loadDoctorProfile();
-  }, [patient?.id, token]);
+  }, [patient?.id]);
 
   const loadDoctorProfile = async () => {
-    if (!patient?.id || !token) return;
+    if (!patient?.id) return;
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/doctors/profile`, {
@@ -65,7 +65,7 @@ export default function DoctorProfile({ onNavigate }) {
   };
 
   const handleSave = async () => {
-    if (!patient || !token) {
+    if (!patient) {
       setError("É necessário estar autenticado para salvar.");
       return;
     }

@@ -20,7 +20,7 @@ function isPast(dateStr, timeStr) {
 }
 
 export default function MinhaAgenda({ onNavigate }) {
-  const { patient, token } = useAuth();
+  const { patient } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -32,22 +32,11 @@ export default function MinhaAgenda({ onNavigate }) {
 
   useEffect(() => {
     loadAppointments();
-  }, [patient?.id, token]);
+  }, [patient?.id]);
 
   const loadAppointments = async () => {
-    // Get patient_id - try from patient object first, then from token
-    let patientIdToUse = patient?.id;
-    
-    // Fallback: if patient.id is undefined, try to extract from token
-    if (!patientIdToUse && token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        patientIdToUse = payload.patient_id || payload.patientId;
-
-      } catch (e) {
-        console.error('[MinhaAgenda] Failed to decode token:', e);
-      }
-    }
+    // Get patient_id from patient object
+    const patientIdToUse = patient?.id;
     
     if (!patientIdToUse) {
       setLoading(false);

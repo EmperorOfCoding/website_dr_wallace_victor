@@ -7,7 +7,7 @@ import styles from "./ReviewAppointment.module.css";
 
 export default function ReviewAppointment({ onNavigate }) {
   const { appointmentId } = useParams();
-  const { patient, token } = useAuth();
+  const { patient } = useAuth();
   const [appointment, setAppointment] = useState(null);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -20,7 +20,7 @@ export default function ReviewAppointment({ onNavigate }) {
 
   useEffect(() => {
     loadAppointment();
-  }, [appointmentId, token]);
+  }, [appointmentId]);
 
   const loadAppointment = async () => {
     if (!appointmentId) return;
