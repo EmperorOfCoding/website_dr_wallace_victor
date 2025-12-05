@@ -15,7 +15,7 @@ function formatDate(dateStr) {
 }
 
 export default function Dashboard({ onNavigate }) {
-  const { patient, token } = useAuth();
+  const { patient } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,7 +57,6 @@ export default function Dashboard({ onNavigate }) {
       try {
         const resp = await fetch(`${API_BASE_URL}/api/appointments?patient_id=${patientId}`, {
           credentials: 'include', // Send cookies for authentication
-          credentials: 'include', // Send cookies
         });
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
@@ -71,7 +70,7 @@ export default function Dashboard({ onNavigate }) {
       }
     }
     load();
-  }, [patient?.id, token]);
+  }, [patient?.id]);
 
   const nextAppointment = useMemo(() => {
     if (!appointments.length) return null;

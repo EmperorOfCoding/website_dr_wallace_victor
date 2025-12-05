@@ -139,7 +139,6 @@ export default function DocumentUpload({ onNavigate }) {
         const resp = await fetch(`${API_BASE_URL}/api/documents/upload`, {
           method: "POST",
           credentials: 'include', // Send cookies
-          },
           body: formData,
         });
         const data = await resp.json().catch(() => ({}));
@@ -197,7 +196,6 @@ export default function DocumentUpload({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}/download`, {
         credentials: 'include', // Send cookies
-        },
       });
 
       if (!resp.ok) {
@@ -235,7 +233,6 @@ export default function DocumentUpload({ onNavigate }) {
       const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}`, {
         method: "DELETE",
         credentials: 'include', // Send cookies
-        },
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok) {

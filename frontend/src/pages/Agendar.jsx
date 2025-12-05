@@ -37,7 +37,7 @@ function getInitialDate(searchParams) {
 
 export default function Agendar({ onNavigate }) {
   const [searchParams] = useSearchParams();
-  const { patient, token, isAdmin } = useAuth();
+  const { patient, isAdmin } = useAuth();
   const [date, setDate] = useState(() => getInitialDate(searchParams));
   const [available, setAvailable] = useState([]);
   const [selectedTime, setSelectedTime] = useState("");
@@ -168,7 +168,7 @@ export default function Agendar({ onNavigate }) {
 
     loadAvailable();
     loadTypes();
-  }, [date, token, selectedDoctor]);
+  }, [date, selectedDoctor]);
 
   useEffect(() => {
     async function loadPatients() {
@@ -195,7 +195,7 @@ export default function Agendar({ onNavigate }) {
       }
     }
     loadPatients();
-  }, [isAdmin, patientSearch, token, selectedPatientId]);
+  }, [isAdmin, patientSearch, selectedPatientId]);
 
   const handleBook = async () => {
     if (!selectedDoctor) {
@@ -234,9 +234,9 @@ export default function Agendar({ onNavigate }) {
 
       const resp = await fetch(`${API_BASE_URL}/api/appointments/book`, {
         method: "POST",
+        credentials: 'include', // Send cookies
         headers: {
           "Content-Type": "application/json",
-          
         },
         body: JSON.stringify({
           patient_id: patientIdToUse,
@@ -268,9 +268,7 @@ export default function Agendar({ onNavigate }) {
         try {
           await fetch(`${API_BASE_URL}/api/documents/upload`, {
             method: "POST",
-            headers: {
-              
-            },
+            credentials: 'include', // Send cookies
             body: formData,
           });
         } catch (uploadErr) {
