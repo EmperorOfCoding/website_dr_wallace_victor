@@ -35,17 +35,8 @@ export default function Dashboard({ onNavigate }) {
 
   useEffect(() => {
     async function load() {
-      // Fallback: try to get patient_id from token if not in context
-      let patientId = patient?.id;
-      if (!patientId && token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          patientId = payload.patient_id;
-
-        } catch (e) {
-          console.error("Error decoding token:", e);
-        }
-      }
+      // Get patient_id from patient object
+      const patientId = patient?.id;
 
       if (!patientId) {
         setLoading(false);

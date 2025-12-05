@@ -218,19 +218,8 @@ export default function Agendar({ onNavigate }) {
     setError("");
     setMessage("");
     try {
-      // Get patient_id - try from patient object first, then from token
-      let patientIdToUse = isAdmin ? selectedPatientId : patient?.id;
-      
-      // Fallback: if patient.id is undefined, try to extract from token
-      if (!isAdmin && !patientIdToUse && token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          patientIdToUse = payload.patient_id || payload.patientId;
-
-        } catch (e) {
-          console.error('Failed to decode token:', e);
-        }
-      }
+      // Get patient_id from admin selection or patient object
+      const patientIdToUse = isAdmin ? selectedPatientId : patient?.id;
 
       const resp = await fetch(`${API_BASE_URL}/api/appointments/book`, {
         method: "POST",

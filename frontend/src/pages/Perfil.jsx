@@ -8,7 +8,7 @@ import DoctorProfile from "./DoctorProfile";
 import styles from "./Perfil.module.css";
 
 export default function Perfil({ onNavigate }) {
-  const { patient, token, isAdmin } = useAuth();
+  const { patient, isAdmin } = useAuth();
   
   // Route to doctor profile if user is admin (doctor)
   if (isAdmin) {
@@ -36,24 +36,13 @@ export default function Perfil({ onNavigate }) {
 
   useEffect(() => {
     loadProfile();
-  }, [patient?.id, token]);
+  }, [patient?.id]);
 
   const loadProfile = async () => {
-    // Get patient_id - try from patient object first, then from token
-    let patientIdToUse = patient?.id;
+    // Get patient_id from patient object
+    const patientIdToUse = patient?.id;
     
-    // Fallback: if patient.id is undefined, try to extract from token
-    if (!patientIdToUse && token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        patientIdToUse = payload.patient_id || payload.patientId;
-
-      } catch (e) {
-        console.error('[Perfil] Failed to decode token:', e);
-      }
-    }
-    
-    if (!patientIdToUse || !token) {
+    if (!patientIdToUse) {
       setLoading(false);
       return;
     }
@@ -97,7 +86,7 @@ export default function Perfil({ onNavigate }) {
   };
 
   const handleSave = async () => {
-    if (!patient || !token) {
+    if (!patient) {
       setError("É necessário estar autenticado para salvar.");
       return;
     }

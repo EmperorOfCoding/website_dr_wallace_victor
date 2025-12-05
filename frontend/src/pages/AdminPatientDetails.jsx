@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProtectedAdmin from "../components/ProtectedAdmin";
 import { API_BASE_URL } from "../config";
-import { useAuth } from "../context/AuthContext";
 import styles from "./AdminDashboard.module.css";
 import docStyles from "./DocumentUpload.module.css"; // Reuse document styles
 
@@ -19,7 +18,7 @@ export default function AdminPatientDetails({ onNavigate }) {
 
   useEffect(() => {
     loadPatientData();
-  }, [id, token]);
+  }, [id]);
 
   const loadPatientData = async () => {
     setLoading(true);

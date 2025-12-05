@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import ProtectedPage from "../components/ProtectedPage";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./PatientExams.module.css";
-import { API_BASE_URL } from "../config";
 
 export default function PatientExams({ onNavigate }) {
-  const { token, patient } = useAuth();
+  const { patient } = useAuth();
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export default function PatientExams({ onNavigate }) {
 
   useEffect(() => {
     loadExams();
-  }, [patient, token]);
+  }, [patient]);
 
   return (
     <ProtectedPage onNavigate={onNavigate}>

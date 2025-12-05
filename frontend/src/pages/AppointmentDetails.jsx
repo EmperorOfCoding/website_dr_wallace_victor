@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL } from "../config";
-import { useAuth } from "../context/AuthContext";
 import styles from "./AppointmentDetails.module.css";
 
 export default function AppointmentDetails({ onNavigate }) {
@@ -13,7 +12,7 @@ export default function AppointmentDetails({ onNavigate }) {
 
   useEffect(() => {
     loadAppointment();
-  }, [appointmentId, token]);
+  }, [appointmentId]);
 
   const loadAppointment = async () => {
     if (!appointmentId) return;
