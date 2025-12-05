@@ -31,7 +31,7 @@ export default function DoctorProfile({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/doctors/profile`, {
         credentials: 'include',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data.doctor) {

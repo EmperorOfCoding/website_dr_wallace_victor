@@ -86,7 +86,7 @@ export default function Agendar({ onNavigate }) {
       async function loadOriginalAppointment() {
         try {
           const resp = await fetch(`${API_BASE_URL}/api/appointments/${rescheduleId}`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            credentials: 'include', // Send cookies
           });
           const data = await resp.json().catch(() => ({}));
           if (resp.ok && data.appointment) {
@@ -120,7 +120,7 @@ export default function Agendar({ onNavigate }) {
       // Store the ID but wait for doctors to load
       setRescheduleFromId(rescheduleId);
     }
-  }, [token, doctors]);
+  }, [doctors]);
 
   useEffect(() => {
     async function loadAvailable() {
@@ -131,7 +131,7 @@ export default function Agendar({ onNavigate }) {
       setSelectedTime("");
       try {
         const resp = await fetch(`${API_BASE_URL}/api/appointments/available?date=${date}&doctor_id=${selectedDoctor}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          credentials: 'include', // Send cookies
         });
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
@@ -150,7 +150,7 @@ export default function Agendar({ onNavigate }) {
       if (!selectedDoctor) return;
       try {
         const resp = await fetch(`${API_BASE_URL}/api/consultation-types?doctor_id=${selectedDoctor}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          credentials: 'include', // Send cookies
         });
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
@@ -179,7 +179,7 @@ export default function Agendar({ onNavigate }) {
         params.append("limit", 50);
         if (patientSearch) params.append("search", patientSearch);
         const resp = await fetch(`${API_BASE_URL}/api/admin/patients?${params.toString()}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          credentials: 'include', // Send cookies
         });
         const data = await resp.json().catch(() => ({}));
         if (resp.ok) {
@@ -236,7 +236,7 @@ export default function Agendar({ onNavigate }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          
         },
         body: JSON.stringify({
           patient_id: patientIdToUse,
@@ -269,7 +269,7 @@ export default function Agendar({ onNavigate }) {
           await fetch(`${API_BASE_URL}/api/documents/upload`, {
             method: "POST",
             headers: {
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              
             },
             body: formData,
           });

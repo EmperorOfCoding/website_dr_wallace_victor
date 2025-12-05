@@ -14,7 +14,7 @@ export default function PatientExams({ onNavigate }) {
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/exams?patient_id=${patient.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json();
       if (resp.ok) {

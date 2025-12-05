@@ -26,8 +26,7 @@ function useDebounce(value, delay) {
 }
 
 export default function AdminAgenda({ onNavigate }) {
-  const { token } = useAuth();
-  const [appointments, setAppointments] = useState([]);
+    const [appointments, setAppointments] = useState([]);
   const [date, setDate] = useState("");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,7 +44,7 @@ export default function AdminAgenda({ onNavigate }) {
         if (date) params.append("date", date);
         if (debouncedSearch) params.append("patient", debouncedSearch);
         const resp = await fetch(`${API_BASE_URL}/api/admin/appointments?${params.toString()}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include', // Send cookies
         });
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
@@ -59,7 +58,7 @@ export default function AdminAgenda({ onNavigate }) {
       }
     }
     load();
-  }, [token, date, debouncedSearch]);
+  }, [date, debouncedSearch]);
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>

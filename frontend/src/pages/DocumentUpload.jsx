@@ -46,7 +46,7 @@ export default function DocumentUpload({ onNavigate }) {
         ? `/api/documents?appointment_id=${appointmentId}`
         : `/api/documents?patient_id=${patientIdToUse}`;
       const resp = await fetch(url, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok) {
@@ -138,8 +138,7 @@ export default function DocumentUpload({ onNavigate }) {
       try {
         const resp = await fetch(`${API_BASE_URL}/api/documents/upload`, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
+          credentials: 'include', // Send cookies
           },
           body: formData,
         });
@@ -197,8 +196,7 @@ export default function DocumentUpload({ onNavigate }) {
   const handleDownload = async (docId, filename) => {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}/download`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+        credentials: 'include', // Send cookies
         },
       });
 
@@ -236,8 +234,7 @@ export default function DocumentUpload({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
+        credentials: 'include', // Send cookies
         },
       });
       const data = await resp.json().catch(() => ({}));

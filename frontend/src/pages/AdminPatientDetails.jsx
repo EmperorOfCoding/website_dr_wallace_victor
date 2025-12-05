@@ -8,8 +8,7 @@ import docStyles from "./DocumentUpload.module.css"; // Reuse document styles
 
 export default function AdminPatientDetails({ onNavigate }) {
   const { id } = useParams();
-  const { token } = useAuth();
-  const [patient, setPatient] = useState(null);
+    const [patient, setPatient] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,7 +26,7 @@ export default function AdminPatientDetails({ onNavigate }) {
     try {
       // Fetch Patient Details
       const patientResp = await fetch(`${API_BASE_URL}/api/admin/patients/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
       });
       const patientData = await patientResp.json();
 
@@ -47,7 +46,7 @@ export default function AdminPatientDetails({ onNavigate }) {
   const loadDocuments = async () => {
     try {
       const docResp = await fetch(`${API_BASE_URL}/api/documents?patient_id=${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
       });
       const docData = await docResp.json();
       if (docResp.ok) {
@@ -86,7 +85,7 @@ export default function AdminPatientDetails({ onNavigate }) {
         try {
             const resp = await fetch(`${API_BASE_URL}/api/documents/upload`, {
                 method: "POST",
-                headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include', // Send cookies
                 body: formData,
             });
             
@@ -112,7 +111,7 @@ export default function AdminPatientDetails({ onNavigate }) {
   const handleDownload = async (docId, filename) => {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}/download`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
       });
       if (!resp.ok) throw new Error("Erro ao baixar");
       
@@ -135,7 +134,7 @@ export default function AdminPatientDetails({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/documents/${docId}?patient_id=${id}`, { // patient_id might be needed for check? No, backend handles it.
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
       });
       if (resp.ok) {
         loadDocuments();

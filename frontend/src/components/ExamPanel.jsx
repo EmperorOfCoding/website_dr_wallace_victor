@@ -4,8 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import styles from "./ExamPanel.module.css";
 
 export default function ExamPanel({ patientId, onClose }) {
-  const { token } = useAuth();
-  const [exams, setExams] = useState([]);
+    const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(false);
   const [examName, setExamName] = useState("");
   const [requesting, setRequesting] = useState(false);
@@ -20,7 +19,7 @@ export default function ExamPanel({ patientId, onClose }) {
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/exams?patient_id=${patientId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json();
       if (resp.ok) {
@@ -77,7 +76,7 @@ export default function ExamPanel({ patientId, onClose }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/documents/upload`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Send cookies
         body: formData,
       });
 

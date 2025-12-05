@@ -16,8 +16,7 @@ function decodeDoctorId(token) {
 }
 
 export default function AdminPatients({ onNavigate }) {
-  const { token } = useAuth();
-  const [patients, setPatients] = useState([]);
+    const [patients, setPatients] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -34,7 +33,7 @@ export default function AdminPatients({ onNavigate }) {
         if (doctorId) params.append("doctor_id", doctorId);
         if (search) params.append("search", search);
         const resp = await fetch(`${API_BASE_URL}/api/admin/patients?${params.toString()}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include', // Send cookies
         });
         const data = await resp.json().catch(() => ({}));
         if (resp.ok) {
@@ -52,7 +51,7 @@ export default function AdminPatients({ onNavigate }) {
       }
     }
     load();
-  }, [token, search, doctorId]);
+  }, [search, doctorId]);
 
   return (
     <ProtectedAdmin onNavigate={onNavigate}>

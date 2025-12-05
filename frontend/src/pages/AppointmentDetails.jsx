@@ -6,8 +6,7 @@ import styles from "./AppointmentDetails.module.css";
 
 export default function AppointmentDetails({ onNavigate }) {
   const { appointmentId } = useParams();
-  const { token } = useAuth();
-  const navigate = useNavigate();
+    const navigate = useNavigate();
   const [appointment, setAppointment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,7 +20,7 @@ export default function AppointmentDetails({ onNavigate }) {
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data.appointment) {

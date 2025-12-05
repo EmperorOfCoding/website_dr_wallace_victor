@@ -27,7 +27,7 @@ export default function ReviewAppointment({ onNavigate }) {
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data.appointment) {

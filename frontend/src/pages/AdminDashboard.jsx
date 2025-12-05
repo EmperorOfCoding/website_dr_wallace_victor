@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import ExamPanel from "../components/ExamPanel";
 import ProtectedAdmin from "../components/ProtectedAdmin";
-import { useAuth } from "../context/AuthContext";
 import { apiGet } from "../utils/api";
 import styles from "./AdminDashboard.module.css";
 
@@ -11,15 +10,14 @@ function formatDate(dateStr) {
 }
 
 export default function AdminDashboard({ onNavigate }) {
-  const { token } = useAuth();
   const [stats, setStats] = useState({ total: 0, today: 0, pending: 0, patients: 0 });
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPatientForExams, setSelectedPatientForExams] = useState(null);
 
-  useEffect(() =>{
+  useEffect(() => {
     loadDashboardData();
-  }, [token]);
+  }, []);
 
   async function loadDashboardData() {
     setLoading(true);

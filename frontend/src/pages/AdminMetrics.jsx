@@ -21,8 +21,7 @@ import { API_BASE_URL } from "../config";
 const COLORS = ["#3b5bfd", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 
 export default function AdminMetrics({ onNavigate }) {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({
     totalAppointments: 0,
     totalPatients: 0,
@@ -39,13 +38,13 @@ export default function AdminMetrics({ onNavigate }) {
 
   useEffect(() => {
     loadMetrics();
-  }, [token, period]);
+  }, [period]);
 
   const loadMetrics = async () => {
     setLoading(true);
     try {
       const resp = await fetch(`${API_BASE_URL}/api/admin/metrics?period=${period}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data.metrics) {

@@ -8,8 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import styles from "./AdminCalendar.module.css";
 
 export default function AdminCalendar({ onNavigate }) {
-  const { token } = useAuth();
-  const [events, setEvents] = useState([]);
+    const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -27,7 +26,7 @@ export default function AdminCalendar({ onNavigate }) {
       }
 
       const resp = await fetch(url, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include', // Send cookies
       });
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data.appointments) {
