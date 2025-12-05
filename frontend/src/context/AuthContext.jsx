@@ -116,6 +116,19 @@ export function AuthProvider({ children }) {
       isAdmin: nextRole === 'admin'
     });
 
+    // CRITICAL: Save to sessionStorage synchronously BEFORE state updates
+    // This prevents race condition on mobile browsers where navigation happens
+    // before the useEffect has a chance to save the state
+    if (userData) {
+      const sessionData = { patient: userData, role: nextRole };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
+      console.log('[Auth] SessionStorage synchronously updated in login():', {
+        patientId: userData.id,
+        role: nextRole,
+        isAdmin: nextRole === 'admin'
+      });
+    }
+
     setPatient(userData);
     setRole(nextRole);
     
