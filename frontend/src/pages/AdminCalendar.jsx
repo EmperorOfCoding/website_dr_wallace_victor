@@ -4,7 +4,6 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useRef, useState } from "react";
 import { API_BASE_URL } from "../config";
-import { useAuth } from "../context/AuthContext";
 import styles from "./AdminCalendar.module.css";
 
 export default function AdminCalendar({ onNavigate }) {
@@ -96,9 +95,9 @@ export default function AdminCalendar({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/admin/appointments/${selectedEvent.id}/cancel`, {
         method: "PUT",
+        credentials: 'include', // Send cookies
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ reason: "Cancelado pelo administrador" }),
       });

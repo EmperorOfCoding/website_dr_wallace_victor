@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 import { useAuth } from "../context/AuthContext";
 import styles from "./ReviewAppointment.module.css";
-import { API_BASE_URL } from "../config";
 
 export default function ReviewAppointment({ onNavigate }) {
   const { appointmentId } = useParams();
@@ -59,9 +59,9 @@ export default function ReviewAppointment({ onNavigate }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/review`, {
         method: existingReview ? "PUT" : "POST",
+        credentials: 'include', // Send cookies
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ rating, comment }),
       });

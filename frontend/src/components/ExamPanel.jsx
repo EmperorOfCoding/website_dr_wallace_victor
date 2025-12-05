@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
-import { useAuth } from "../context/AuthContext";
 import styles from "./ExamPanel.module.css";
 
 export default function ExamPanel({ patientId, onClose }) {
@@ -40,9 +39,9 @@ export default function ExamPanel({ patientId, onClose }) {
     try {
       const resp = await fetch(`${API_BASE_URL}/api/exams`, {
         method: "POST",
+        credentials: 'include', // Send cookies
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           patient_id: patientId,

@@ -78,7 +78,6 @@ export default function DoctorProfile({ onNavigate }) {
         credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           phone: form.phone,
@@ -109,7 +108,6 @@ export default function DoctorProfile({ onNavigate }) {
         credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ dark_mode: newDarkMode }),
       });

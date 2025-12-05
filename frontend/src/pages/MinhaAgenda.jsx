@@ -97,7 +97,6 @@ export default function MinhaAgenda({ onNavigate }) {
         credentials: 'include', // Send cookies
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ reason: cancelReason || "Cancelado pelo paciente" }),
       });
