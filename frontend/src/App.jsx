@@ -62,20 +62,34 @@ function ThemeProvider({ children }) {
 
 // Protected Route Component
 function ProtectedRoute({ children, adminOnly = false }) {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading, role } = useAuth();
+  const location = useLocation();
+
+  console.log('[ProtectedRoute] Checking access:', {
+    path: location.pathname,
+    loading,
+    isAuthenticated,
+    isAdmin,
+    role,
+    adminOnly
+  });
 
   if (loading) {
+    console.log('[ProtectedRoute] Still loading, showing loading screen');
     return <div className="loading-screen">Carregando...</div>;
   }
 
   if (!isAuthenticated) {
+    console.log('[ProtectedRoute] Not authenticated, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 
   if (adminOnly && !isAdmin) {
+    console.log('[ProtectedRoute] Admin required but user is not admin, redirecting to dashboard');
     return <Navigate to="/dashboard" replace />;
   }
 
+  console.log('[ProtectedRoute] Access granted');
   return children;
 }
 
@@ -209,7 +223,10 @@ function AppRoutes() {
             {/* Public Routes */}
             <Route path="/" element={
               isAuthenticated ? (
-                <Navigate to={isAdmin ? "/painel-medico" : "/dashboard"} replace />
+                (() => {
+                  console.log('[App] Home route redirect:', { isAuthenticated, isAdmin, redirectTo: isAdmin ? '/painel-medico' : '/dashboard' });
+                  return <Navigate to={isAdmin ? "/painel-medico" : "/dashboard"} replace />;
+                })()
               ) : (
                 <PageTransition><Home onNavigate={handleNavigate} /></PageTransition>
               )

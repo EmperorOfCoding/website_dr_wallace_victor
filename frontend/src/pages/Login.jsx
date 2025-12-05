@@ -37,14 +37,34 @@ export default function Login({ onNavigate }) {
         throw new Error(data.message || "Falha no login.");
       }
 
+      console.log('[Login] Login successful, response data:', {
+        isAdminMode,
+        hasAdmin: !!data.admin,
+        hasPatient: !!data.patient,
+        adminRole: data.admin?.role,
+        responseStatus: response.status
+      });
+
       // Verify we have user data before login and pass correct structure to AuthContext
       if (isAdminMode && data.admin) {
         // Admin login: pass admin data as 'admin' property
+        console.log('[Login] Calling login() for admin with data:', {
+          id: data.admin.id,
+          name: data.admin.name,
+          role: data.admin.role,
+          doctor_id: data.admin.doctor_id
+        });
+
         login({ 
           admin: data.admin,
         });
       } else if (!isAdminMode && data.patient) {
         // Patient login: pass patient data as 'patient' property
+        console.log('[Login] Calling login() for patient with data:', {
+          id: data.patient.id,
+          name: data.patient.name
+        });
+
         login({ 
           patient: data.patient,
         });
@@ -54,14 +74,21 @@ export default function Login({ onNavigate }) {
       
       setStatus("Login realizado com sucesso.");
       
-      // Small delay before navigation to ensure state is updated
+      console.log('[Login] Waiting before navigation...', {
+        isAdminMode,
+        targetRoute: isAdminMode ? 'painel-medico' : 'dashboard',
+        timestamp: new Date().toISOString()
+      });
+
+      // Increased delay for mobile browsers to ensure state updates complete
       setTimeout(() => {
+        console.log('[Login] Navigating to:', isAdminMode ? 'painel-medico' : 'dashboard');
         if (isAdminMode) {
           onNavigate("painel-medico");
         } else {
           onNavigate("dashboard");
         }
-      }, 100);
+      }, 200);
     } catch (err) {
       setError(err.message || "Erro ao conectar com o servidor.");
       setStatus("");

@@ -57,9 +57,12 @@ export function AuthProvider({ children }) {
         }
 
         // Restore session (cookie will be validated on next API call)
-        if (process.env.NODE_ENV === 'development') {
-          console.info('[Auth] Restored session from sessionStorage');
-        }
+        console.log('[Auth] Restored session from sessionStorage:', {
+          hasPatient: !!parsed.patient,
+          patientId: parsed.patient?.id,
+          role: parsed.role,
+          isAdmin: parsed.role === 'admin'
+        });
         setPatient(parsed.patient || null);
         setRole(parsed.role || decodeRoleFromPatient(parsed.patient));
         
@@ -80,18 +83,43 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (patient) {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ patient, role }));
+      const sessionData = { patient, role };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
+      console.log('[Auth] SessionStorage updated:', {
+        patientId: patient.id,
+        role: role,
+        isAdmin: role === 'admin'
+      });
     } else {
       sessionStorage.removeItem(STORAGE_KEY);
+      console.log('[Auth] SessionStorage cleared');
     }
   }, [patient, role]);
 
   const login = (session) => {
     // session now only contains patient/admin data (no token)
     // Token is stored as httpOnly cookie by the server
+    console.log('[Auth] Login called with session:', {
+      hasPatient: !!session.patient,
+      hasAdmin: !!session.admin,
+      patientRole: session.patient?.role,
+      adminRole: session.admin?.role,
+      sessionKeys: Object.keys(session)
+    });
+
     const nextRole = session.patient?.role || session.admin?.role || decodeRoleFromPatient(session.patient || session.admin);
-    setPatient(session.patient || session.admin);
+    const userData = session.patient || session.admin;
+    
+    console.log('[Auth] Setting authentication state:', {
+      userData: userData ? { id: userData.id, name: userData.name, email: userData.email } : null,
+      determinedRole: nextRole,
+      isAdmin: nextRole === 'admin'
+    });
+
+    setPatient(userData);
     setRole(nextRole);
+    
+    console.log('[Auth] Login completed, state updated');
   };
 
   const logout = async () => {
