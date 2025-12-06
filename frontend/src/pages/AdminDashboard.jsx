@@ -16,7 +16,14 @@ export default function AdminDashboard({ onNavigate }) {
   const [selectedPatientForExams, setSelectedPatientForExams] = useState(null);
 
   useEffect(() => {
-    loadDashboardData();
+    // Small delay to ensure cookie is registered on mobile browsers
+    // Mobile browsers need time to process cross-origin cookies (SameSite=None)
+    // after login before making authenticated API calls
+    const timer = setTimeout(() => {
+      loadDashboardData();
+    }, 300); // 300ms is sufficient for cookie registration
+    
+    return () => clearTimeout(timer);
   }, []);
 
   async function loadDashboardData() {
