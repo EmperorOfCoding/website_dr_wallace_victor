@@ -8,12 +8,27 @@ ensureJwtSecret();
 
 async function authAdmin(req, res, next) {
   try {
+    // DEBUG: Log what we're receiving
+    console.log('[authAdmin] Request details:', {
+      path: req.path,
+      method: req.method,
+      origin: req.headers.origin,
+      hasCookies: !!req.cookies,
+      cookieKeys: req.cookies ? Object.keys(req.cookies) : [],
+      hasAuthCookie: !!(req.cookies && req.cookies.auth_token),
+      hasAuthHeader: !!req.headers.authorization,
+      userAgent: req.headers['user-agent']?.substring(0, 50)
+    });
+
     // Get token from cookie or Authorization header
     const token = getAuthToken(req);
 
     if (!token) {
+      console.log('[authAdmin] No token found - returning 401');
       return res.status(401).json({ status: 'error', message: 'Acesso não autorizado.' });
     }
+
+    console.log('[authAdmin] Token found, verifying...');
 
     let payload;
     try {
