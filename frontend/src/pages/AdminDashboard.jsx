@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import ExamPanel from "../components/ExamPanel";
 import ProtectedAdmin from "../components/ProtectedAdmin";
+import { useAuth } from "../context/AuthContext";
 import { apiGet } from "../utils/api";
 import styles from "./AdminDashboard.module.css";
 
@@ -14,6 +15,7 @@ export default function AdminDashboard({ onNavigate }) {
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPatientForExams, setSelectedPatientForExams] = useState(null);
+  const { token } = useAuth(); // Get token for Authorization header (mobile fallback)
 
   useEffect(() => {
     // Small delay to ensure cookie is registered on mobile browsers
@@ -29,12 +31,12 @@ export default function AdminDashboard({ onNavigate }) {
   async function loadDashboardData() {
     setLoading(true);
     try {
-      // Load appointments
-      const apptResp = await apiGet('/api/admin/appointments?limit=5');
+      // Load appointments - pass token for Authorization header (mobile fallback)
+      const apptResp = await apiGet('/api/admin/appointments?limit=5', token);
       const apptData = await apptResp.json().catch(() => ({}));
       
-      // Load patients count
-      const patientsResp = await apiGet('/api/admin/patients');
+      // Load patients count - pass token for Authorization header (mobile fallback)
+      const patientsResp = await apiGet('/api/admin/patients', token);
       const patientsData = await patientsResp.json().catch(() => ({}));
 
       if (apptResp.ok) {

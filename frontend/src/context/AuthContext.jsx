@@ -30,6 +30,7 @@ export function AuthProvider({ children }) {
   const [patient, setPatient] = useState(null);
   const [role, setRole] = useState("patient");
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(null); // Store token for Authorization header fallback
 
   useEffect(() => {
     // Initialize authentication state from sessionStorage
@@ -61,9 +62,11 @@ export function AuthProvider({ children }) {
           hasPatient: !!parsed.patient,
           patientId: parsed.patient?.id,
           role: parsed.role,
-          isAdmin: parsed.role === 'admin'
+          isAdmin: parsed.role === 'admin',
+          hasToken: !!parsed.token
         });
         setPatient(parsed.patient || null);
+        setToken(parsed.token || null);
         setRole(parsed.role || decodeRoleFromPatient(parsed.patient));
         
       } catch (error) {
@@ -72,6 +75,7 @@ export function AuthProvider({ children }) {
         sessionStorage.removeItem(STORAGE_KEY);
         setPatient(null);
         setRole("patient");
+        setToken(null);
       } finally {
         // Always set loading to false
         setLoading(false);
@@ -83,27 +87,29 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (patient) {
-      const sessionData = { patient, role };
+      const sessionData = { patient, role, token };
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
       console.log('[Auth] SessionStorage updated:', {
         patientId: patient.id,
         role: role,
-        isAdmin: role === 'admin'
+        isAdmin: role === 'admin',
+        hasToken: !!token
       });
     } else {
       sessionStorage.removeItem(STORAGE_KEY);
       console.log('[Auth] SessionStorage cleared');
     }
-  }, [patient, role]);
+  }, [patient, role, token]);
 
   const login = (session) => {
-    // session now only contains patient/admin data (no token)
-    // Token is stored as httpOnly cookie by the server
+    // session contains patient/admin data AND token (for mobile fallback)
+    // Token is stored as httpOnly cookie by the server AND returned in response
     console.log('[Auth] Login called with session:', {
       hasPatient: !!session.patient,
       hasAdmin: !!session.admin,
       patientRole: session.patient?.role,
       adminRole: session.admin?.role,
+      hasToken: !!session.token,
       sessionKeys: Object.keys(session)
     });
 
@@ -113,24 +119,27 @@ export function AuthProvider({ children }) {
     console.log('[Auth] Setting authentication state:', {
       userData: userData ? { id: userData.id, name: userData.name, email: userData.email } : null,
       determinedRole: nextRole,
-      isAdmin: nextRole === 'admin'
+      isAdmin: nextRole === 'admin',
+      hasToken: !!session.token
     });
 
     // CRITICAL: Save to sessionStorage synchronously BEFORE state updates
     // This prevents race condition on mobile browsers where navigation happens
     // before the useEffect has a chance to save the state
     if (userData) {
-      const sessionData = { patient: userData, role: nextRole };
+      const sessionData = { patient: userData, role: nextRole, token: session.token };
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
       console.log('[Auth] SessionStorage synchronously updated in login():', {
         patientId: userData.id,
         role: nextRole,
-        isAdmin: nextRole === 'admin'
+        isAdmin: nextRole === 'admin',
+        hasToken: !!session.token
       });
     }
 
     setPatient(userData);
     setRole(nextRole);
+    setToken(session.token || null);
     
     console.log('[Auth] Login completed, state updated');
   };
@@ -151,6 +160,7 @@ export function AuthProvider({ children }) {
     // Clear local state
     setPatient(null);
     setRole("patient");
+    setToken(null);
     sessionStorage.removeItem(STORAGE_KEY);
   };
 
@@ -159,12 +169,13 @@ export function AuthProvider({ children }) {
       patient,
       role,
       loading,
+      token, // Expose token for API calls
       isAuthenticated: Boolean(patient),
       isAdmin: role === "admin",
       login,
       logout,
     }),
-    [patient, role, loading]
+    [patient, role, loading, token]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

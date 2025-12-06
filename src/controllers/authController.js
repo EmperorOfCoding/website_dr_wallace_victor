@@ -76,11 +76,14 @@ async function login(req, res) {
 
     const token = authService.generateToken(patient);
 
-    // Set httpOnly cookie instead of returning token
+    // Set httpOnly cookie (primary method)
     setAuthCookie(res, token);
 
+    // ALSO return token in response for mobile browsers that block third-party cookies
+    // Backend supports both: cookie (preferred) and Authorization header (fallback)
     return res.status(200).json({
       status: 'success',
+      token, // Include token for Authorization header fallback
       patient: {
         id: patient.id,
         name: patient.name,
