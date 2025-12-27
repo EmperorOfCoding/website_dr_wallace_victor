@@ -88,3 +88,57 @@ Error: read ECONNRESET
     at Timeout._onTimeout (C:\Users\victo\OneDrive\Desktop\website_dr_wallace_victor-2\node_modules\node-cron\dist\cjs\scheduler\runner.js:70:55)
     at listOnTimeout (node:internal/timers:588:17)
     at process.processTimers (node:internal/timers:523:7)
+2025-12-22 16:39:00 [ERROR]: Failed to send notification 1: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:00 [ERROR]: Failed to send notification 2: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:00 [ERROR]: Failed to send notification 3: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:00 [ERROR]: Failed to send notification 4: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:00 [ERROR]: Failed to send notification 5: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:00 [ERROR]: Failed to send notification 6: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:00 [ERROR]: Failed to send notification 7: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:01 [ERROR]: Failed to send notification 8: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:01 [ERROR]: Failed to send notification 16: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:01 [ERROR]: Failed to send notification 17: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:01 [ERROR]: Failed to send notification 20: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:39:01 [ERROR]: Failed to send notification 21: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:41:35 [ERROR]: Failed to send confirmation for appointment 39: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:42:17 [ERROR]: Failed to send confirmation for appointment 40: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:46:46 [ERROR]: Failed to send confirmation for appointment 41: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:49:15 [ERROR]: Failed to send confirmation for appointment 42: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:49:34 [ERROR]: Failed to send cancellation for appointment 42: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+2025-12-22 16:50:08 [ERROR]: Failed to send confirmation for appointment 43: getaddrinfo ENOTFOUND smtp.example.com {"errno":-3008,"code":"EDNS","syscall":"getaddrinfo","hostname":"smtp.example.com","command":"CONN"}
+Error: getaddrinfo ENOTFOUND smtp.example.com
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
